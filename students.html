@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTU Marks System - Student Marks</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23228B22'/%3E%3Ctext x='20' y='27' font-family='Arial' font-size='16' fill='%23D4AF37' text-anchor='middle'%3ETTU%3C/text%3E%3C/svg%3E" alt="TTU Logo" class="sidebar-logo">
+                <h3>TTU Marks</h3>
+            </div>
+            
+            <div class="lecturer-info" id="lecturer-info">
+                <!-- Populated by JavaScript -->
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="/dashboard.html"><span class="nav-icon">📊</span> Dashboard</a></li>
+                    <li><a href="#" id="my-units-link"><span class="nav-icon">📚</span> My Units</a></li>
+                    <li><a href="students.html" id="upload-marks-link"><span class="nav-icon">📤</span> Upload Marks</a></li>
+                    <li><a href="#" id="logout-link"><span class="nav-icon">🚪</span> Logout</a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p>PF: <span id="pf-number"></span></p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Student Marks</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="upload-bulk-btn">📤 Upload Bulk File</button>
+                    <button class="btn btn-success" id="submit-marks-btn">✓ Submit Marks to ERP</button>
+                </div>
+            </div>
+
+            <!-- Unit Context Banner -->
+            <div class="context-banner" id="context-banner">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <!-- Marks Summary -->
+            <div class="marks-summary" id="marks-summary">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading student data...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message" class="error-message" style="display: none;"></div>
+
+            <!-- Students Table -->
+            <div class="table-container">
+                <table class="data-table" id="students-table">
+                    <thead>
+                        <tr>
+                            <th>Reg No</th>
+                            <th>Student Name</th>
+                            <th>CAT Marks (<span id="cat-max"></span>)</th>
+                            <th>Exam Marks (<span id="exam-max"></span>)</th>
+                            <th>Final Marks</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table-body">
+                        <tr>
+                            <td colspan="7" class="text-center">Select a unit to view students</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Marks Modal -->
+    <div id="edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Marks</h3>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="edit-marks-form">
+                    <input type="hidden" id="edit-regno">
+                    <div class="form-group">
+                        <label>Student Name:</label>
+                        <p id="edit-student-name" class="form-text"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-cat">CAT Marks (Max: <span id="edit-cat-max"></span>):</label>
+                        <input type="number" id="edit-cat" class="form-control" min="0" max="100" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-exam">Exam Marks (Max: <span id="edit-exam-max"></span>):</label>
+                        <input type="number" id="edit-exam" class="form-control" min="0" max="100" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label>Final Marks:</label>
+                        <p id="edit-final" class="form-text"></p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancel-edit">Cancel</button>
+                <button class="btn btn-primary" id="save-edit">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/students.js"></script>
+</body>
+</html>

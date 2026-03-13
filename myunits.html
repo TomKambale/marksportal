@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTU Marks System - My Units</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23228B22'/%3E%3Ctext x='20' y='27' font-family='Arial' font-size='16' fill='%23D4AF37' text-anchor='middle'%3ETTU%3C/text%3E%3C/svg%3E" alt="TTU Logo" class="sidebar-logo">
+                <h3>TTU Marks</h3>
+            </div>
+            
+            <div class="lecturer-info" id="lecturer-info">
+                <!-- Populated by JavaScript -->
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="/dashboard.html"><span class="nav-icon">📊</span> Dashboard</a></li>
+                    <li><a href="/myunits.html" class="active"><span class="nav-icon">📚</span> My Units</a></li>
+                    <li><a href="#" id="upload-marks-link"><span class="nav-icon">📤</span> Upload Marks</a></li>
+                    <li><a href="#" id="logout-link"><span class="nav-icon">🚪</span> Logout</a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p>PF: <span id="pf-number"></span></p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Breadcrumb Navigation -->
+            <nav class="breadcrumb-nav" aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dashboard.html">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">My Units</li>
+                </ol>
+            </nav>
+
+            <div class="content-header">
+                <div>
+                    <h1>My Units</h1>
+                    <p class="text-muted">View all units assigned to you across all semesters</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="refresh-btn">
+                        <span class="btn-icon">🔄</span> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="filters-card">
+                <div class="filters-header">
+                    <h3>Filter Units</h3>
+                    <span class="filter-badge" id="active-filters-count">0 filters active</span>
+                </div>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label for="semester-filter">
+                            <span class="label-icon">📅</span> Semester
+                        </label>
+                        <select id="semester-filter" class="form-control">
+                            <option value="">All Semesters</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="stage-filter">
+                            <span class="label-icon">📊</span> Stage
+                        </label>
+                        <select id="stage-filter" class="form-control" disabled>
+                            <option value="">All Stages</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="programme-filter">
+                            <span class="label-icon">🎓</span> Programme
+                        </label>
+                        <select id="programme-filter" class="form-control">
+                            <option value="">All Programmes</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="status-filter">
+                            <span class="label-icon">⚡</span> Status
+                        </label>
+                        <select id="status-filter" class="form-control">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Submitted">Submitted</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="search-filter">
+                            <span class="label-icon">🔍</span> Search
+                        </label>
+                        <input type="text" id="search-filter" class="form-control" placeholder="Search by unit code or name...">
+                    </div>
+                </div>
+                
+                <div class="filters-actions">
+                    <button class="btn btn-secondary btn-sm" id="clear-filters-btn">
+                        <span class="btn-icon">🗑️</span> Clear Filters
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="apply-filters-btn">
+                        <span class="btn-icon">✅</span> Apply Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-content">
+                        <span class="stat-label">Total Units</span>
+                        <span class="stat-value" id="total-units">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-content">
+                        <span class="stat-label">Total Students</span>
+                        <span class="stat-value" id="total-students">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <span class="stat-label">Submitted</span>
+                        <span class="stat-value" id="submitted-units">0</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-content">
+                        <span class="stat-label">Pending</span>
+                        <span class="stat-value" id="pending-units">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <button class="view-btn active" data-view="grid">
+                    <span class="btn-icon">📱</span> Grid View
+                </button>
+                <button class="view-btn" data-view="list">
+                    <span class="btn-icon">📋</span> List View
+                </button>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loading-indicator" class="loading-indicator" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading your units...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message" class="error-message" style="display: none;"></div>
+
+            <!-- Units Grid View -->
+            <div id="units-grid" class="units-grid">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <!-- Units List View -->
+            <div id="units-list" class="units-list" style="display: none;">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination-container" id="pagination">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <div class="empty-state-icon">📚</div>
+                <h3>No Units Found</h3>
+                <p>You don't have any units assigned for the selected filters.</p>
+                <button class="btn btn-primary" id="clear-filters-empty-btn">Clear Filters</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Quick Actions Modal -->
+    <div id="quick-actions-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Quick Actions</h3>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div class="modal-body" id="quick-actions-body">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/myunits.js"></script>
+</body>
+</html>
