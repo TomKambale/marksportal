@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTU Marks System - Lecturer Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation (Same as before) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23228B22'/%3E%3Ctext x='20' y='27' font-family='Arial' font-size='16' fill='%23D4AF37' text-anchor='middle'%3ETTU%3C/text%3E%3C/svg%3E" alt="TTU Logo" class="sidebar-logo">
+                <h3>TTU Marks</h3>
+            </div>
+            
+            <div class="lecturer-info" id="lecturer-info"></div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="/dashboard.html" class="active"><span class="nav-icon">📊</span> Dashboard</a></li>
+                    <li><a href="/myunits.html"><span class="nav-icon">📚</span> My Units</a></li>
+                    <li><a href="/upload.html" id="upload-marks-link"><span class="nav-icon">📤</span> Upload Marks</a></li>
+                    <li><a href="#" id="logout-link"><span class="nav-icon">🚪</span> Logout</a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p>PF: <span id="pf-number"></span></p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Welcome Section with Time-based Greeting -->
+            <div class="welcome-section">
+                <div class="welcome-text">
+                    <h1 class="greeting" id="greeting-text">Hello,</h1>
+                    <h2 class="lecturer-name-display" id="lecturer-name-display"></h2>
+                    <span class="stat-value" id="current-semester">Loading...</span>
+                    <p class="date-time" id="current-datetime"></p>
+                </div>
+                <div class="quick-stats-cards">
+                    <div class="quick-stat">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Current Semester</span>
+                            <span class="stat-value" id="current-semester">Loading...</span>
+                        </div>
+                    </div>
+                    <!-- <div class="quick-stat">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <span class="stat-label">Completion Rate</span>
+                            <span class="stat-value" id="completion-rate">0%</span>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+
+            <!-- Quick Actions Bar -->
+            <div class="quick-actions-bar">
+                <button class="action-chip" id="quick-upload">
+                    <span class="chip-icon">📤</span> Quick Upload
+                </button>
+                <!-- <button class="action-chip" id="quick-view-all">
+                    <span class="chip-icon">👥</span> View All Students
+                </button> -->
+                <button class="action-chip" id="quick-download-reports">
+                    <span class="chip-icon">📊</span> Download Reports
+                </button>
+                <button class="action-chip" id="quick-help">
+                    <span class="chip-icon">❓</span><a href="mailto:support@ttu.ac.ke
+                    "></a> Help & Support
+                </button>
+            </div>
+
+            <!-- Analytics Dashboard -->
+            <div class="analytics-grid">
+                <!-- Performance Metrics Card -->
+                <div class="analytics-card metrics-card">
+                    <div class="card-header">
+                        <h3>Performance Overview</h3>
+                        <span class="period-badge">This Semester</span>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-value" id="total-units">0</div>
+                            <div class="metric-label">Total Units</div>
+                            <!-- <div class="metric-trend positive" id="units-trend">+2 from last sem</div> -->
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="total-students">0</div>
+                            <div class="metric-label">Students Enrolled</div>
+                            <!-- <div class="metric-trend positive" id="students-trend">+15% increase</div> -->
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="submitted-units">0</div>
+                            <div class="metric-label">Marks Submitted</div>
+                            <div class="metric-trend" id="submitted-trend">In progress</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-value" id="pending-units">0</div>
+                            <div class="metric-label">Pending Submission</div>
+                            <div class="metric-trend warning" id="pending-trend">Action required</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Chart Card -->
+                <!-- <div class="analytics-card chart-card">
+                    <div class="card-header">
+                        <h3>Submission Progress</h3>
+                        <div class="chart-controls">
+                            <button class="chart-control active" data-chart="weekly">Weekly</button>
+                            <button class="chart-control" data-chart="monthly">Monthly</button>
+                        </div>
+                    </div>
+                    <canvas id="submission-chart" height="200"></canvas>
+                </div> -->
+
+                <!-- Recent Activity Card -->
+                <!-- <div class="analytics-card activity-card">
+                    <div class="card-header">
+                        <h3>Recent Activity</h3>
+                        <button class="view-all-btn" id="view-all-activity">View All →</button>
+                    </div>
+                    <div class="activity-timeline" id="activity-timeline">
+                        <!-- Activity items will be populated here -->
+                    <!-- </div>
+                </div> --> 
+
+                <!-- Upcoming Deadlines Card -->
+                <div class="analytics-card deadlines-card">
+                    <div class="card-header">
+                        <h3>Upcoming Deadlines</h3>
+                        <span class="deadline-badge">⚠️ 3 this week</span>
+                    </div>
+                    <div class="deadlines-list" id="deadlines-list">
+                        <!-- Deadlines will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Sections -->
+            <!-- <div class="dashboard-tabs">
+                <button class="tab-btn active" data-tab="my-units">📚 My Units</button>
+                <button class="tab-btn" data-tab="recent-marks">📊 Recent Marks</button>
+                <button class="tab-btn" data-tab="notifications">🔔 Notifications</button>
+                <button class="tab-btn" data-tab="insights">💡 Insights</button>
+            </div> -->
+
+            <!-- My Units Tab -->
+            <!-- <div class="tab-content active" id="my-units-tab">
+                Filter Bar
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <select id="semester-select" class="form-control">
+                            <option value="">Select Semester</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="stage-select" class="form-control" disabled>
+                            <option value="">Select Stage</option>
+                        </select>
+                    </div>
+                    <div class="filter-group search-group">
+                        <input type="text" id="unit-search" class="form-control" placeholder="Search units...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-secondary btn-sm" id="clear-filters">Clear</button>
+                    </div>
+                </div>
+
+                Units Grid
+                <div id="units-grid" class="units-grid-modern">
+                    Populated by JavaScript
+                </div>
+
+                Loading State
+                <div id="units-loading" class="loading-state" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Loading your units...</p>
+                </div>
+
+                Empty State
+                <div id="units-empty" class="empty-state-modern" style="display: none;">
+                    <div class="empty-icon">📚</div>
+                    <h3>No Units Found</h3>
+                    <p>You don't have any units assigned for the selected filters.</p>
+                    <button class="btn btn-primary" id="reset-filters">Reset Filters</button>
+                </div>
+            </div> -->
+
+            <!-- Recent Marks Tab -->
+            <div class="tab-content" id="recent-marks-tab">
+                <div class="recent-marks-header">
+                    <h3>Recently Updated Marks</h3>
+                    <button class="btn btn-secondary btn-sm" id="refresh-marks">Refresh</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="recent-marks-table">
+                        <thead>
+                            <tr>
+                                <th>Unit Code</th>
+                                <th>Unit Name</th>
+                                <th>Student</th>
+                                <th>CAT</th>
+                                <th>Exam</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-marks-body">
+                            <tr><td colspan="8" class="text-center">Loading marks...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Notifications Tab -->
+            <div class="tab-content" id="notifications-tab">
+                <div class="notifications-header">
+                    <h3>Notifications</h3>
+                    <button class="btn btn-secondary btn-sm" id="mark-all-read">Mark all as read</button>
+                </div>
+                <div class="notifications-list" id="notifications-list">
+                    <!-- Notifications will be populated here -->
+                </div>
+            </div>
+
+            <!-- Insights Tab -->
+            <div class="tab-content" id="insights-tab">
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-icon">📈</div>
+                        <div class="insight-content">
+                            <h4>Top Performing Unit</h4>
+                            <p class="insight-value" id="top-unit">Loading...</p>
+                            <small>Based on average marks</small>
+                        </div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-icon">⚠️</div>
+                        <div class="insight-content">
+                            <h4>At-Risk Students</h4>
+                            <p class="insight-value" id="at-risk-count">0</p>
+                            <small>Students below 40%</small>
+                        </div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-icon">⭐</div>
+                        <div class="insight-content">
+                            <h4>High Achievers</h4>
+                            <p class="insight-value" id="high-achievers">0</p>
+                            <small>Students above 70%</small>
+                        </div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-icon">📊</div>
+                        <div class="insight-content">
+                            <h4>Average Class Score</h4>
+                            <p class="insight-value" id="avg-score">0%</p>
+                            <small>Across all units</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Quick Upload Modal -->
+    <div id="quick-upload-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Quick Upload</h3>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="unit-selector">
+                    <label>Select Unit to Upload</label>
+                    <select id="modal-unit-select" class="form-control"></select>
+                </div>
+                <div class="upload-area-mini" id="modal-upload-area">
+                    <div class="upload-icon">📁</div>
+                    <p>Drag file here or click to browse</p>
+                    <input type="file" id="modal-file-input" accept=".csv,.xlsx,.xls" style="display: none;">
+                    <button class="btn btn-secondary btn-sm" id="modal-browse-btn">Browse Files</button>
+                </div>
+                <div id="modal-upload-preview" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+                <button class="btn btn-primary" id="modal-upload" disabled>Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>

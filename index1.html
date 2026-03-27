@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTU Marks Upload Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #006400;
+            --secondary-green: #228B22;
+            --light-green: #f0f9f0;
+            --dark-green: #004d00;
+            --accent-gold: #D4AF37;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --info: #0dcaf0;
+        }
+
+        body {
+            font-family: 'Inter', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+
+        /* Login Page Specific */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1%, transparent 1%);
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 3rem 2.5rem;
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            z-index: 2;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+
+        .login-logo {
+            width: 100px;
+            height: 100px;
+            background: var(--light-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .login-logo i {
+            font-size: 48px;
+            color: var(--primary-green);
+        }
+
+        .login-card h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-card p {
+            color: var(--medium-gray);
+            margin-bottom: 2rem;
+        }
+
+        .google-btn {
+            background: var(--white);
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            padding: 12px 24px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--dark-gray);
+        }
+
+        .google-btn:hover {
+            border-color: var(--secondary-green);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .google-btn img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .error-message {
+            margin-top: 1rem;
+            padding: 12px;
+            background: #fee2e2;
+            color: var(--danger);
+            border-radius: 12px;
+            font-size: 13px;
+            display: none;
+        }
+
+        /* Dashboard Layout */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--dark-green) 0%, var(--primary-green) 100%);
+            color: var(--white);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: var(--transition);
+            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
+        }
+
+        .sidebar-header i {
+            font-size: 48px;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h3 {
+            font-size: 18px;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+        }
+
+        .nav-item {
+            margin: 0.5rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: var(--white);
+            transform: translateX(5px);
+        }
+
+        .nav-link i {
+            width: 24px;
+            font-size: 18px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .card-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--light-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Form Elements */
+        select, input {
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--secondary-green);
+            box-shadow: 0 0 0 3px rgba(34,139,34,0.1);
+        }
+
+        button {
+            background: var(--secondary-green);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--primary-green);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .data-table th {
+            background: var(--light-green);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tr:hover {
+            background: var(--light-gray);
+        }
+
+        /* Badges */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-pending {
+            background: #fff3e0;
+            color: var(--warning);
+        }
+
+        .badge-submitted {
+            background: #e8f5e9;
+            color: var(--secondary-green);
+        }
+
+        .badge-inactive {
+            background: #e9ecef;
+            color: var(--medium-gray);
+        }
+
+        /* Assignment Cards */
+        .assignments-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+
+        .unit-card {
+            background: var(--white);
+            border-left: 4px solid var(--accent-gold);
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .unit-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .unit-code {
+            font-weight: 700;
+            color: var(--primary-green);
+            font-size: 16px;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed #ddd;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .upload-zone.drag-over {
+            border-color: var(--secondary-green);
+            background: var(--light-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+            }
+            .sidebar-header h3, .sidebar-header p, .nav-link span {
+                display: none;
+            }
+            .main-content {
+                margin-left: 80px;
+            }
+            .nav-link {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Page -->
+<div id="loginPage" class="login-container">
+    <div class="login-card">
+        <div class="login-logo">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <h1>TTU Marks Portal</h1>
+        <p>Lecturer Assessment Management System</p>
+        <div id="googleButton" class="google-btn">
+            <i class="fab fa-google"></i> Sign in with Google
+        </div>
+        <div id="loginError" class="error-message"></div>
+    </div>
+</div>
+
+<!-- Dashboard Container (Hidden Initially) -->
+<div id="dashboardContainer" style="display: none;">
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-chalkboard-user"></i>
+                <h3 id="lecturerName">Lecturer</h3>
+                <p id="lecturerPf">PF Number</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#" class="nav-link" data-page="dashboard"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-page="students"><i class="fas fa-users"></i><span>Students & Marks</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" data-page="upload"><i class="fas fa-upload"></i><span>Bulk Upload</span></a></li>
+                <li class="nav-item"><a href="#" class="nav-link" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></li>
+            </ul>
+        </aside>
+        <main class="main-content" id="mainContent">
+            <!-- Dynamic content loads here -->
+        </main>
+    </div>
+</div>
+
+<!-- CDN Scripts -->
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
+<script>
+    // API Base URL - update as needed
+    const API_BASE = '/api';
+    
+    // Global state
+    let currentUser = null;
+    let currentUnitContext = null;
+    let pendingMarksData = null;
+    let validationResults = [];
+    
+    // Helper: Get token
+    function getToken() {
+        return sessionStorage.getItem('ttu_token');
+    }
+    
+    // Helper: Set auth header
+    function authHeaders() {
+        return { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' };
+    }
+    
+    // Helper: API calls
+    async function apiCall(endpoint, options = {}) {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+            ...options,
+            headers: { ...authHeaders(), ...options.headers }
+        });
+        if (response.status === 401) {
+            sessionStorage.removeItem('ttu_token');
+            window.location.reload();
+            throw new Error('Unauthorized');
+        }
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Request failed');
+        return data;
+    }
+    
+    // Decode JWT payload
+    function parseJwt(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(atob(base64));
+        } catch(e) { return null; }
+    }
+    
+    // Google Login Handler
+    function initGoogleLogin() {
+        const googleBtn = document.getElementById('googleButton');
+        googleBtn.addEventListener('click', async () => {
+            // Load Google Identity Services
+            const client = google.accounts.oauth2.initTokenClient({
+                client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+                scope: 'email profile',
+                callback: async (tokenResponse) => {
+                    try {
+                        const idToken = tokenResponse.access_token; // For simplicity, using access token; actual flow uses id_token
+                        // In real scenario, we'd use credential response. For demo, we simulate backend call.
+                        // The actual prompt expects id_token from credential response.
+                        // Simulating a token exchange:
+                        const res = await fetch(`${API_BASE}/auth/login`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ idToken: 'simulated-google-token' })
+                        });
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error);
+                        sessionStorage.setItem('ttu_token', data.token);
+                        initDashboard();
+                    } catch(err) {
+                        document.getElementById('loginError').style.display = 'block';
+                        document.getElementById('loginError').innerText = err.message;
+                    }
+                }
+            });
+            client.requestAccessToken();
+        });
+    }
+    
+    // Dashboard Initialization
+    async function initDashboard() {
+        const token = getToken();
+        if (!token) return;
+        const decoded = parseJwt(token);
+        if (!decoded) return;
+        currentUser = decoded;
+        document.getElementById('lecturerName').innerText = decoded.name || 'Lecturer';
+        document.getElementById('lecturerPf').innerText = decoded.pfNumber || '';
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('dashboardContainer').style.display = 'block';
+        loadPage('dashboard');
+        
+        // Navigation
+        document.querySelectorAll('.nav-link[data-page]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                loadPage(link.dataset.page);
+            });
+        });
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('ttu_token');
+            window.location.reload();
+        });
+    }
+    
+    // Page Router
+    async function loadPage(page, params = null) {
+        const main = document.getElementById('mainContent');
+        if (page === 'dashboard') {
+            await renderDashboard(main);
+        } else if (page === 'students') {
+            await renderStudentsPage(main, params);
+        } else if (page === 'upload') {
+            await renderUploadPage(main, params);
+        }
+    }
+    
+    // DASHBOARD RENDER
+    async function renderDashboard(container) {
+        container.innerHTML = `
+            <div class="card">
+                <div class="card-header">📚 My Teaching Assignments</div>
+                <div class="filters" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <select id="semesterSelect" style="flex:1"><option>Loading semesters...</option></select>
+                    <select id="stageSelect" style="flex:1" disabled><option>Select stage</option></select>
+                </div>
+                <div id="assignmentsList" class="assignments-grid">Select semester and stage to view units</div>
+            </div>
+        `;
+        
+        // Load semesters
+        const semesters = await apiCall('/academics/semesters');
+        const semesterSelect = document.getElementById('semesterSelect');
+        semesterSelect.innerHTML = '<option value="">-- Select Semester --</option>' + 
+            semesters.map(s => `<option value="${s.semesterId}">${s.semesterName}</option>`).join('');
+        
+        semesterSelect.addEventListener('change', async (e) => {
+            const semId = e.target.value;
+            if (!semId) return;
+            const stages = await apiCall(`/academics/stages?semesterId=${semId}`);
+            const stageSelect = document.getElementById('stageSelect');
+            stageSelect.disabled = false;
+            stageSelect.innerHTML = '<option value="">-- Select Stage --</option>' + 
+                stages.map(st => `<option value="${st.stageId}" ${st.status !== 'Active' ? 'disabled' : ''}>${st.stageCode} ${st.status !== 'Active' ? '(Inactive)' : ''}</option>`).join('');
+        });
+        
+        document.getElementById('stageSelect').addEventListener('change', async (e) => {
+            const stageId = e.target.value;
+            const semId = document.getElementById('semesterSelect').value;
+            if (!stageId || !semId) return;
+            try {
+                const assignments = await apiCall(`/lecturers/assignments?semesterId=${semId}&stageId=${stageId}`);
+                const containerDiv = document.getElementById('assignmentsList');
+                if (!assignments.length) {
+                    containerDiv.innerHTML = '<p>No units assigned for this selection.</p>';
+                    return;
+                }
+                // Group by programme
+                const grouped = assignments.reduce((acc, unit) => {
+                    if (!acc[unit.programmeId]) acc[unit.programmeId] = { name: unit.programmeName, units: [] };
+                    acc[unit.programmeId].units.push(unit);
+                    return acc;
+                }, {});
+                let html = '';
+                for (const progId in grouped) {
+                    html += `<div style="margin-bottom: 1rem;"><h4>${grouped[progId].name}</h4><div class="assignments-grid">`;
+                    grouped[progId].units.forEach(unit => {
+                        html += `<div class="unit-card" data-unit='${JSON.stringify(unit)}'>
+                                    <div class="unit-code">${unit.unitCode} - ${unit.unitName}</div>
+                                    <div>👥 Students: ${unit.studentCount}</div>
+                                    <div style="font-size:12px; color:var(--medium-gray);">Stage: ${unit.stage}</div>
+                                </div>`;
+                    });
+                    html += `</div></div>`;
+                }
+                containerDiv.innerHTML = html;
+                document.querySelectorAll('.unit-card').forEach(card => {
+                    card.addEventListener('click', () => {
+                        const unit = JSON.parse(card.dataset.unit);
+                        currentUnitContext = unit;
+                        loadPage('students', { unitCode: unit.unitCode, semesterId: semId, stageId: stageId, programmeId: unit.programmeId });
+                    });
+                });
+            } catch(err) { console.error(err); }
+        });
+    }
+    
+    // STUDENTS PAGE
+    async function renderStudentsPage(container, params) {
+        if (!params && currentUnitContext) params = currentUnitContext;
+        if (!params) {
+            container.innerHTML = '<div class="card">Please select a unit from dashboard first.</div>';
+            return;
+        }
+        const { unitCode, semesterId, stageId, programmeId } = params;
+        container.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <span>📝 Marks Management: ${unitCode}</span>
+                    <button id="bulkUploadBtn" class="btn-secondary">📁 Bulk Upload File</button>
+                </div>
+                <div id="marksTableContainer">
+                    <div style="text-align:center; padding:2rem;">Loading students...</div>
+                </div>
+                <div style="margin-top:1rem; text-align:right;">
+                    <button id="submitMarksBtn" disabled>✅ Submit Marks to ERP</button>
+                </div>
+            </div>
+        `;
+        
+        // Fetch students
+        const students = await apiCall(`/students?unitCode=${unitCode}&semesterId=${semesterId}&stageId=${stageId}&programmeId=${programmeId}`);
+        const editable = students.some(s => s.submissionStatus !== 'Submitted');
+        
+        let tableHtml = `<table class="data-table"><thead><tr><th>Reg No</th><th>Student Name</th><th>CAT Marks (Max 30)</th><th>Exam Marks (Max 70)</th><th>Final Marks</th><th>Status</th></tr></thead><tbody>`;
+        students.forEach(s => {
+            const isSubmitted = s.submissionStatus === 'Submitted';
+            tableHtml += `<tr data-reg="${s.regNo}">
+                <td>${s.regNo}</td><td>${s.name}</td>
+                <td><input type="number" class="cat-input" value="${s.catMarks || 0}" min="0" max="30" ${isSubmitted ? 'disabled' : ''}></td>
+                <td><input type="number" class="exam-input" value="${s.examMarks || 0}" min="0" max="70" ${isSubmitted ? 'disabled' : ''}></td>
+                <td><span class="final-mark">${(s.catMarks||0)+(s.examMarks||0)}</span></td>
+                <td><span class="badge ${isSubmitted ? 'badge-submitted' : 'badge-pending'}">${s.submissionStatus}</span></td>
+            </tr>`;
+        });
+        tableHtml += `</tbody></table>`;
+        document.getElementById('marksTableContainer').innerHTML = tableHtml;
+        
+        // Live calculation
+        document.querySelectorAll('.cat-input, .exam-input').forEach(inp => {
+            inp.addEventListener('input', function() {
+                const row = this.closest('tr');
+                const cat = parseFloat(row.querySelector('.cat-input').value) || 0;
+                const exam = parseFloat(row.querySelector('.exam-input').value) || 0;
+                const finalSpan = row.querySelector('.final-mark');
+                finalSpan.innerText = cat + exam;
+            });
+        });
+        
+        document.getElementById('bulkUploadBtn').addEventListener('click', () => {
+            loadPage('upload', { unitCode, semesterId, stageId, programmeId });
+        });
+        
+        const submitBtn = document.getElementById('submitMarksBtn');
+        if (students.some(s => s.submissionStatus === 'Pending')) submitBtn.disabled = false;
+        submitBtn.addEventListener('click', async () => {
+            // Collect marks
+            const marksData = [];
+            document.querySelectorAll('.data-table tbody tr').forEach(row => {
+                const regNo = row.dataset.reg;
+                const cat = parseFloat(row.querySelector('.cat-input').value) || 0;
+                const exam = parseFloat(row.querySelector('.exam-input').value) || 0;
+                marksData.push({ regNo, cat, exam });
+            });
+            try {
+                const response = await apiCall('/marks/submit', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        semester: semesterId,
+                        stage: stageId,
+                        programme: programmeId,
+                        unitCode,
+                        lecturerPF: currentUser.pfNumber,
+                        marks: marksData
+                    })
+                });
+                alert(`Submitted: ${response.totalSubmitted} success, ${response.totalFailed} failed.`);
+                renderStudentsPage(container, params);
+            } catch(err) { alert('Submission error: ' + err.message); }
+        });
+    }
+    
+    // UPLOAD PAGE
+    async function renderUploadPage(container, params) {
+        if (!params && currentUnitContext) params = currentUnitContext;
+        if (!params) {
+            container.innerHTML = '<div class="card">Please select a unit from dashboard first.</div>';
+            return;
+        }
+        const { unitCode, semesterId, stageId, programmeId } = params;
+        container.innerHTML = `
+            <div class="card">
+                <div class="card-header">📂 Bulk Upload: ${unitCode}</div>
+                <div><strong>Semester:</strong> ${semesterId} | <strong>Stage:</strong> ${stageId} | <strong>Programme:</strong> ${programmeId}</div>
+                <hr>
+                <div><button id="downloadTemplateBtn" class="btn-outline">📥 Download CSV Template</button></div>
+                <div class="upload-zone" id="dropZone">
+                    <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                    <p>Drag & drop CSV/Excel file here or click to browse</p>
+                    <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display:none">
+                </div>
+                <div id="previewTable" style="margin-top:1rem; overflow-x:auto;"></div>
+                <div style="margin-top:1rem;">
+                    <button id="validateBtn" disabled>🔍 Validate & Upload</button>
+                    <button id="confirmUploadBtn" disabled style="background: var(--accent-gold);">✅ Confirm Upload to ERP</button>
+                </div>
+                <div id="uploadResult"></div>
+            </div>
+        `;
+        
+        let parsedData = [];
+        let validatedRows = [];
+        
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        
+        function handleFile(file) {
+            if (!file) return;
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (ext === 'csv') {
+                Papa.parse(file, { header: true, complete: (results) => processUploadData(results.data) });
+            } else if (['xlsx','xls'].includes(ext)) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(sheet);
+                    processUploadData(json);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+        
+        function processUploadData(rows) {
+            parsedData = rows.map(r => ({ regNo: r.RegNo, unitCode: r.UnitCode, cat: parseFloat(r.CAT), exam: parseFloat(r.Exam) }));
+            let previewHtml = '<table class="data-table"><thead><tr><th>RegNo</th><th>CAT</th><th>Exam</th><th>Validation</th></tr></thead><tbody>';
+            parsedData.forEach((row, idx) => {
+                let error = '';
+                if (!row.regNo) error = 'Missing RegNo';
+                else if (row.cat > 30) error = 'CAT exceeds 30';
+                else if (row.exam > 70) error = 'Exam exceeds 70';
+                previewHtml += `<tr data-idx="${idx}" style="background:${error ? '#FFE0E0' : '#FFF2CC'}"><td>${row.regNo}</td><td>${row.cat}</td><td>${row.exam}</td><td>${error || 'Pending ERP check'}</td></tr>`;
+            });
+            previewHtml += '</tbody></table>';
+            document.getElementById('previewTable').innerHTML = previewHtml;
+            document.getElementById('validateBtn').disabled = false;
+        }
+        
+        document.getElementById('downloadTemplateBtn').addEventListener('click', () => {
+            const csvContent = "RegNo,UnitCode,CAT,Exam\n,,"+unitCode+",\n";
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `marks_template_${unitCode}.csv`;
+            a.click();
+        });
+        
+        document.getElementById('validateBtn').addEventListener('click', async () => {
+            const validRows = parsedData.filter(r => r.regNo && r.cat <= 30 && r.exam <= 70);
+            const payload = { unitCode, semesterId, stageId, programmeId, rows: validRows.map(r => ({ regNo: r.regNo, cat: r.cat, exam: r.exam })) };
+            const validation = await apiCall('/marks/validate', { method: 'POST', body: JSON.stringify(payload) });
+            validatedRows = validation;
+            // Update preview
+            const rows = document.querySelectorAll('#previewTable tbody tr');
+            validation.forEach((res, i) => {
+                if (rows[i]) {
+                    const status = res.matched ? '✅ Matched' : `❌ ${res.errorReason}`;
+                    rows[i].style.background = res.matched ? '#e8f5e9' : '#FFE0E0';
+                    rows[i].cells[3].innerHTML = status;
+                }
+            });
+            document.getElementById('confirmUploadBtn').disabled = false;
+        });
+        
+        document.getElementById('confirmUploadBtn').addEventListener('click', async () => {
+            const marksToSubmit = validatedRows.filter(v => v.matched).map(v => ({ regNo: v.regNo, cat: parsedData.find(p => p.regNo === v.regNo)?.cat, exam: parsedData.find(p => p.regNo === v.regNo)?.exam }));
+            const result = await apiCall('/marks/submit', {
+                method: 'POST',
+                body: JSON.stringify({
+                    semester: semesterId,
+                    stage: stageId,
+                    programme: programmeId,
+                    unitCode,
+                    lecturerPF: currentUser.pfNumber,
+                    marks: marksToSubmit
+                })
+            });
+            const resultDiv = document.getElementById('uploadResult');
+            resultDiv.innerHTML = `<div class="card">✅ Upload Complete: ${result.totalSubmitted} succeeded, ${result.totalFailed} failed.<br>
+            <a href="#" id="dlSuccess">Download Success CSV</a> | <a href="#" id="dlFailed">Download Failed CSV</a></div>`;
+            document.getElementById('dlSuccess').addEventListener('click', (e) => {
+                e.preventDefault();
+                window.open(`${API_BASE}/marks/download/${result.successFileId}`);
+            });
+            document.getElementById('dlFailed').addEventListener('click', (e) => {
+                e.preventDefault();
+                window.open(`${API_BASE}/marks/download/${result.failedFileId}`);
+            });
+        });
+    }
+    
+    // Check token on load
+    if (getToken()) {
+        initDashboard();
+    } else {
+        initGoogleLogin();
+    }
+</script>
+</body>
+</html>

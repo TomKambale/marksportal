@@ -3,9 +3,8 @@
    Version: 2.0
 */
 
-/* ==========================================================================
-   CSS Variables & Design Tokens
-   ========================================================================== */
+/*   CSS Variables & Design Tokens
+*/
 :root {
     /* Primary Colors - TTU Brand */
     --primary-50: #e8f5e8;
@@ -100,9 +99,8 @@
     --container-padding: 2rem;
 }
 
-/* ==========================================================================
-   Reset & Base Styles
-   ========================================================================== */
+/*   Reset & Base Styles
+*/
 *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -124,9 +122,8 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* ==========================================================================
-   Typography
-   ========================================================================== */
+/*   Typography
+*/
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     line-height: 1.3;
@@ -152,9 +149,8 @@ h6 { font-size: 0.875rem; }
     font-size: 1rem;
 }
 
-/* ==========================================================================
-   Login Page - Modern Centered Layout
-   ========================================================================== */
+/*   Login Page - Modern Centered Layout
+*/
 .login-body {
     min-height: 100vh;
     display: flex;
@@ -295,9 +291,8 @@ h6 { font-size: 0.875rem; }
     margin: 0.25rem 0;
 }
 
-/* ==========================================================================
-   App Container & Sidebar Layout
-   ========================================================================== */
+/*   App Container & Sidebar Layout
+*/
 .app-container {
     display: flex;
     min-height: 100vh;
@@ -473,9 +468,8 @@ h6 { font-size: 0.875rem; }
     transition: var(--transition-smooth);
 }
 
-/* ==========================================================================
-   Content Header
-   ========================================================================== */
+/*   Content Header
+*/
 .content-header {
     display: flex;
     justify-content: space-between;
@@ -502,9 +496,8 @@ h6 { font-size: 0.875rem; }
     gap: 0.75rem;
 }
 
-/* ==========================================================================
-   Filters Section
-   ========================================================================== */
+/*   Filters Section
+*/
 .filters-section {
     background: white;
     padding: 1.5rem;
@@ -531,9 +524,8 @@ h6 { font-size: 0.875rem; }
     letter-spacing: 0.02em;
 }
 
-/* ==========================================================================
-   Form Controls - Modern Design
-   ========================================================================== */
+/*   Form Controls - Modern Design
+*/
 .form-control {
     width: 100%;
     padding: 0.75rem 1rem;
@@ -568,9 +560,8 @@ h6 { font-size: 0.875rem; }
     background-color: var(--danger-50);
 }
 
-/* ==========================================================================
-   Button System - Modern & Consistent
-   ========================================================================== */
+/*   Button System - Modern & Consistent
+*/
 .btn {
     padding: 0.75rem 1.5rem;
     border: none;
@@ -669,9 +660,8 @@ h6 { font-size: 0.875rem; }
     font-size: 1rem;
 }
 
-/* ==========================================================================
-   Cards - Modern Glass Morphism
-   ========================================================================== */
+/*   Cards - Modern Glass Morphism
+*/
 .assignments-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -751,9 +741,8 @@ h6 { font-size: 0.875rem; }
     justify-content: flex-end;
 }
 
-/* ==========================================================================
-   Tables - Modern Data Grid
-   ========================================================================== */
+/*   Tables - Modern Data Grid
+*/
 .table-container {
     background: white;
     border-radius: var(--border-radius-xl);
@@ -847,9 +836,8 @@ h6 { font-size: 0.875rem; }
     cursor: not-allowed;
 }
 
-/* ==========================================================================
-   Badges & Status Indicators
-   ========================================================================== */
+/*   Badges & Status Indicators
+*/
 .badge {
     display: inline-flex;
     align-items: center;
@@ -900,9 +888,8 @@ h6 { font-size: 0.875rem; }
     border-color: var(--danger-500);
 }
 
-/* ==========================================================================
-   Context Banner
-   ========================================================================== */
+/*   Context Banner
+*/
 .context-banner {
     background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
     padding: 1.5rem;
@@ -949,9 +936,8 @@ h6 { font-size: 0.875rem; }
     font-weight: 500;
 }
 
-/* ==========================================================================
-   Marks Summary
-   ========================================================================== */
+/*   Marks Summary
+*/
 .marks-summary {
     background: white;
     padding: 1.25rem 1.5rem;
@@ -988,9 +974,8 @@ h6 { font-size: 0.875rem; }
     line-height: 1;
 }
 
-/* ==========================================================================
-   Loading Indicator
-   ========================================================================== */
+/*   Loading Indicator
+*/
 .loading-indicator {
     text-align: center;
     padding: 3rem;
@@ -1012,9 +997,8 @@ h6 { font-size: 0.875rem; }
     100% { transform: rotate(360deg); }
 }
 
-/* ==========================================================================
-   Upload Area - Modern Drag & Drop
-   ========================================================================== */
+/*   Upload Area - Modern Drag & Drop
+*/
 .upload-area {
     background: linear-gradient(135deg, white 0%, var(--neutral-50) 100%);
     border: 3px dashed var(--neutral-300);
@@ -1057,9 +1041,8 @@ h6 { font-size: 0.875rem; }
     color: var(--neutral-500);
 }
 
-/* ==========================================================================
-   Preview Table & Validation
-   ========================================================================== */
+/*   Preview Table & Validation
+*/
 .validation-status {
     display: inline-flex;
     align-items: center;
@@ -1102,9 +1085,8 @@ h6 { font-size: 0.875rem; }
     border-left: 4px solid var(--success-500);
 }
 
-/* ==========================================================================
-   Modal - Modern Dialog
-   ========================================================================== */
+/*   Modal - Modern Dialog
+*/
 .modal {
     position: fixed;
     top: 0;
@@ -1194,9 +1176,8 @@ h6 { font-size: 0.875rem; }
     background: var(--neutral-50);
 }
 
-/* ==========================================================================
-   Form Groups
-   ========================================================================== */
+/*   Form Groups
+*/
 .form-group {
     margin-bottom: 1.25rem;
 }
@@ -1215,9 +1196,8 @@ h6 { font-size: 0.875rem; }
     color: var(--neutral-800);
 }
 
-/* ==========================================================================
-   Alert Messages
-   ========================================================================== */
+/*   Alert Messages
+*/
 .alert-message {
     padding: 1rem 1.25rem;
     border-radius: var(--border-radius-lg);
@@ -1254,9 +1234,8 @@ h6 { font-size: 0.875rem; }
     color: var(--info-500);
 }
 
-/* ==========================================================================
-   Download Links
-   ========================================================================== */
+/*   Download Links
+*/
 .download-links {
     margin: 2rem 0;
     display: flex;
@@ -1265,9 +1244,8 @@ h6 { font-size: 0.875rem; }
     flex-wrap: wrap;
 }
 
-/* ==========================================================================
-   Results Section
-   ========================================================================== */
+/*   Results Section
+*/
 .results-summary {
     text-align: center;
     padding: 2rem;
@@ -1290,9 +1268,8 @@ h6 { font-size: 0.875rem; }
     margin: 0.5rem 0;
 }
 
-/* ==========================================================================
-   Breadcrumbs
-   ========================================================================== */
+/*   Breadcrumbs
+*/
 .breadcrumbs {
     display: flex;
     align-items: center;
@@ -1325,9 +1302,8 @@ h6 { font-size: 0.875rem; }
     font-size: 0.875rem;
 }
 
-/* ==========================================================================
-   Tooltips
-   ========================================================================== */
+/*   Tooltips
+*/
 [data-tooltip] {
     position: relative;
     cursor: help;
@@ -1358,9 +1334,8 @@ h6 { font-size: 0.875rem; }
     transform: translateX(-50%) translateY(-10px);
 }
 
-/* ==========================================================================
-   Pagination
-   ========================================================================== */
+/*   Pagination
+*/
 .pagination {
     display: flex;
     justify-content: center;
@@ -1390,9 +1365,8 @@ h6 { font-size: 0.875rem; }
     color: white;
 }
 
-/* ==========================================================================
-   Empty States
-   ========================================================================== */
+/*   Empty States
+*/
 .empty-state {
     text-align: center;
     padding: 4rem 2rem;
@@ -1417,9 +1391,8 @@ h6 { font-size: 0.875rem; }
     margin-bottom: 1.5rem;
 }
 
-/* ==========================================================================
-   Progress Indicators
-   ========================================================================== */
+/*   Progress Indicators
+*/
 .progress-bar {
     width: 100%;
     height: 8px;
@@ -1435,9 +1408,8 @@ h6 { font-size: 0.875rem; }
     transition: width 0.3s ease;
 }
 
-/* ==========================================================================
-   Utility Classes
-   ========================================================================== */
+/*   Utility Classes
+*/
 .text-center { text-align: center; }
 .text-left { text-align: left; }
 .text-right { text-align: right; }
@@ -1486,9 +1458,734 @@ h6 { font-size: 0.875rem; }
 .w-100 { width: 100%; }
 .h-100 { height: 100%; }
 
-/* ==========================================================================
-   Responsive Design
-   ========================================================================== */
+/* Enhanced Dashboard Styles */
+
+/* Welcome Section */
+.welcome-section {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
+    border-radius: var(--border-radius-2xl);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.greeting {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+}
+
+.lecturer-name-display {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.date-time {
+    font-size: 0.875rem;
+    opacity: 0.8;
+}
+
+.quick-stats-cards {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.quick-stat {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius-xl);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: var(--transition-base);
+}
+
+.quick-stat:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.quick-stat .stat-icon {
+    font-size: 2rem;
+}
+
+.quick-stat .stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.quick-stat .stat-label {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.quick-stat .stat-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Quick Actions Bar */
+.quick-actions-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.action-chip {
+    background: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--neutral-700);
+    cursor: pointer;
+    transition: var(--transition-base);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.action-chip:hover {
+    background: var(--primary-500);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.chip-icon {
+    font-size: 1.125rem;
+}
+
+/* Analytics Grid */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.analytics-card {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-base);
+}
+
+.analytics-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--neutral-200);
+}
+
+.card-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--neutral-800);
+}
+
+.period-badge, .deadline-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius-full);
+    background: var(--primary-50);
+    color: var(--primary-700);
+}
+
+/* Metrics Grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.metric-item {
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-700);
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: var(--neutral-600);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.metric-trend {
+    font-size: 0.7rem;
+    margin-top: 0.5rem;
+}
+
+.metric-trend.positive {
+    color: var(--success-500);
+}
+
+.metric-trend.warning {
+    color: var(--warning-500);
+}
+
+/* Activity Timeline */
+.activity-timeline {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--neutral-200);
+    transition: var(--transition-base);
+}
+
+.activity-item:hover {
+    background: var(--neutral-50);
+    transform: translateX(4px);
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--neutral-100);
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.activity-details {
+    flex: 1;
+}
+
+.activity-message {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.activity-unit {
+    font-size: 0.75rem;
+    color: var(--primary-600);
+    font-weight: 500;
+}
+
+.activity-time {
+    font-size: 0.7rem;
+    color: var(--neutral-500);
+}
+
+/* Deadlines List */
+.deadlines-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.deadline-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: var(--border-radius-lg);
+    background: var(--neutral-50);
+    transition: var(--transition-base);
+}
+
+.deadline-item.urgent {
+    background: var(--danger-50);
+    border-left: 4px solid var(--danger-500);
+}
+
+.deadline-item.warning {
+    background: var(--warning-50);
+    border-left: 4px solid var(--warning-500);
+}
+
+.deadline-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.deadline-unit {
+    font-weight: 600;
+    color: var(--neutral-800);
+}
+
+.deadline-type {
+    font-size: 0.7rem;
+    color: var(--neutral-600);
+    text-transform: capitalize;
+}
+
+.deadline-date {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--warning-700);
+}
+
+/* Dashboard Tabs */
+.dashboard-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    background: white;
+    padding: 0.5rem;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: transparent;
+    border-radius: var(--border-radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-base);
+    color: var(--neutral-600);
+}
+
+.tab-btn:hover {
+    background: var(--neutral-100);
+}
+
+.tab-btn.active {
+    background: var(--primary-500);
+    color: white;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Modern Unit Cards */
+.units-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.unit-card-modern {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-smooth);
+}
+
+.unit-card-modern:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.unit-card-header {
+    padding: 1.25rem;
+    background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--neutral-200);
+}
+
+.unit-badge {
+    background: var(--primary-500);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--border-radius-full);
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge.submitted {
+    background: var(--success-100);
+    color: var(--success-700);
+}
+
+.status-badge.in-progress {
+    background: var(--warning-100);
+    color: var(--warning-700);
+}
+
+.status-badge.pending {
+    background: var(--neutral-200);
+    color: var(--neutral-700);
+}
+
+.unit-card-body {
+    padding: 1.25rem;
+}
+
+.unit-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--neutral-800);
+}
+
+.programme-info {
+    font-size: 0.75rem;
+    color: var(--neutral-600);
+    margin-bottom: 1rem;
+}
+
+.unit-stats {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--neutral-700);
+}
+
+.stat-icon {
+    font-size: 1rem;
+}
+
+.progress-section {
+    margin-top: 1rem;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+    color: var(--neutral-600);
+}
+
+.progress-bar {
+    height: 6px;
+    background: var(--neutral-200);
+    border-radius: var(--border-radius-full);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-500), var(--accent-500));
+    border-radius: var(--border-radius-full);
+    transition: width 0.3s ease;
+}
+
+.unit-card-footer {
+    padding: 1rem 1.25rem;
+    background: var(--neutral-50);
+    border-top: 1px solid var(--neutral-200);
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Filter Bar */
+.filter-bar {
+    background: white;
+    padding: 1rem;
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.filter-bar .filter-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+.search-group {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--neutral-500);
+}
+
+/* Modern Empty State */
+.empty-state-modern {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: var(--border-radius-2xl);
+    box-shadow: var(--shadow-md);
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    opacity: 0.5;
+}
+
+/* Notifications List */
+.notifications-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--neutral-200);
+    transition: var(--transition-base);
+}
+
+.notification-item.unread {
+    background: var(--primary-50);
+}
+
+.notification-item:hover {
+    background: var(--neutral-50);
+}
+
+.notification-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--neutral-100);
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-content h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.notification-content p {
+    font-size: 0.875rem;
+    color: var(--neutral-600);
+    margin-bottom: 0.25rem;
+}
+
+.notification-time {
+    font-size: 0.7rem;
+    color: var(--neutral-500);
+}
+
+/* Insights Grid */
+.insights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.insight-card {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-base);
+}
+
+.insight-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.insight-icon {
+    font-size: 2rem;
+}
+
+.insight-content {
+    flex: 1;
+}
+
+.insight-content h4 {
+    font-size: 0.875rem;
+    color: var(--neutral-600);
+    margin-bottom: 0.5rem;
+}
+
+.insight-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-700);
+    margin-bottom: 0.25rem;
+}
+
+/* Recent Marks Header */
+.recent-marks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.recent-marks-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+/* Quick Upload Modal */
+.upload-area-mini {
+    border: 2px dashed var(--neutral-300);
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition-base);
+    margin-top: 1rem;
+}
+
+.upload-area-mini:hover {
+    border-color: var(--primary-500);
+    background: var(--primary-50);
+}
+
+.unit-selector {
+    margin-bottom: 1rem;
+}
+
+.unit-selector label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--neutral-700);
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: var(--success-50);
+    border-radius: var(--border-radius-lg);
+    color: var(--success-700);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .welcome-section {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .quick-stats-cards {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .units-grid-modern {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-bar {
+        flex-direction: column;
+    }
+    
+    .filter-bar .filter-group {
+        width: 100%;
+    }
+    
+    .dashboard-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .tab-btn {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/*   Responsive Design
+*/
 @media (max-width: 1024px) {
     :root {
         --sidebar-width: 240px;
@@ -1602,9 +2299,8 @@ h6 { font-size: 0.875rem; }
     }
 }
 
-/* ==========================================================================
-   Print Styles
-   ========================================================================== */
+/*   Print Styles
+*/
 @media print {
     .sidebar,
     .header-actions,
