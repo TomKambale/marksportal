@@ -354,14 +354,14 @@
     <!-- Upload Card -->
     <div class="card">
         <div class="card-title">
-            📂 1. Upload Student Marks
+            1. Upload Student Marks
             <span class="badge">CSV: Adm.No, CAT, Exam</span>
         </div>
         
         <!-- Calculation Method Selector -->
         <div class="calculation-selector">
             <div class="selector-group">
-                <label>📐 Calculation Method:</label>
+                <label>Contributions:</label>
                 <select id="calculationMethod">
                     <option value="pre-calculated">Pre-Calculated (Marks as is → out of 100)</option>
                     <option value="category1">Category 1 (30:70) - CAT out of 30, Exam out of 70</option>
@@ -403,14 +403,14 @@
     <!-- Preview & Edit Card -->
     <div class="card">
         <div class="card-title">
-            👩‍🎓 2. Review Student Records
+            2. Review Student Records
             <span class="badge" id="recordCountBadge">0 students</span>
         </div>
         <div class="stats-bar">
-            <div class="stat-item">📌 Total Students: <strong id="totalStudents">0</strong></div>
-            <div class="stat-item">📊 Avg CAT (raw): <strong id="avgCat">—</strong></div>
-            <div class="stat-item">📈 Avg Exam (raw): <strong id="avgExam">—</strong></div>
-            <div class="stat-item">⭐ Avg Final Total: <strong id="avgTotal">—</strong></div>
+            <div class="stat-item">Total Students: <strong id="totalStudents">0</strong></div>
+            <div class="stat-item">Avg CAT (raw): <strong id="avgCat">—</strong></div>
+            <div class="stat-item">Avg Exam (raw): <strong id="avgExam">—</strong></div>
+            <div class="stat-item">Avg Final Total: <strong id="avgTotal">—</strong></div>
         </div>
         <div class="table-wrapper">
             <table class="marks-table" id="marksTable">
@@ -429,18 +429,18 @@
             </table>
         </div>
         <div class="btn-group" style="margin-top: 1.5rem; justify-content: flex-end;">
-            <button class="btn btn-primary" id="viewERPPreviewBtn">🔌 Preview ERP Payload</button>
-            <button class="btn btn-warning-custom" id="simulateERPSyncBtn">⬆️ Simulate ERP Upload</button>
+            <button class="btn btn-primary" id="viewERPPreviewBtn">Preview ERP Payload</button>
+            <button class="btn btn-warning-custom" id="simulateERPSyncBtn">Simulate ERP Upload</button>
         </div>
         <div id="erpPreviewContainer" style="margin-top: 1.2rem; display: none;">
             <div class="erp-preview" id="erpPreviewText">
-                <strong>📡 ERP Integration Payload (JSON) – ready for API endpoint</strong><br>
+                <strong>ERP Integration Payload (JSON) – ready for API endpoint</strong><br>
                 <pre id="jsonPreview" style="margin-top: 8px; white-space: pre-wrap; font-size: 0.75rem;"></pre>
             </div>
         </div>
     </div>
     <footer>
-        Marks File Upload @2026 | Calculation methods adjust marks to out of 100
+        Marks File Upload | 2026
     </footer>
 </div>
 
@@ -608,7 +608,7 @@ SE217-2000/2024,61,65
     // render table and update stats
     function renderTable() {
         if (!studentRecords.length) {
-            tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">📭 No student data. Upload a CSV or load sample.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No student data. Upload a CSV or load sample.</td></tr>`;
             totalStudentsSpan.innerText = '0';
             avgCatSpan.innerText = '—';
             avgExamSpan.innerText = '—';
