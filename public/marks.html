@@ -305,63 +305,113 @@
 </div>
 
 <script>
-    // Mock student data for a selected class
-    const studentData = {
-        "CSC201": {
-            unitName: "Data Structures & Algorithms",
-            examCategory: "30:70",
-            students: [
-                { admNo: "SE217/2000/1001", name: "Alice Wanjiku", cat: 25, exam: 58 },
-                { admNo: "SE217/2000/1002", name: "Brian Otieno", cat: 28, exam: 65 },
-                { admNo: "SE217/2000/1003", name: "Catherine Muthoni", cat: 22, exam: 55 },
-                { admNo: "SE217/2000/1004", name: "David Kipchoge", cat: 29, exam: 68 },
-                { admNo: "SE217/2000/1005", name: "Esther Nyokabi", cat: 18, exam: 48 },
-                { admNo: "SE217/2000/1006", name: "Francis Maina", cat: 26, exam: 62 },
-                { admNo: "SE217/2000/1007", name: "Grace Achieng", cat: 30, exam: 70 },
-                { admNo: "SE217/2000/1008", name: "Henry Kariuki", cat: 15, exam: 42 }
-            ]
-        },
-        "CSC301": {
-            unitName: "Software Engineering",
-            examCategory: "40:60",
-            students: [
-                { admNo: "SE217/2000/2001", name: "Ian Njoroge", cat: 35, exam: 52 },
-                { admNo: "SE217/2000/2002", name: "Jane Atieno", cat: 38, exam: 58 },
-                { admNo: "SE217/2000/2003", name: "Kevin Odhiambo", cat: 32, exam: 48 }
-            ]
-        },
-        "CSC401": {
-            unitName: "Software Engineering",
-            examCategory: "40:60",
-            students: [
-                { admNo: "SE217/2000/2001", name: "Ian Njoroge", cat: 35, exam: 52 },
-                { admNo: "SE217/2000/2002", name: "Jane Atieno", cat: 38, exam: 58 },
-                { admNo: "SE217/2000/2003", name: "Kevin Odhiambo", cat: 32, exam: 48 }
-            ]
-        },
-        "ITC201": {
-            unitName: "Database Administration",
-            examCategory: "40:60",
-            students: [
-                { admNo: "SE217/2000/3001", name: "Linda Chebet", cat: 36, exam: 55 },
-                { admNo: "SE217/2000/3002", name: "Michael Omondi", cat: 34, exam: 50 }
-            ]
-        }
-    };
-
     let currentClass = null;
     let currentStudents = [];
+    let currentUser = null;
+
+    // Get current user from session
+    async function getCurrentUser() {
+        try {
+            const response = await fetch('/api/current-user', {
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Server error');
+            }
+
+            const data = await response.json();
+
+            if (data.success && data.user) {
+                currentUser = data.user;
+                console.log('User loaded:', currentUser);
+                return true;
+            }
+
+            // fallback to localStorage
+            const pf = localStorage.getItem('userPfNo');
+            const email = localStorage.getItem('userEmail');
+
+            if (pf && email) {
+                currentUser = { pf_no: pf, email: email };
+                return true;
+            }
+
+            window.location.href = 'login.html';
+            return false;
+
+        } catch (err) {
+            console.error('Error getting user:', err);
+            const pf = localStorage.getItem('userPfNo');
+            const email = localStorage.getItem('userEmail');
+
+            if (pf && email) {
+                currentUser = { pf_no: pf, email: email };
+                return true;
+            }
+
+            window.location.href = 'login.html';
+            return false;
+        }
+    }
+
+    // Fetch student marks from API
+    async function fetchStudentMarks() {
+        try {
+            const tbody = document.getElementById('marksTableBody');
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Loading student marks...</td></tr>';
+            
+            // Prepare the exact payload structure
+            const payload = {
+                programme_code: currentClass.programmeCode,
+                semester: currentClass.semester?.semester || currentClass.semester?.name,
+                stage: currentClass.stage,
+                unit_code: currentClass.unitCode,
+                exam_category: currentClass.examCategory
+            };
+            
+            console.log('Sending marks request with payload:', payload);
+            
+            const response = await fetch('/api/marks', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Server error: ${response.status} - ${errorText}`);
+            }
+
+            const data = await response.json();
+            console.log('Marks API response:', data);
+
+            if (data.success && data.students) {
+                currentStudents = data.students;
+                renderMarksTable();
+                updateClassBanner();
+            } else {
+                throw new Error(data.error || 'Failed to fetch student marks');
+            }
+
+        } catch (err) {
+            console.error('Error fetching marks:', err);
+            document.getElementById('marksTableBody').innerHTML = 
+                `<tr class="empty-row"><td colspan="6">❌ Error: ${err.message}<br>
+                <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-green); color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button></td></tr>`;
+        }
+    }
 
     function calculateTotal(cat, exam, category) {
-        if (category === "30:70") {
-            // CAT max 30, Exam max 70 -> total out of 100
-            return Math.min(100, cat + exam);
-        } else if (category === "40:60") {
-            // CAT max 40, Exam max 60 -> total out of 100
-            return Math.min(100, cat + exam);
+        if (category === "DEGREE" || category === "30:70") {
+            return Math.min(100, (cat || 0) + (exam || 0));
+        } else if (category === "DIPLOMA" || category === "40:60") {
+            return Math.min(100, (cat || 0) + (exam || 0));
         } else {
-            // Pre-calculated: assume already out of 100
-            return Math.min(100, cat + exam);
+            return Math.min(100, (cat || 0) + (exam || 0));
         }
     }
 
@@ -373,28 +423,44 @@
         return { text: "Fail", class: "status-fail" };
     }
 
+    function getMaxMarks(category) {
+        if (category === "DEGREE" || category === "30:70") {
+            return { cat: 30, exam: 70 };
+        } else if (category === "DIPLOMA" || category === "40:60") {
+            return { cat: 40, exam: 60 };
+        }
+        return { cat: 100, exam: 100 };
+    }
+
     function renderMarksTable() {
-        if (!currentStudents.length) {
+        if (!currentStudents || currentStudents.length === 0) {
             document.getElementById('marksTableBody').innerHTML = '<tr class="empty-row"><td colspan="6">No students found for this class.</td></tr>';
+            document.getElementById('totalStudents').textContent = '0';
+            document.getElementById('avgCat').textContent = '—';
+            document.getElementById('avgExam').textContent = '—';
+            document.getElementById('avgTotal').textContent = '—';
             return;
         }
 
         let totalCat = 0, totalExam = 0, totalFinal = 0;
+        const maxMarks = getMaxMarks(currentClass.examCategory);
         
         const tbody = document.getElementById('marksTableBody');
         tbody.innerHTML = currentStudents.map((student, index) => {
-            const finalTotal = calculateTotal(student.cat, student.exam, currentClass.examCategory);
+            const cat = student.cat_marks || student.cat || 0;
+            const exam = student.exam_marks || student.exam || 0;
+            const finalTotal = calculateTotal(cat, exam, currentClass.examCategory);
             const status = getStatus(finalTotal);
-            totalCat += student.cat;
-            totalExam += student.exam;
+            totalCat += cat;
+            totalExam += exam;
             totalFinal += finalTotal;
             
             return `
                 <tr>
-                    <td><strong>${escapeHtml(student.admNo)}</strong></td>
-                    <td>${escapeHtml(student.name)}</td>
-                    <td><input type="number" class="marks-input" id="cat_${index}" value="${student.cat}" step="0.5" min="0" max="${currentClass.examCategory === '30:70' ? 30 : 40}" onchange="updateMarks(${index}, 'cat', this.value)"></td>
-                    <td><input type="number" class="marks-input" id="exam_${index}" value="${student.exam}" step="0.5" min="0" max="${currentClass.examCategory === '30:70' ? 70 : 60}" onchange="updateMarks(${index}, 'exam', this.value)"></td>
+                    <td><strong>${escapeHtml(student.adm_no || student.admNo || '-')}</strong></td>
+                    <td>${escapeHtml(student.name || student.student_name || '-')}</td>
+                    <td><input type="number" class="marks-input" id="cat_${index}" value="${cat}" step="0.5" min="0" max="${maxMarks.cat}" onchange="updateMarks(${index}, 'cat', this.value)"></td>
+                    <td><input type="number" class="marks-input" id="exam_${index}" value="${exam}" step="0.5" min="0" max="${maxMarks.exam}" onchange="updateMarks(${index}, 'exam', this.value)"></td>
                     <td class="total-cell" id="total_${index}">${finalTotal.toFixed(1)}</td>
                     <td class="${status.class}">${status.text}</td>
                 </tr>
@@ -413,13 +479,17 @@
         if (isNaN(numValue)) numValue = 0;
         
         if (type === 'cat') {
+            currentStudents[index].cat_marks = numValue;
             currentStudents[index].cat = numValue;
         } else {
+            currentStudents[index].exam_marks = numValue;
             currentStudents[index].exam = numValue;
         }
         
         // Update total cell
-        const finalTotal = calculateTotal(currentStudents[index].cat, currentStudents[index].exam, currentClass.examCategory);
+        const cat = type === 'cat' ? numValue : (currentStudents[index].cat_marks || currentStudents[index].cat || 0);
+        const exam = type === 'exam' ? numValue : (currentStudents[index].exam_marks || currentStudents[index].exam || 0);
+        const finalTotal = calculateTotal(cat, exam, currentClass.examCategory);
         document.getElementById(`total_${index}`).textContent = finalTotal.toFixed(1);
         
         // Update status cell
@@ -431,10 +501,12 @@
         
         // Recalculate averages
         let totalCat = 0, totalExam = 0, totalFinal = 0;
-        currentStudents.forEach(s => {
-            totalCat += s.cat;
-            totalExam += s.exam;
-            totalFinal += calculateTotal(s.cat, s.exam, currentClass.examCategory);
+        currentStudents.forEach((s) => {
+            const c = s.cat_marks || s.cat || 0;
+            const e = s.exam_marks || s.exam || 0;
+            totalCat += c;
+            totalExam += e;
+            totalFinal += calculateTotal(c, e, currentClass.examCategory);
         });
         const count = currentStudents.length;
         document.getElementById('avgCat').textContent = (totalCat / count).toFixed(1);
@@ -442,18 +514,59 @@
         document.getElementById('avgTotal').textContent = (totalFinal / count).toFixed(1);
     }
 
-    function saveMarks() {
-        // In a real app, this would send an API request to save marks
-        alert('✅ Marks saved successfully!\n\nChanges have been stored locally. In production, this would sync with the ERP database.');
-        console.log('Saved marks:', currentStudents);
+    async function saveMarks() {
+        try {
+            // Prepare marks data for API with correct structure
+            const marksData = currentStudents.map(student => ({
+                adm_no: student.adm_no || student.admNo,
+                student_name: student.name || student.student_name,
+                cat_marks: student.cat_marks || student.cat || 0,
+                exam_marks: student.exam_marks || student.exam || 0
+            }));
+            
+            const payload = {
+                programme_code: currentClass.programmeCode,
+                semester: currentClass.semester?.semester || currentClass.semester?.name,
+                stage: currentClass.stage,
+                unit_code: currentClass.unitCode,
+                exam_category: currentClass.examCategory,
+                marks: marksData
+            };
+            
+            console.log('Saving marks with payload:', payload);
+            
+            const response = await fetch('/api/marks/save', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('✅ Marks saved successfully!');
+                console.log('Saved marks response:', data);
+            } else {
+                throw new Error(data.error || 'Failed to save marks');
+            }
+            
+        } catch (err) {
+            console.error('Error saving marks:', err);
+            alert('❌ Error saving marks: ' + err.message);
+        }
     }
 
     function exportToCSV() {
         let csvContent = "Admission No.,Student Name,CAT Marks,Exam Marks,Total,Status\n";
         currentStudents.forEach(student => {
-            const finalTotal = calculateTotal(student.cat, student.exam, currentClass.examCategory);
+            const cat = student.cat_marks || student.cat || 0;
+            const exam = student.exam_marks || student.exam || 0;
+            const finalTotal = calculateTotal(cat, exam, currentClass.examCategory);
             const status = getStatus(finalTotal).text;
-            csvContent += `"${student.admNo}","${student.name}",${student.cat},${student.exam},${finalTotal.toFixed(1)},"${status}"\n`;
+            csvContent += `"${student.adm_no || student.admNo}","${student.name || student.student_name}",${cat},${exam},${finalTotal.toFixed(1)},"${status}"\n`;
         });
         
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -468,6 +581,23 @@
         URL.revokeObjectURL(url);
     }
 
+    function updateClassBanner() {
+        const unitName = currentClass.unitName || currentClass.unit_name || 'Class';
+        const unitCode = currentClass.unitCode;
+        const semesterName = currentClass.semester?.semester || currentClass.semester?.name || 'Current';
+        const examCategory = currentClass.examCategory || 'DEGREE';
+        
+        document.getElementById('classBanner').innerHTML = `
+            <h1>📖 ${escapeHtml(unitName)}</h1>
+            <div class="class-meta">
+                <span>📚 ${escapeHtml(unitCode)}</span>
+                <span>📅 Semester: ${escapeHtml(semesterName)}</span>
+                <span>🏫 ${escapeHtml(currentClass.programmeCode || '')} - ${escapeHtml(currentClass.stage || '')}</span>
+            </div>
+        `;
+        document.getElementById('examCategoryBadge').textContent = examCategory;
+    }
+
     function loadClassData() {
         const savedClass = localStorage.getItem('selectedClass');
         if (!savedClass) {
@@ -476,32 +606,18 @@
         }
         
         currentClass = JSON.parse(savedClass);
+        console.log('Loaded class data:', currentClass);
         
-        // Load student data for this unit
-        const unitData = studentData[currentClass.unitCode];
-        if (unitData) {
-            currentStudents = JSON.parse(JSON.stringify(unitData.students));
-            document.getElementById('classBanner').innerHTML = `
-                <h1>📖 ${escapeHtml(unitData.unitName)}</h1>
-                <div class="class-meta">
-                    <span>📚 ${escapeHtml(currentClass.unitCode)}</span>
-                    <span>📅 Semester: ${currentClass.semester?.name || 'Current'}</span>
-                </div>
-            `;
-            document.getElementById('examCategoryBadge').textContent = unitData.examCategory;
-            currentClass.examCategory = unitData.examCategory;
-        } else {
-            document.getElementById('classBanner').innerHTML = `
-                <h1>⚠️ Class Not Found</h1>
-                <div class="class-meta">No student data available for this class</div>
-            `;
-            currentStudents = [];
+        // Set default exam category if not present
+        if (!currentClass.examCategory) {
+            currentClass.examCategory = "DEGREE";
         }
         
-        renderMarksTable();
+        updateClassBanner();
     }
 
     function escapeHtml(str) {
+        if (!str) return '';
         return String(str).replace(/[&<>]/g, function(m) {
             if (m === '&') return '&amp;';
             if (m === '<') return '&lt;';
@@ -514,7 +630,23 @@
         window.location.href = 'classes.html';
     }
 
-    loadClassData();
+    // Initialize the page
+    async function init() {
+        console.log('=== MARKS PAGE INIT ===');
+        
+        // Get user from session
+        const userLoaded = await getCurrentUser();
+        if (!userLoaded) return;
+        
+        // Load class data from localStorage
+        loadClassData();
+        
+        // Fetch student marks from API
+        await fetchStudentMarks();
+    }
+    
+    // Start the app
+    init();
 </script>
 </body>
 </html>

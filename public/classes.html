@@ -197,6 +197,7 @@
 
         .view-marks-btn:hover {
             background: var(--dark-green);
+            transform: translateY(-2px);
         }
 
         .empty-row td {
@@ -212,13 +213,14 @@
     </style>
 </head>
 <body>
+
 <div class="container">
     <div class="header">
         <button class="back-btn" onclick="goBack()">← Back to Semesters</button>
     </div>
 
     <div class="semester-banner" id="semesterBanner">
-        <h1>📖 Loading semester...</h1>
+        <h1>Loading semester...</h1>
         <p>Select a class to view student marks</p>
     </div>
 
@@ -229,7 +231,7 @@
         </div>
         <div class="stat-card">
             <div class="stat-number" id="totalStudents">0</div>
-            <div class="stat-label">Total Students Enrolled</div>
+            <div class="stat-label">Total Programmes</div>
         </div>
         <div class="stat-card">
             <div class="stat-number" id="examTypes">0</div>
@@ -255,7 +257,7 @@
                     </tr>
                 </thead>
                 <tbody id="classesTableBody">
-                    <tr class="empty-row"><td colspan="7">Loading classes...</td></tr>
+                    <tr class="empty-row"><td colspan="7">Loading classes...<\/tr>
                 </tbody>
             </table>
         </div>
@@ -263,116 +265,232 @@
 </div>
 
 <script>
-    // Mock data for classes taught in a semester
-    const allClasses = {
-        1: [ // Semester 1 - 2024/2025
-            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 2", unitCode: "CSC201", unitName: "Data Structures & Algorithms", examCategory: "30:70", students: 45 },
-            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 3", unitCode: "CSC301", unitName: "Software Engineering", examCategory: "40:60", students: 38 },
-            { programmeCode: "BSC-IT", programmeName: "BSc Information Technology", stage: "Year 2", unitCode: "ITC201", unitName: "Database Administration", examCategory: "40:60", students: 42 }
-        ],
-        2: [ // Semester 2 - 2024/2025
-            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 1", unitCode: "CSC102", unitName: "Object-Oriented Programming", examCategory: "30:70", students: 52 },
-            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 2", unitCode: "CSC202", unitName: "Algorithm Design", examCategory: "30:70", students: 44 },
-            { programmeCode: "BSC-IT", programmeName: "BSc Information Technology", stage: "Year 1", unitCode: "ITC102", unitName: "Web Development II", examCategory: "Pre-calculated", students: 48 },
-            { programmeCode: "BSC-IT", programmeName: "BSc Information Technology", stage: "Year 3", unitCode: "ITC301", unitName: "System Analysis & Design", examCategory: "40:60", students: 35 }
-        ],
-        3: [ // Semester 1 - 2023/2024 (closed)
-            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 1", unitCode: "CSC101", unitName: "Introduction to Programming", examCategory: "30:70", students: 50 },
-            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 2", unitCode: "CSC203", unitName: "Operating Systems", examCategory: "30:70", students: 42 },
-            { programmeCode: "BSC-IT", programmeName: "BSc Information Technology", stage: "Year 2", unitCode: "ITC203", unitName: "Networking I", examCategory: "30:70", students: 39 }
-        ],
-        4: [ // Semester 2 - 2023/2024
-            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 3", unitCode: "CSC304", unitName: "Mobile Application Dev", examCategory: "40:60", students: 36 },
-            { programmeCode: "BSC-IT", programmeName: "BSc Information Technology", stage: "Year 1", unitCode: "ITC104", unitName: "UI/UX Design", examCategory: "Pre-calculated", students: 47 }
-        ],
-        5: [ // Summer Session
-            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 4", unitCode: "CSC401", unitName: "Project Management", examCategory: "30:70", students: 28 }
-        ]
-    };
+let currentSemester = null;
+let currentUser = null;
 
-    let currentSemester = null;
-
-    function getExamCategoryClass(category) {
-        if (category === "30:70") return "cat-30-70";
-        if (category === "40:60") return "cat-40-60";
-        return "cat-pre";
-    }
-
-    function renderClasses() {
-        const savedSemester = localStorage.getItem('selectedSemester');
-        if (!savedSemester) {
-            window.location.href = 'semesters.html';
-            return;
-        }
-
-        currentSemester = JSON.parse(savedSemester);
-        
-        // Update banner
-        document.getElementById('semesterBanner').innerHTML = `
-            <h1>📖 ${escapeHtml(currentSemester.name)}</h1>
-            <p>${currentSemester.startDate} - ${currentSemester.endDate} | Status: ${currentSemester.status.toUpperCase()}</p>
-        `;
-
-        const classes = allClasses[currentSemester.id] || [];
-        const tbody = document.getElementById('classesTableBody');
-        
-        if (classes.length === 0) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No classes found for this semester.</td></tr>';
-            document.getElementById('totalClasses').textContent = '0';
-            document.getElementById('totalStudents').textContent = '0';
-            document.getElementById('examTypes').textContent = '0';
-            return;
-        }
-
-        let totalStudents = 0;
-        const uniqueCategories = new Set();
-        
-        tbody.innerHTML = classes.map(cls => {
-            totalStudents += cls.students;
-            uniqueCategories.add(cls.examCategory);
-            return `
-                <tr onclick="selectClass('${cls.unitCode}', '${cls.unitName}', '${cls.examCategory}')">
-                    <td>${escapeHtml(cls.programmeCode)}</td>
-                    <td>${escapeHtml(cls.programmeName)}</td>
-                    <td>${escapeHtml(cls.stage)}</td>
-                    <td><strong>${escapeHtml(cls.unitCode)}</strong></td>
-                    <td>${escapeHtml(cls.unitName)}</td>
-                    <td><span class="exam-category ${getExamCategoryClass(cls.examCategory)}">${escapeHtml(cls.examCategory)}</span></td>
-                    <td><button class="view-marks-btn">View Marks →</button></td>
-                </tr>
-            `;
-        }).join('');
-
-        document.getElementById('totalClasses').textContent = classes.length;
-        document.getElementById('totalStudents').textContent = totalStudents;
-        document.getElementById('examTypes').textContent = uniqueCategories.size;
-    }
-
-    function selectClass(unitCode, unitName, examCategory) {
-        const classData = {
-            semester: currentSemester,
-            unitCode: unitCode,
-            unitName: unitName,
-            examCategory: examCategory
-        };
-        localStorage.setItem('selectedClass', JSON.stringify(classData));
-        window.location.href = 'marks.html';
-    }
-
-    function escapeHtml(str) {
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+// ✅ Get user with fallback + safe response handling
+async function getCurrentUser() {
+    try {
+        const response = await fetch('/api/current-user', {
+            credentials: 'include'
         });
+
+        if (!response.ok) {
+            throw new Error('Server error');
+        }
+
+        const data = await response.json();
+
+        if (data.success && data.user) {
+            currentUser = data.user;
+            console.log('User from session:', currentUser);
+            return true;
+        }
+
+        // fallback to localStorage
+        const pf = localStorage.getItem('userPfNo');
+        const email = localStorage.getItem('userEmail');
+
+        if (pf && email) {
+            currentUser = { pf_no: pf, email: email };
+            console.log('User from localStorage:', currentUser);
+            return true;
+        }
+
+        console.log('No user found, redirecting to login');
+        window.location.href = 'login.html';
+        return false;
+
+    } catch (err) {
+        console.error('Error getting user:', err);
+        const pf = localStorage.getItem('userPfNo');
+        const email = localStorage.getItem('userEmail');
+
+        if (pf && email) {
+            currentUser = { pf_no: pf, email: email };
+            console.log('User from localStorage (fallback):', currentUser);
+            return true;
+        }
+
+        window.location.href = 'login.html';
+        return false;
+    }
+}
+
+// ✅ Fetch classes from API
+async function fetchClasses(semesterName, pf_no) {
+    try {
+        const tbody = document.getElementById('classesTableBody');
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Loading classes...<\/tr>';
+        
+        console.log('Fetching classes for semester:', semesterName);
+        console.log('With PF number:', pf_no);
+        
+        const response = await fetch('/api/classes', {
+            method: 'POST',
+            credentials: 'include', // ✅ IMPORTANT for session
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ 
+                semester: semesterName, 
+                pf_no: pf_no 
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+
+        const data = await response.json();
+        console.log('API Response:', data);
+
+        if (data.success && data.classes) {
+            renderClasses(data.classes);
+        } else {
+            throw new Error(data.error || 'Failed to fetch classes');
+        }
+
+    } catch (err) {
+        console.error('Error fetching classes:', err);
+        document.getElementById('classesTableBody').innerHTML = 
+            `<tr class="empty-row"><td colspan="7">❌ Error: ${err.message}<br>
+            <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-green); color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button><\/tr>`;
+    }
+}
+
+// ✅ Get exam category styling class
+function getExamCategoryClass(category) {
+    if (category === "DEGREE" || category === "30:70") return "cat-30-70";
+    if (category === "DIPLOMA" || category === "40:60") return "cat-40-60";
+    return "cat-pre";
+}
+
+// ✅ Format exam category for display
+function formatExamCategory(category) {
+    if (category === "DEGREE") return "Degree Programme";
+    if (category === "DIPLOMA") return "Diploma Programme";
+    if (category === "CERTIFICATE") return "Certificate Programme";
+    return category;
+}
+
+// ✅ Render classes to table
+function renderClasses(classes) {
+    const tbody = document.getElementById('classesTableBody');
+    
+    console.log('Rendering classes:', classes.length);
+
+    if (!classes || classes.length === 0) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No classes found for this semester.<\/tr>';
+        document.getElementById('totalClasses').textContent = '0';
+        document.getElementById('totalStudents').textContent = '0';
+        document.getElementById('examTypes').textContent = '0';
+        return;
     }
 
-    function goBack() {
+    // Calculate statistics
+    const totalClasses = classes.length;
+    const uniqueProgrammes = new Set(classes.map(c => c.programme_code));
+    const uniqueCategories = new Set(classes.map(c => c.exam_category));
+    
+    document.getElementById('totalClasses').textContent = totalClasses;
+    document.getElementById('totalStudents').textContent = uniqueProgrammes.size;
+    document.getElementById('examTypes').textContent = uniqueCategories.size;
+    
+    // Render table rows
+    tbody.innerHTML = classes.map(cls => `
+        <tr onclick="selectClass('${cls.unit_code}', '${escapeHtml(cls.unit_name)}', '${cls.exam_category}', '${cls.programme_code}', '${escapeHtml(cls.programme_name)}', '${cls.stage}')">
+            <td><strong>${escapeHtml(cls.programme_code)}</strong></td>
+            <td>${escapeHtml(cls.programme_name || '-')}</td>
+            <td>${escapeHtml(cls.stage || '-')}</td>
+            <td><strong>${escapeHtml(cls.unit_code)}</strong></td>
+            <td>${escapeHtml(cls.unit_name)}</td>
+            <td><span class="exam-category ${getExamCategoryClass(cls.exam_category)}">${formatExamCategory(cls.exam_category)}</span></td>
+            <td><button class="view-marks-btn">View Marks →</button></td>
+        </tr>
+    `).join('');
+}
+
+// ✅ Select class and navigate to marks page
+function selectClass(unitCode, unitName, examCategory, programmeCode, programmeName, stage) {
+    const classData = {
+        semester: currentSemester,
+        unitCode: unitCode,
+        unitName: unitName,
+        examCategory: examCategory,
+        programmeCode: programmeCode,
+        programmeName: programmeName,
+        stage: stage,
+        pf_no: currentUser?.pf_no
+    };
+    console.log('Selected class data being saved:', classData);
+    localStorage.setItem('selectedClass', JSON.stringify(classData));
+    window.location.href = 'marks.html';
+}
+
+// ✅ Escape HTML to prevent XSS
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// ✅ Go back to semesters page
+function goBack() {
+    window.location.href = 'semesters.html';
+}
+
+// ✅ Initialize the page
+async function init() {
+    console.log('=== CLASSES PAGE INIT ===');
+    
+    // Get user from session
+    const userLoaded = await getCurrentUser();
+    if (!userLoaded) return;
+
+    // Validate PF number
+    if (!currentUser || !currentUser.pf_no) {
+        console.error('No PF number found for user');
+        window.location.href = 'login.html';
+        return;
+    }
+
+    console.log('Current user PF:', currentUser.pf_no);
+
+    // Get selected semester from localStorage
+    const saved = localStorage.getItem('selectedSemester');
+    console.log('Saved semester from localStorage:', saved);
+    
+    if (!saved) {
+        console.log('No semester selected, redirecting to semesters page');
         window.location.href = 'semesters.html';
+        return;
     }
 
-    renderClasses();
+    currentSemester = JSON.parse(saved);
+    console.log('Current semester:', currentSemester);
+
+    // Update banner
+    const semesterName = currentSemester.semester || currentSemester.name;
+    const academicYear = currentSemester.academic_year || '';
+    
+    document.getElementById('semesterBanner').innerHTML = `
+        <h1>📖 ${escapeHtml(semesterName)}</h1>
+        <p>${academicYear ? academicYear + ' | ' : ''}Click any class to view student marks</p>
+    `;
+
+    // Fetch classes for this semester
+    await fetchClasses(semesterName, currentUser.pf_no);
+}
+
+// Start the app when page loads
+init();
 </script>
+
 </body>
 </html>

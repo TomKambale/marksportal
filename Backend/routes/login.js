@@ -18,12 +18,12 @@ router.post('/login', (req, res) => {
     db.query(sql, [uname, pf], async (err, results) => {
         if (err) {
             console.error(err);
-            return res.status(500).send('Login error');
+            return res.status(500).json({ success: false, error: 'Login error' });
         }
 
         if (results.length === 0) {
             console.log('User not found with email:', uname, 'and pf:', pf);
-            return res.send('User not found');
+            return res.status(401).json({ success: false, error: 'User not found' });
         }
 
         const user = results[0];
@@ -32,7 +32,7 @@ router.post('/login', (req, res) => {
         // Check if password_hash exists
         if (!user.password_hash) {
             console.error('No password hash found for user');
-            return res.send('Account configuration error');
+            return res.status(401).json({ success: false, error: 'Account configuration error' });
         }
 
         try {
@@ -41,7 +41,7 @@ router.post('/login', (req, res) => {
             console.log('Password match result:', match);
 
             if (!match) {
-                return res.send('Incorrect password');
+                return res.status(401).json({ success: false, error: 'Incorrect password' });
             }
 
             // Store user data in session
@@ -50,14 +50,13 @@ router.post('/login', (req, res) => {
                 pf_no: user.pf_number,
                 full_name: user.full_name
             };
-            
-            console.log('User stored in session, redirecting...');
-            // Redirect to semesters page - MAKE SURE THIS IS THE ONLY RESPONSE
-            return res.redirect('/semesters.html');
+res.redirect('/semesters.html');
+            // Send success response
+
 
         } catch (compareErr) {
             console.error('Error comparing passwords:', compareErr);
-            return res.send('Password verification error');
+            res.status(500).json({ success: false, error: 'Password verification error' });
         }
     });
 });

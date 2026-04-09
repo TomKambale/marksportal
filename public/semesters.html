@@ -228,7 +228,7 @@
 
     <div class="lecturer-info">
         <div>
-            <div class="lecturer-name">Dr. Jane Mwangi</div>
+            <div class="lecturer-name">{userName}</div>
             <div class="lecturer-dept">Faculty of Computing & Informatics</div>
         </div>
         <div class="stats-row" style="margin-bottom: 0; gap: 0.5rem;">
@@ -357,72 +357,117 @@
         }
     }
 
-    function renderSemesters(semesters) {
-        const container = document.getElementById('semesterList');
+    // function renderSemesters(semesters) {
+    //     const container = document.getElementById('semesterList');
         
-        if (!semesters || semesters.length === 0) {
-            container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--medium-gray);">📭 No semesters found for this lecturer</div>';
-            return;
-        }
+    //     if (!semesters || semesters.length === 0) {
+    //         container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--medium-gray);">📭 No semesters found for this lecturer</div>';
+    //         return;
+    //     }
 
-        // Transform API data to match your display format
-        const formattedSemesters = semesters.map((semester, index) => {
-            // Parse academic_year and semester format
-            const academicYear = semester.academic_year;
-            const semesterName = semester.semester;
+    //     // Transform API data to match your display format
+    //     const formattedSemesters = semesters.map((semester, index) => {
+    //         // Parse academic_year and semester format
+    //         const academicYear = semester.academic_year;
+    //         const semesterName = semester.semester;
             
-            // Determine status based on marks_entry_date or is_current
-            let status = 'closed';
-            let statusText = '● Closed';
+    //         // Determine status based on marks_entry_date or is_current
+    //         let status = 'closed';
+    //         let statusText = '● Closed';
             
-            if (semester.is_current === 1) {
+    //         if (semester.is_current === 1) {
+    //             status = 'open';
+    //             statusText = '● Open';
+    //         } else if (semester.marks_entry_date && semester.marks_entry_date !== '1753-01-01T00:00:00') {
+    //             const entryDate = new Date(semester.marks_entry_date);
+    //             const today = new Date();
+    //             if (entryDate > today) {
+    //                 status = 'open';
+    //                 statusText = '● Open';
+    //             }
+    //         }
+            
+    //         // Format dates for display
+    //         const [startYear, endYear] = academicYear.split('/');
+    //         const startDate = `${semesterName.includes('1') ? 'Sep' : 'Jan'} ${startYear}`;
+    //         const endDate = `${semesterName.includes('1') ? 'Dec' : 'Apr'} ${endYear || startYear}`;
+            
+    //         return {
+    //             id: index,
+    //             academic_year: academicYear,
+    //             semester_name: semesterName,
+    //             startDate: startDate,
+    //             endDate: endDate,
+    //             status: status,
+    //             statusText: statusText,
+    //             is_current: semester.is_current,
+    //             marks_entry_date: semester.marks_entry_date,
+    //             lecturer: semester.lecturer,
+    //             raw: semester
+    //         };
+    //     });
+
+    //     container.innerHTML = formattedSemesters.map(semester => `
+    //         <div class="semester-item" onclick="selectSemester(${JSON.stringify(semester.raw).replace(/"/g, '&quot;')})">
+    //             <div class="semester-info">
+    //                 <div class="semester-name">${escapeHtml(semester.semester_name)} (${escapeHtml(semester.academic_year)})</div>
+    //                 <div class="semester-dates">📅 ${semester.startDate} - ${semester.endDate}</div>
+    //             </div>
+    //             <div style="display: flex; align-items: center; gap: 0.75rem;">
+    //                 <span class="status-badge ${semester.status === 'open' ? 'status-open' : 'status-closed'}">
+    //                     ${semester.statusText}
+    //                 </span>
+    //                 <button class="view-btn">View Classes →</button>
+    //             </div>
+    //         </div>
+    //     `).join('');
+    // }
+function renderSemesters(semesters) {
+    const container = document.getElementById('semesterList');
+    
+    if (!semesters || semesters.length === 0) {
+        container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--medium-gray);">📭 No semesters found for this lecturer</div>';
+        return;
+    }
+
+    container.innerHTML = semesters.map((semester, index) => {
+        // Determine status
+        let status = 'closed';
+        let statusText = '● Closed';
+        
+        if (semester.is_current === 1) {
+            status = 'open';
+            statusText = '● Open';
+        } else if (semester.marks_entry_date && semester.marks_entry_date !== '1753-01-01T00:00:00') {
+            const entryDate = new Date(semester.marks_entry_date);
+            const today = new Date();
+            if (entryDate > today) {
                 status = 'open';
                 statusText = '● Open';
-            } else if (semester.marks_entry_date && semester.marks_entry_date !== '1753-01-01T00:00:00') {
-                const entryDate = new Date(semester.marks_entry_date);
-                const today = new Date();
-                if (entryDate > today) {
-                    status = 'open';
-                    statusText = '● Open';
-                }
             }
-            
-            // Format dates for display
-            const [startYear, endYear] = academicYear.split('/');
-            const startDate = `${semesterName.includes('1') ? 'Sep' : 'Jan'} ${startYear}`;
-            const endDate = `${semesterName.includes('1') ? 'Dec' : 'Apr'} ${endYear || startYear}`;
-            
-            return {
-                id: index,
-                academic_year: academicYear,
-                semester_name: semesterName,
-                startDate: startDate,
-                endDate: endDate,
-                status: status,
-                statusText: statusText,
-                is_current: semester.is_current,
-                marks_entry_date: semester.marks_entry_date,
-                lecturer: semester.lecturer,
-                raw: semester
-            };
-        });
-
-        container.innerHTML = formattedSemesters.map(semester => `
-            <div class="semester-item" onclick="selectSemester(${JSON.stringify(semester.raw).replace(/"/g, '&quot;')})">
+        }
+        
+        // Format dates for display
+        const [startYear, endYear] = semester.academic_year.split('/');
+        const startDate = `${semester.semester.includes('1') ? 'Sep' : 'Jan'} ${startYear}`;
+        const endDate = `${semester.semester.includes('1') ? 'Dec' : 'Apr'} ${endYear || startYear}`;
+        
+        return `
+            <div class="semester-item" onclick='selectSemester(${JSON.stringify(semester)})'>
                 <div class="semester-info">
-                    <div class="semester-name">${escapeHtml(semester.semester_name)} (${escapeHtml(semester.academic_year)})</div>
-                    <div class="semester-dates">📅 ${semester.startDate} - ${semester.endDate}</div>
+                    <div class="semester-name">${escapeHtml(semester.semester)} (${escapeHtml(semester.academic_year)})</div>
+                    <div class="semester-dates">📅 ${startDate} - ${endDate}</div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <span class="status-badge ${semester.status === 'open' ? 'status-open' : 'status-closed'}">
-                        ${semester.statusText}
+                    <span class="status-badge ${status === 'open' ? 'status-open' : 'status-closed'}">
+                        ${statusText}
                     </span>
                     <button class="view-btn">View Classes →</button>
                 </div>
             </div>
-        `).join('');
-    }
-
+        `;
+    }).join('');
+}
     function updateStats(semesters) {
         const total = semesters.length;
         const active = semesters.filter(s => s.is_current === 1).length;
@@ -441,13 +486,57 @@
         });
     }
 
-    function selectSemester(semester) {
-        // Store selected semester data for the classes page
-        localStorage.setItem('selectedSemester', JSON.stringify(semester));
-        // Redirect to classes page
-        window.location.href = 'classes.html';
-    }
-
+    // function selectSemester(semester) {
+    //     // Store selected semester data for the classes page
+    //     localStorage.setItem('selectedSemester', JSON.stringify(semester));
+    //     // Redirect to classes page
+    //     window.location.href = 'classes.html';
+    // }
+//     function selectSemester(semester) {
+//     // Store the complete semester data as received from API
+//     localStorage.setItem('selectedSemester', JSON.stringify({
+//         semester: semester.semester,
+//         academic_year: semester.academic_year,
+//         is_current: semester.is_current,
+//         marks_entry_date: semester.marks_entry_date,
+//         lecturer: semester.lecturer,
+//         name: semester.semester,  // For display
+//         startDate: semester.academic_year?.split('/')[0] || 'N/A',
+//         endDate: semester.academic_year?.split('/')[1] || 'N/A',
+//         status: semester.is_current === 1 ? 'open' : 'closed'
+//     }));
+//     window.location.href = 'classes.html';
+// }
+// function selectSemester(semester) {
+//     // Store the complete semester data as received from API
+//     // Make sure we store the exact semester string the API expects
+//     const semesterData = {
+//         semester: semester.semester,  // This should be "SEM 1 25/26"
+//         academic_year: semester.academic_year,
+//         is_current: semester.is_current,
+//         marks_entry_date: semester.marks_entry_date,
+//         lecturer: semester.lecturer,
+//         // For display purposes
+//         display_name: `${semester.semester} (${semester.academic_year})`,
+//         status: semester.is_current === 1 ? 'open' : 'closed'
+//     };
+    
+//     console.log('Storing semester data:', semesterData);
+//     localStorage.setItem('selectedSemester', JSON.stringify(semesterData));
+//     window.location.href = 'classes.html';
+// }
+function selectSemester(semester) {
+    console.log('Selected semester:', semester);
+    // Store the complete semester data as received from API
+    localStorage.setItem('selectedSemester', JSON.stringify({
+        semester: semester.semester,
+        academic_year: semester.academic_year,
+        is_current: semester.is_current,
+        marks_entry_date: semester.marks_entry_date,
+        lecturer: semester.lecturer
+    }));
+    window.location.href = 'classes.html';
+}
     // Initialize page
     updateLecturerInfo(currentUser.email, currentUser.pf_no);
     fetchSemesters();
