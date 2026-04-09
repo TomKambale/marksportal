@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Marks Uploader | Raw CSV to ERP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #006400;
+            --secondary-green: #228B22;
+            --light-green: #f0f9f0;
+            --dark-green: #004d00;
+            --accent-gold: #D4AF37;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --info: #0dcaf0;
+            --font-sans: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            --font-mono: 'SF Mono', 'Fira Code', monospace;
+            --color-background-primary: #ffffff;
+            --color-background-secondary: #f8f9fa;
+            --color-background-tertiary: #f0f2f5;
+            --color-background-info: #e7f3ff;
+            --color-background-success: #e6f4ea;
+            --color-background-warning: #fff3e0;
+            --color-text-primary: #1a2a1a;
+            --color-text-secondary: #5a6e5a;
+            --color-text-info: #0a5d8a;
+            --color-text-success: #1e6f3f;
+            --color-text-warning: #b85c00;
+            --color-text-danger: #c0392b;
+            --color-border-secondary: #dce5dc;
+            --color-border-tertiary: #e9ecef;
+            --border-radius-md: 12px;
+            --border-radius-lg: 20px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            font-family: var(--font-sans);
+        }
+
+        .page {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--color-background-primary);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 100, 0, 0.08);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            border-bottom: 2px solid var(--light-green);
+            padding-bottom: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-green);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-weight: 600;
+            background: var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .badge-info {
+            background: #e7f3ff;
+            color: var(--info);
+        }
+
+        .badge-success {
+            background: var(--light-green);
+            color: var(--primary-green);
+        }
+
+        .badge-warning {
+            background: #fff3e0;
+            color: var(--warning);
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--secondary-green);
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--light-gray);
+        }
+
+        .upload-zone:hover {
+            background: var(--light-green);
+            border-color: var(--primary-green);
+        }
+
+        .upload-icon svg {
+            color: var(--primary-green);
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-green);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid var(--primary-green);
+            color: var(--primary-green);
+        }
+
+        .btn-outline:hover {
+            background: var(--light-green);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b02a37;
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 16px;
+            margin-top: 1rem;
+            border: 1px solid var(--color-border-tertiary);
+        }
+
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .marks-table th {
+            background: var(--dark-green);
+            color: white;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .marks-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--color-border-tertiary);
+            color: var(--dark-gray);
+        }
+
+        .marks-table tr:hover {
+            background: var(--light-green);
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 2rem;
+            color: var(--medium-gray);
+        }
+
+        /* Stats */
+        .stats-bar {
+            background: var(--light-green);
+            padding: 1rem;
+            border-radius: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--dark-green);
+        }
+
+        /* Alert */
+        .alert-message {
+            background: #fff3e0;
+            border-left: 4px solid var(--warning);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* ERP Preview */
+        .erp-preview {
+            background: #1e2a1e;
+            color: #d4ffd4;
+            border-radius: 16px;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        .erp-preview pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border: none;
+            border-top: 1px solid var(--color-border-tertiary);
+        }
+
+        .template-hint {
+            background: var(--light-green);
+            padding: 0.75rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 1rem;
+            }
+            .stats-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <!-- Header Card -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                📂 Raw CSV Upload → ERP Sync
+            </div>
+            <span class="badge badge-info">No calculations · Raw data only</span>
+        </div>
+        <p style="font-size: 0.85rem; color: var(--medium-gray); margin-bottom: 1rem;">
+            Upload a CSV file with student marks. The system reads the raw values and prepares them exactly as provided.
+            No automatic scaling or conversion — what you upload is what gets sent to the ERP.
+        </p>
+
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+            </div>
+            <p style="font-weight: 600; margin-bottom: 0.25rem;">Click or drag CSV file</p>
+            <p style="font-size: 0.75rem; color: var(--medium-gray);">Headers required: <strong>Student adm.no, CAT, Exam</strong></p>
+            <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-outline" id="downloadTemplateBtn">
+                📥 Download CSV Template
+            </button>
+            <button class="btn btn-outline" id="sampleDataBtn">
+                Load Sample Data
+            </button>
+            <button class="btn btn-danger" id="clearDataBtn">
+                Clear All
+            </button>
+        </div>
+
+        <div class="template-hint">
+            <strong>Note:</strong> The CSV must contain exactly these columns: <strong>Student adm.no, CAT, Exam</strong><br>
+            No calculations are performed — raw CAT and Exam values are sent as-is to the ERP.
+        </div>
+
+        <div id="feedbackMessage" class="alert-message" style="display: none;"></div>
+    </div>
+
+    <!-- Preview Card -->
+    <div class="card" id="previewCard" style="display: none;">
+        <div class="card-header">
+            <div class="card-title">
+                Uploaded Marks Preview
+            </div>
+            <span class="badge badge-success" id="recordCountBadge">0 records</span>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">Total Students: <strong id="totalStudents">0</strong></div>
+            <div class="stat-item">Avg CAT (raw): <strong id="avgCat">—</strong></div>
+            <div class="stat-item">Avg Exam (raw): <strong id="avgExam">—</strong></div>
+        </div>
+
+        <div class="table-wrapper">
+            <table class="marks-table">
+                <thead>
+                    <tr>
+                        <th>Admission Number</th>
+                        <th>CAT Marks (raw)</th>
+                        <th>Exam Marks (raw)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr class="empty-row"><td colspan="3">No data uploaded yet</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="btn-group" style="justify-content: flex-end; margin-top: 1.25rem;">
+            <button class="btn btn-outline" id="previewErpBtn">
+                🔍 Preview ERP JSON
+            </button>
+            <button class="btn btn-primary" id="pushToErpBtn">
+                ⬆️ Push to ERP (Simulate)
+            </button>
+        </div>
+
+        <div id="erpPreviewContainer" style="display: none; margin-top: 1rem;">
+            <div class="erp-preview">
+                <strong style="color: var(--accent-gold);">📡 ERP Payload (raw data)</strong>
+                <pre id="jsonPreview" style="margin-top: 0.5rem;"></pre>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align: center; font-size: 0.7rem; color: var(--medium-gray);">
+        Raw uploader — sends exactly what you provide: { "admission_number", "cat", "exam" }
+    </footer>
+</div>
+
+<script>
+    // ---------- STATE ----------
+    let uploadedRecords = []; // each object: { admission_number, cat, exam }
+
+    // DOM Elements
+    const fileInput = document.getElementById('csvFileInput');
+    const uploadZone = document.getElementById('uploadZone');
+    const tableBody = document.getElementById('tableBody');
+    const totalStudentsSpan = document.getElementById('totalStudents');
+    const avgCatSpan = document.getElementById('avgCat');
+    const avgExamSpan = document.getElementById('avgExam');
+    const recordCountBadge = document.getElementById('recordCountBadge');
+    const previewCard = document.getElementById('previewCard');
+    const feedbackDiv = document.getElementById('feedbackMessage');
+    const downloadBtn = document.getElementById('downloadTemplateBtn');
+    const sampleBtn = document.getElementById('sampleDataBtn');
+    const clearBtn = document.getElementById('clearDataBtn');
+    const previewErpBtn = document.getElementById('previewErpBtn');
+    const pushToErpBtn = document.getElementById('pushToErpBtn');
+    const erpPreviewContainer = document.getElementById('erpPreviewContainer');
+    const jsonPreview = document.getElementById('jsonPreview');
+
+    // Helper: Show feedback message
+    function showFeedback(message, isError = false) {
+        feedbackDiv.style.display = 'block';
+        feedbackDiv.innerHTML = `<span>${isError ? '⚠️ ' : '✅ '}${message}</span>`;
+        feedbackDiv.style.background = isError ? '#ffe6e6' : '#e6ffed';
+        feedbackDiv.style.borderLeftColor = isError ? 'var(--danger)' : 'var(--secondary-green)';
+        setTimeout(() => {
+            feedbackDiv.style.display = 'none';
+        }, 4000);
+    }
+
+    // Escape HTML
+    function escapeHtml(str) {
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Parse CSV: expects headers "Student adm.no", "CAT", "Exam"
+    function parseCSVToRawRecords(csvText) {
+        const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
+        if (lines.length < 2) {
+            throw new Error("CSV must contain header row + at least one data row.");
+        }
+
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+        
+        // Flexible header matching
+        const admIndex = headers.findIndex(h => 
+            h.includes('adm.no') || h === 'student adm.no' || h === 'adm no' || h === 'admission number' || h === 'admission_no'
+        );
+        const catIndex = headers.findIndex(h => 
+            h === 'cat' || h === 'cat marks' || h === 'cat_marks'
+        );
+        const examIndex = headers.findIndex(h => 
+            h === 'exam' || h === 'exam marks' || h === 'exam_marks'
+        );
+
+        if (admIndex === -1 || catIndex === -1 || examIndex === -1) {
+            throw new Error(`Required columns missing. Found: ${headers.join(', ')}. Need: "Student adm.no", "CAT", "Exam"`);
+        }
+
+        const records = [];
+        for (let i = 1; i < lines.length; i++) {
+            const row = lines[i].split(',').map(cell => cell.trim());
+            if (row.length < Math.max(admIndex, catIndex, examIndex) + 1) continue;
+            
+            let admissionNumber = row[admIndex].trim();
+            if (admissionNumber === "") continue;
+            
+            let rawCat = row[catIndex].trim();
+            let rawExam = row[examIndex].trim();
+            
+            // Parse as numbers, but keep original if invalid? We'll convert to number, default to 0
+            let catValue = parseFloat(rawCat);
+            let examValue = parseFloat(rawExam);
+            
+            if (isNaN(catValue)) catValue = 0;
+            if (isNaN(examValue)) examValue = 0;
+            
+            // No clamping, no conversion — just raw values as provided
+            records.push({
+                admission_number: String(admissionNumber),
+                cat: catValue,
+                exam: examValue
+            });
+        }
+        
+        if (records.length === 0) {
+            throw new Error("No valid student records found after parsing. Check your data rows.");
+        }
+        return records;
+    }
+
+    // Render the table and stats
+    function renderTable() {
+        if (!uploadedRecords.length) {
+            tableBody.innerHTML = `<tr class="empty-row"><td colspan="3">📭 No student data. Upload a CSV or load sample.</td></tr>`;
+            totalStudentsSpan.innerText = '0';
+            avgCatSpan.innerText = '—';
+            avgExamSpan.innerText = '—';
+            recordCountBadge.innerText = '0 records';
+            previewCard.style.display = 'none';
+            erpPreviewContainer.style.display = 'none';
+            return;
+        }
+
+        previewCard.style.display = 'block';
+        const count = uploadedRecords.length;
+        let totalCat = 0, totalExam = 0;
+        let htmlRows = '';
+        
+        for (let i = 0; i < uploadedRecords.length; i++) {
+            const r = uploadedRecords[i];
+            totalCat += r.cat;
+            totalExam += r.exam;
+            htmlRows += `
+                <tr>
+                    <td><strong>${escapeHtml(r.admission_number)}</strong></td>
+                    <td>${r.cat.toFixed(2)}</td>
+                    <td>${r.exam.toFixed(2)}</td>
+                </tr>
+            `;
+        }
+        
+        const avgCat = totalCat / count;
+        const avgExam = totalExam / count;
+        
+        totalStudentsSpan.innerText = count;
+        avgCatSpan.innerText = avgCat.toFixed(2);
+        avgExamSpan.innerText = avgExam.toFixed(2);
+        recordCountBadge.innerText = `${count} record${count !== 1 ? 's' : ''}`;
+        
+        tableBody.innerHTML = htmlRows;
+        erpPreviewContainer.style.display = 'none';
+    }
+
+    // Set records and render
+    function setRecords(records) {
+        uploadedRecords = [...records];
+        renderTable();
+    }
+
+    // Load CSV file
+    function handleFileUpload(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const csvText = e.target.result;
+                const records = parseCSVToRawRecords(csvText);
+                setRecords(records);
+                showFeedback(`✅ Successfully loaded ${records.length} student records (raw data, no calculations applied).`);
+            } catch (err) {
+                console.error(err);
+                showFeedback(`❌ Error: ${err.message}`, true);
+            }
+        };
+        reader.onerror = function() {
+            showFeedback('Failed to read file.', true);
+        };
+        reader.readAsText(file, "UTF-8");
+    }
+
+    // Download CSV Template with correct headers
+    function downloadTemplate() {
+        const templateContent = `Student adm.no,CAT,Exam
+SE217/2000/2022,,
+SE217/2000/2023,,
+SE217/2000/2024,,
+SE217/2000/2025,,`;
+        const blob = new Blob([templateContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'student_marks_template.csv');
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showFeedback('📥 Template downloaded! Fill in your data and upload.');
+    }
+
+    // Load sample data (raw realistic values)
+    function loadSampleData() {
+        const sampleRecords = [
+            { admission_number: "SE217/2000/2022", cat: 24.5, exam: 68.0 },
+            { admission_number: "SE217/2000/2023", cat: 18.0, exam: 55.5 },
+            { admission_number: "SE217/2000/2024", cat: 29.0, exam: 72.0 },
+            { admission_number: "SE217/2000/2025", cat: 12.0, exam: 41.0 },
+            { admission_number: "SE217/2000/2026", cat: 27.5, exam: 79.0 },
+            { admission_number: "SE217/2000/2027", cat: 8.5, exam: 33.0 },
+            { admission_number: "SE217/2000/2028", cat: 30.0, exam: 85.0 }
+        ];
+        setRecords(sampleRecords);
+        showFeedback(`📋 Sample data loaded (${sampleRecords.length} students). Raw marks ready for ERP.`);
+    }
+
+    // Clear all data
+    function clearAllData() {
+        if (uploadedRecords.length > 0 && confirm('⚠️ Clear all uploaded marks? This action cannot be undone.')) {
+            uploadedRecords = [];
+            renderTable();
+            showFeedback('All records cleared.');
+        } else if (uploadedRecords.length === 0) {
+            showFeedback('No data to clear.', false);
+        }
+    }
+
+    // Build ERP Payload: exactly { admission_number, cat, exam }
+    function buildERPPayload() {
+        if (uploadedRecords.length === 0) return null;
+        
+        // The payload structure: each record contains admission_number, cat, exam (raw)
+        // No total, no status, no conversion — pure raw data as requested.
+        const payload = {
+            module: "marks_raw_upload",
+            timestamp: new Date().toISOString(),
+            total_records: uploadedRecords.length,
+            marks_data: uploadedRecords.map(record => ({
+                admission_number: record.admission_number,
+                cat: record.cat,
+                exam: record.exam
+            }))
+        };
+        return payload;
+    }
+
+    // Preview ERP JSON
+    function showERPPreview() {
+        const payload = buildERPPayload();
+        if (!payload || uploadedRecords.length === 0) {
+            showFeedback('No data to preview. Upload a CSV or load sample first.', true);
+            erpPreviewContainer.style.display = 'none';
+            return;
+        }
+        const prettyJson = JSON.stringify(payload, null, 2);
+        jsonPreview.innerText = prettyJson;
+        erpPreviewContainer.style.display = 'block';
+        showFeedback('📡 ERP payload ready — raw CAT and Exam values (no calculations).');
+    }
+
+    // Simulate ERP push (mock POST request)
+    async function simulateERPUpload() {
+        const payload = buildERPPayload();
+        if (!payload || uploadedRecords.length === 0) {
+            showFeedback('❌ No records to push. Upload data first.', true);
+            return;
+        }
+
+        showFeedback('⏳ Sending raw data to ERP (simulation)...', false);
+        
+        // Simulate network delay
+        setTimeout(() => {
+            console.log("[ERP MOCK] Raw payload:", payload);
+            const successMsg = `✅ SIMULATION: ${payload.total_records} raw student records sent to ERP endpoint. Each record contains admission_number, cat, exam (as uploaded).`;
+            showFeedback(successMsg);
+            
+            // Also show preview automatically
+            const prettyJson = JSON.stringify(payload, null, 2);
+            jsonPreview.innerText = prettyJson;
+            erpPreviewContainer.style.display = 'block';
+        }, 600);
+    }
+
+    // File input handlers
+    function setupFileHandlers() {
+        uploadZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                handleFileUpload(e.target.files[0]);
+            }
+            fileInput.value = '';
+        });
+        
+        // Drag and drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.style.background = 'var(--light-green)';
+            uploadZone.style.borderColor = 'var(--primary-green)';
+        });
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.style.background = 'var(--light-gray)';
+            uploadZone.style.borderColor = 'var(--secondary-green)';
+        });
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.style.background = 'var(--light-gray)';
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                handleFileUpload(files[0]);
+            } else {
+                showFeedback('Please drop a valid CSV file.', true);
+            }
+        });
+    }
+
+    // Event listeners
+    downloadBtn.addEventListener('click', downloadTemplate);
+    sampleBtn.addEventListener('click', loadSampleData);
+    clearBtn.addEventListener('click', clearAllData);
+    previewErpBtn.addEventListener('click', showERPPreview);
+    pushToErpBtn.addEventListener('click', simulateERPUpload);
+    
+    // Initialize
+    setupFileHandlers();
+    renderTable();
+    
+    // Welcome hint
+    setTimeout(() => {
+        if (uploadedRecords.length === 0) {
+            showFeedback('💡 Ready: Upload a CSV with columns "Student adm.no, CAT, Exam". No calculations — raw data sent to ERP.', false);
+        }
+    }, 500);
+</script>
+</body>
+</html>

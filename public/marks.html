@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Student Marks | Lecturer Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        :root {
+            --primary-green: #006400;
+            --secondary-green: #228B22;
+            --light-green: #f0f9f0;
+            --dark-green: #004d00;
+            --accent-gold: #D4AF37;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --info: #0dcaf0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .back-btn:hover {
+            background: var(--light-green);
+            transform: translateX(-4px);
+        }
+
+        .class-banner {
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            border-radius: 24px;
+            padding: 1.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .class-banner h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .class-banner .class-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
+            flex: 1;
+            min-width: 120px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--medium-gray);
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid rgba(0, 100, 0, 0.1);
+        }
+
+        .card-header {
+            background: var(--dark-green);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .exam-badge {
+            background: var(--accent-gold);
+            color: var(--dark-green);
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .marks-table th {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .marks-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .marks-table tr:hover {
+            background: var(--light-green);
+        }
+
+        .marks-input {
+            width: 80px;
+            padding: 0.4rem 0.5rem;
+            border: 1.5px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .marks-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 2px rgba(0, 100, 0, 0.1);
+        }
+
+        .total-cell {
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .status-pass {
+            color: var(--primary-green);
+            font-weight: 600;
+        }
+
+        .status-fail {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .save-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .save-btn:hover {
+            background: var(--dark-green);
+            transform: translateY(-2px);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 2rem;
+            color: var(--medium-gray);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .marks-table th, .marks-table td { padding: 0.5rem; font-size: 0.7rem; }
+            .marks-input { width: 60px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <button class="back-btn" onclick="goBack()">← Back to Classes</button>
+    </div>
+
+    <div class="class-banner" id="classBanner">
+        <h1>Loading class...</h1>
+        <div class="class-meta"></div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-number" id="totalStudents">0</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="avgCat">—</div>
+            <div class="stat-label">Average CAT</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="avgExam">—</div>
+            <div class="stat-label">Average Exam</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="avgTotal">—</div>
+            <div class="stat-label">Average Total</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Student Marks</h2>
+            <span class="exam-badge" id="examCategoryBadge">Exam Category</span>
+        </div>
+        <div class="table-wrapper">
+            <table class="marks-table">
+                <thead>
+                    <tr>
+                        <th>Admission No.</th>
+                        <th>Student Name</th>
+                        <th>CAT Marks</th>
+                        <th>Exam Marks</th>
+                        <th>Total (out of 100)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="marksTableBody">
+                    <tr class="empty-row"><td colspan="6">Loading student data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="btn-group">
+            <button class="save-btn" onclick="saveMarks()">Save Changes</button>
+            <button class="save-btn" onclick="exportToCSV()">Export to CSV</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mock student data for a selected class
+    const studentData = {
+        "CSC201": {
+            unitName: "Data Structures & Algorithms",
+            examCategory: "30:70",
+            students: [
+                { admNo: "SE217/2000/1001", name: "Alice Wanjiku", cat: 25, exam: 58 },
+                { admNo: "SE217/2000/1002", name: "Brian Otieno", cat: 28, exam: 65 },
+                { admNo: "SE217/2000/1003", name: "Catherine Muthoni", cat: 22, exam: 55 },
+                { admNo: "SE217/2000/1004", name: "David Kipchoge", cat: 29, exam: 68 },
+                { admNo: "SE217/2000/1005", name: "Esther Nyokabi", cat: 18, exam: 48 },
+                { admNo: "SE217/2000/1006", name: "Francis Maina", cat: 26, exam: 62 },
+                { admNo: "SE217/2000/1007", name: "Grace Achieng", cat: 30, exam: 70 },
+                { admNo: "SE217/2000/1008", name: "Henry Kariuki", cat: 15, exam: 42 }
+            ]
+        },
+        "CSC301": {
+            unitName: "Software Engineering",
+            examCategory: "40:60",
+            students: [
+                { admNo: "SE217/2000/2001", name: "Ian Njoroge", cat: 35, exam: 52 },
+                { admNo: "SE217/2000/2002", name: "Jane Atieno", cat: 38, exam: 58 },
+                { admNo: "SE217/2000/2003", name: "Kevin Odhiambo", cat: 32, exam: 48 }
+            ]
+        },
+        "CSC401": {
+            unitName: "Software Engineering",
+            examCategory: "40:60",
+            students: [
+                { admNo: "SE217/2000/2001", name: "Ian Njoroge", cat: 35, exam: 52 },
+                { admNo: "SE217/2000/2002", name: "Jane Atieno", cat: 38, exam: 58 },
+                { admNo: "SE217/2000/2003", name: "Kevin Odhiambo", cat: 32, exam: 48 }
+            ]
+        },
+        "ITC201": {
+            unitName: "Database Administration",
+            examCategory: "40:60",
+            students: [
+                { admNo: "SE217/2000/3001", name: "Linda Chebet", cat: 36, exam: 55 },
+                { admNo: "SE217/2000/3002", name: "Michael Omondi", cat: 34, exam: 50 }
+            ]
+        }
+    };
+
+    let currentClass = null;
+    let currentStudents = [];
+
+    function calculateTotal(cat, exam, category) {
+        if (category === "30:70") {
+            // CAT max 30, Exam max 70 -> total out of 100
+            return Math.min(100, cat + exam);
+        } else if (category === "40:60") {
+            // CAT max 40, Exam max 60 -> total out of 100
+            return Math.min(100, cat + exam);
+        } else {
+            // Pre-calculated: assume already out of 100
+            return Math.min(100, cat + exam);
+        }
+    }
+
+    function getStatus(total) {
+        if (total >= 70) return { text: "Pass (A)", class: "status-pass" };
+        if (total >= 60) return { text: "Pass (B)", class: "status-pass" };
+        if (total >= 50) return { text: "Pass (C)", class: "status-pass" };
+        if (total >= 40) return { text: "Supplementary", class: "status-fail" };
+        return { text: "Fail", class: "status-fail" };
+    }
+
+    function renderMarksTable() {
+        if (!currentStudents.length) {
+            document.getElementById('marksTableBody').innerHTML = '<tr class="empty-row"><td colspan="6">No students found for this class.</td></tr>';
+            return;
+        }
+
+        let totalCat = 0, totalExam = 0, totalFinal = 0;
+        
+        const tbody = document.getElementById('marksTableBody');
+        tbody.innerHTML = currentStudents.map((student, index) => {
+            const finalTotal = calculateTotal(student.cat, student.exam, currentClass.examCategory);
+            const status = getStatus(finalTotal);
+            totalCat += student.cat;
+            totalExam += student.exam;
+            totalFinal += finalTotal;
+            
+            return `
+                <tr>
+                    <td><strong>${escapeHtml(student.admNo)}</strong></td>
+                    <td>${escapeHtml(student.name)}</td>
+                    <td><input type="number" class="marks-input" id="cat_${index}" value="${student.cat}" step="0.5" min="0" max="${currentClass.examCategory === '30:70' ? 30 : 40}" onchange="updateMarks(${index}, 'cat', this.value)"></td>
+                    <td><input type="number" class="marks-input" id="exam_${index}" value="${student.exam}" step="0.5" min="0" max="${currentClass.examCategory === '30:70' ? 70 : 60}" onchange="updateMarks(${index}, 'exam', this.value)"></td>
+                    <td class="total-cell" id="total_${index}">${finalTotal.toFixed(1)}</td>
+                    <td class="${status.class}">${status.text}</td>
+                </tr>
+            `;
+        }).join('');
+        
+        const count = currentStudents.length;
+        document.getElementById('totalStudents').textContent = count;
+        document.getElementById('avgCat').textContent = (totalCat / count).toFixed(1);
+        document.getElementById('avgExam').textContent = (totalExam / count).toFixed(1);
+        document.getElementById('avgTotal').textContent = (totalFinal / count).toFixed(1);
+    }
+
+    function updateMarks(index, type, value) {
+        let numValue = parseFloat(value);
+        if (isNaN(numValue)) numValue = 0;
+        
+        if (type === 'cat') {
+            currentStudents[index].cat = numValue;
+        } else {
+            currentStudents[index].exam = numValue;
+        }
+        
+        // Update total cell
+        const finalTotal = calculateTotal(currentStudents[index].cat, currentStudents[index].exam, currentClass.examCategory);
+        document.getElementById(`total_${index}`).textContent = finalTotal.toFixed(1);
+        
+        // Update status cell
+        const status = getStatus(finalTotal);
+        const row = document.getElementById(`total_${index}`).parentElement;
+        const statusCell = row.cells[5];
+        statusCell.className = status.class;
+        statusCell.textContent = status.text;
+        
+        // Recalculate averages
+        let totalCat = 0, totalExam = 0, totalFinal = 0;
+        currentStudents.forEach(s => {
+            totalCat += s.cat;
+            totalExam += s.exam;
+            totalFinal += calculateTotal(s.cat, s.exam, currentClass.examCategory);
+        });
+        const count = currentStudents.length;
+        document.getElementById('avgCat').textContent = (totalCat / count).toFixed(1);
+        document.getElementById('avgExam').textContent = (totalExam / count).toFixed(1);
+        document.getElementById('avgTotal').textContent = (totalFinal / count).toFixed(1);
+    }
+
+    function saveMarks() {
+        // In a real app, this would send an API request to save marks
+        alert('✅ Marks saved successfully!\n\nChanges have been stored locally. In production, this would sync with the ERP database.');
+        console.log('Saved marks:', currentStudents);
+    }
+
+    function exportToCSV() {
+        let csvContent = "Admission No.,Student Name,CAT Marks,Exam Marks,Total,Status\n";
+        currentStudents.forEach(student => {
+            const finalTotal = calculateTotal(student.cat, student.exam, currentClass.examCategory);
+            const status = getStatus(finalTotal).text;
+            csvContent += `"${student.admNo}","${student.name}",${student.cat},${student.exam},${finalTotal.toFixed(1)},"${status}"\n`;
+        });
+        
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${currentClass.unitCode}_marks.csv`);
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+
+    function loadClassData() {
+        const savedClass = localStorage.getItem('selectedClass');
+        if (!savedClass) {
+            window.location.href = 'classes.html';
+            return;
+        }
+        
+        currentClass = JSON.parse(savedClass);
+        
+        // Load student data for this unit
+        const unitData = studentData[currentClass.unitCode];
+        if (unitData) {
+            currentStudents = JSON.parse(JSON.stringify(unitData.students));
+            document.getElementById('classBanner').innerHTML = `
+                <h1>📖 ${escapeHtml(unitData.unitName)}</h1>
+                <div class="class-meta">
+                    <span>📚 ${escapeHtml(currentClass.unitCode)}</span>
+                    <span>📅 Semester: ${currentClass.semester?.name || 'Current'}</span>
+                </div>
+            `;
+            document.getElementById('examCategoryBadge').textContent = unitData.examCategory;
+            currentClass.examCategory = unitData.examCategory;
+        } else {
+            document.getElementById('classBanner').innerHTML = `
+                <h1>⚠️ Class Not Found</h1>
+                <div class="class-meta">No student data available for this class</div>
+            `;
+            currentStudents = [];
+        }
+        
+        renderMarksTable();
+    }
+
+    function escapeHtml(str) {
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function goBack() {
+        window.location.href = 'classes.html';
+    }
+
+    loadClassData();
+</script>
+</body>
+</html>

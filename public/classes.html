@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Classes | Lecturer Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        :root {
+            --primary-green: #006400;
+            --secondary-green: #228B22;
+            --light-green: #f0f9f0;
+            --dark-green: #004d00;
+            --accent-gold: #D4AF37;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --info: #0dcaf0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .back-btn:hover {
+            background: var(--light-green);
+            transform: translateX(-4px);
+        }
+
+        .semester-banner {
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            border-radius: 24px;
+            padding: 1.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .semester-banner h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .semester-banner p {
+            opacity: 0.9;
+            font-size: 0.85rem;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
+            flex: 1;
+            min-width: 150px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--medium-gray);
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid rgba(0, 100, 0, 0.1);
+        }
+
+        .card-header {
+            background: var(--dark-green);
+            color: white;
+            padding: 1rem 1.5rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .classes-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .classes-table th {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .classes-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .classes-table tr:hover {
+            background: var(--light-green);
+            cursor: pointer;
+        }
+
+        .exam-category {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .cat-30-70 {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .cat-40-60 {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .cat-pre {
+            background: #e8f5e9;
+            color: var(--primary-green);
+        }
+
+        .view-marks-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .view-marks-btn:hover {
+            background: var(--dark-green);
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 2rem;
+            color: var(--medium-gray);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .classes-table th, .classes-table td { padding: 0.75rem; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <button class="back-btn" onclick="goBack()">← Back to Semesters</button>
+    </div>
+
+    <div class="semester-banner" id="semesterBanner">
+        <h1>📖 Loading semester...</h1>
+        <p>Select a class to view student marks</p>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-number" id="totalClasses">0</div>
+            <div class="stat-label">Total Classes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="totalStudents">0</div>
+            <div class="stat-label">Total Students Enrolled</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="examTypes">0</div>
+            <div class="stat-label">Exam Categories</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>📋 My Classes</h2>
+        </div>
+        <div class="table-wrapper">
+            <table class="classes-table">
+                <thead>
+                    <tr>
+                        <th>Programme Code</th>
+                        <th>Programme Name</th>
+                        <th>Stage</th>
+                        <th>Unit Code</th>
+                        <th>Unit Name</th>
+                        <th>Exam Category</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="classesTableBody">
+                    <tr class="empty-row"><td colspan="7">Loading classes...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mock data for classes taught in a semester
+    const allClasses = {
+        1: [ // Semester 1 - 2024/2025
+            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 2", unitCode: "CSC201", unitName: "Data Structures & Algorithms", examCategory: "30:70", students: 45 },
+            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 3", unitCode: "CSC301", unitName: "Software Engineering", examCategory: "40:60", students: 38 },
+            { programmeCode: "BSC-IT", programmeName: "BSc Information Technology", stage: "Year 2", unitCode: "ITC201", unitName: "Database Administration", examCategory: "40:60", students: 42 }
+        ],
+        2: [ // Semester 2 - 2024/2025
+            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 1", unitCode: "CSC102", unitName: "Object-Oriented Programming", examCategory: "30:70", students: 52 },
+            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 2", unitCode: "CSC202", unitName: "Algorithm Design", examCategory: "30:70", students: 44 },
+            { programmeCode: "BSC-IT", programmeName: "BSc Information Technology", stage: "Year 1", unitCode: "ITC102", unitName: "Web Development II", examCategory: "Pre-calculated", students: 48 },
+            { programmeCode: "BSC-IT", programmeName: "BSc Information Technology", stage: "Year 3", unitCode: "ITC301", unitName: "System Analysis & Design", examCategory: "40:60", students: 35 }
+        ],
+        3: [ // Semester 1 - 2023/2024 (closed)
+            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 1", unitCode: "CSC101", unitName: "Introduction to Programming", examCategory: "30:70", students: 50 },
+            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 2", unitCode: "CSC203", unitName: "Operating Systems", examCategory: "30:70", students: 42 },
+            { programmeCode: "BSC-IT", programmeName: "BSc Information Technology", stage: "Year 2", unitCode: "ITC203", unitName: "Networking I", examCategory: "30:70", students: 39 }
+        ],
+        4: [ // Semester 2 - 2023/2024
+            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 3", unitCode: "CSC304", unitName: "Mobile Application Dev", examCategory: "40:60", students: 36 },
+            { programmeCode: "BSC-IT", programmeName: "BSc Information Technology", stage: "Year 1", unitCode: "ITC104", unitName: "UI/UX Design", examCategory: "Pre-calculated", students: 47 }
+        ],
+        5: [ // Summer Session
+            { programmeCode: "BSC-CS", programmeName: "BSc Computer Science", stage: "Year 4", unitCode: "CSC401", unitName: "Project Management", examCategory: "30:70", students: 28 }
+        ]
+    };
+
+    let currentSemester = null;
+
+    function getExamCategoryClass(category) {
+        if (category === "30:70") return "cat-30-70";
+        if (category === "40:60") return "cat-40-60";
+        return "cat-pre";
+    }
+
+    function renderClasses() {
+        const savedSemester = localStorage.getItem('selectedSemester');
+        if (!savedSemester) {
+            window.location.href = 'semesters.html';
+            return;
+        }
+
+        currentSemester = JSON.parse(savedSemester);
+        
+        // Update banner
+        document.getElementById('semesterBanner').innerHTML = `
+            <h1>📖 ${escapeHtml(currentSemester.name)}</h1>
+            <p>${currentSemester.startDate} - ${currentSemester.endDate} | Status: ${currentSemester.status.toUpperCase()}</p>
+        `;
+
+        const classes = allClasses[currentSemester.id] || [];
+        const tbody = document.getElementById('classesTableBody');
+        
+        if (classes.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No classes found for this semester.</td></tr>';
+            document.getElementById('totalClasses').textContent = '0';
+            document.getElementById('totalStudents').textContent = '0';
+            document.getElementById('examTypes').textContent = '0';
+            return;
+        }
+
+        let totalStudents = 0;
+        const uniqueCategories = new Set();
+        
+        tbody.innerHTML = classes.map(cls => {
+            totalStudents += cls.students;
+            uniqueCategories.add(cls.examCategory);
+            return `
+                <tr onclick="selectClass('${cls.unitCode}', '${cls.unitName}', '${cls.examCategory}')">
+                    <td>${escapeHtml(cls.programmeCode)}</td>
+                    <td>${escapeHtml(cls.programmeName)}</td>
+                    <td>${escapeHtml(cls.stage)}</td>
+                    <td><strong>${escapeHtml(cls.unitCode)}</strong></td>
+                    <td>${escapeHtml(cls.unitName)}</td>
+                    <td><span class="exam-category ${getExamCategoryClass(cls.examCategory)}">${escapeHtml(cls.examCategory)}</span></td>
+                    <td><button class="view-marks-btn">View Marks →</button></td>
+                </tr>
+            `;
+        }).join('');
+
+        document.getElementById('totalClasses').textContent = classes.length;
+        document.getElementById('totalStudents').textContent = totalStudents;
+        document.getElementById('examTypes').textContent = uniqueCategories.size;
+    }
+
+    function selectClass(unitCode, unitName, examCategory) {
+        const classData = {
+            semester: currentSemester,
+            unitCode: unitCode,
+            unitName: unitName,
+            examCategory: examCategory
+        };
+        localStorage.setItem('selectedClass', JSON.stringify(classData));
+        window.location.href = 'marks.html';
+    }
+
+    function escapeHtml(str) {
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    function goBack() {
+        window.location.href = 'semesters.html';
+    }
+
+    renderClasses();
+</script>
+</body>
+</html>
