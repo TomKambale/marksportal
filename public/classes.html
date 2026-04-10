@@ -1,496 +1,523 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
     <title>Classes | Lecturer Dashboard</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family:
+          system-ui, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+      }
 
-        :root {
-            --primary-green: #006400;
-            --secondary-green: #228B22;
-            --light-green: #f0f9f0;
-            --dark-green: #004d00;
-            --accent-gold: #D4AF37;
-            --white: #ffffff;
-            --light-gray: #f8f9fa;
-            --medium-gray: #6c757d;
-            --dark-gray: #343a40;
-            --transition: all 0.3s ease;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            --danger: #dc3545;
-            --warning: #fd7e14;
-            --info: #0dcaf0;
-        }
+      :root {
+        --primary-green: #006400;
+        --secondary-green: #228b22;
+        --light-green: #f0f9f0;
+        --dark-green: #004d00;
+        --accent-gold: #d4af37;
+        --white: #ffffff;
+        --light-gray: #f8f9fa;
+        --medium-gray: #6c757d;
+        --dark-gray: #343a40;
+        --transition: all 0.3s ease;
+        --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        --danger: #dc3545;
+        --warning: #fd7e14;
+        --info: #0dcaf0;
+      }
 
+      body {
+        background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+        min-height: 100vh;
+        padding: 2rem 1.5rem;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .header {
+        margin-bottom: 2rem;
+      }
+
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--white);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--primary-green);
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow);
+      }
+
+      .back-btn:hover {
+        background: var(--light-green);
+        transform: translateX(-4px);
+      }
+
+      .semester-banner {
+        background: linear-gradient(
+          135deg,
+          var(--primary-green),
+          var(--dark-green)
+        );
+        border-radius: 24px;
+        padding: 1.5rem;
+        color: white;
+        margin-bottom: 1.5rem;
+      }
+
+      .semester-banner h1 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .semester-banner p {
+        opacity: 0.9;
+        font-size: 0.85rem;
+      }
+
+      .stats-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .stat-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 1rem 1.5rem;
+        flex: 1;
+        min-width: 150px;
+        box-shadow: var(--shadow);
+      }
+
+      .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-green);
+      }
+
+      .stat-label {
+        font-size: 0.7rem;
+        color: var(--medium-gray);
+      }
+
+      .card {
+        background: var(--white);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        border: 1px solid rgba(0, 100, 0, 0.1);
+      }
+
+      .card-header {
+        background: var(--dark-green);
+        color: white;
+        padding: 1rem 1.5rem;
+      }
+
+      .card-header h2 {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .table-wrapper {
+        overflow-x: auto;
+      }
+
+      .classes-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+
+      .classes-table th {
+        background: var(--light-gray);
+        color: var(--dark-gray);
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid var(--light-green);
+      }
+
+      .classes-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--light-gray);
+        color: var(--dark-gray);
+      }
+
+      .classes-table tr:hover {
+        background: var(--light-green);
+        cursor: pointer;
+      }
+
+      .exam-category {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+      }
+
+      .cat-30-70 {
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+
+      .cat-40-60 {
+        background: #fff3e0;
+        color: #e65100;
+      }
+
+      .cat-pre {
+        background: #e8f5e9;
+        color: var(--primary-green);
+      }
+
+      .view-marks-btn {
+        background: var(--primary-green);
+        color: white;
+        border: none;
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .view-marks-btn:hover {
+        background: var(--dark-green);
+        transform: translateY(-2px);
+      }
+
+      .empty-row td {
+        text-align: center;
+        padding: 2rem;
+        color: var(--medium-gray);
+      }
+
+      @media (max-width: 768px) {
         body {
-            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
-            min-height: 100vh;
-            padding: 2rem 1.5rem;
+          padding: 1rem;
         }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .header {
-            margin-bottom: 2rem;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--white);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--primary-green);
-            margin-bottom: 1rem;
-            box-shadow: var(--shadow);
-        }
-
-        .back-btn:hover {
-            background: var(--light-green);
-            transform: translateX(-4px);
-        }
-
-        .semester-banner {
-            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
-            border-radius: 24px;
-            padding: 1.5rem;
-            color: white;
-            margin-bottom: 1.5rem;
-        }
-
-        .semester-banner h1 {
-            font-size: 1.5rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .semester-banner p {
-            opacity: 0.9;
-            font-size: 0.85rem;
-        }
-
-        .stats-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .stat-card {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 1rem 1.5rem;
-            flex: 1;
-            min-width: 150px;
-            box-shadow: var(--shadow);
-        }
-
-        .stat-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-green);
-        }
-
-        .stat-label {
-            font-size: 0.7rem;
-            color: var(--medium-gray);
-        }
-
-        .card {
-            background: var(--white);
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            border: 1px solid rgba(0, 100, 0, 0.1);
-        }
-
-        .card-header {
-            background: var(--dark-green);
-            color: white;
-            padding: 1rem 1.5rem;
-        }
-
-        .card-header h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        .classes-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
-
-        .classes-table th {
-            background: var(--light-gray);
-            color: var(--dark-gray);
-            padding: 1rem;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid var(--light-green);
-        }
-
+        .classes-table th,
         .classes-table td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--light-gray);
-            color: var(--dark-gray);
+          padding: 0.75rem;
+          font-size: 0.75rem;
         }
-
-        .classes-table tr:hover {
-            background: var(--light-green);
-            cursor: pointer;
-        }
-
-        .exam-category {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .cat-30-70 {
-            background: #e3f2fd;
-            color: #1565c0;
-        }
-
-        .cat-40-60 {
-            background: #fff3e0;
-            color: #e65100;
-        }
-
-        .cat-pre {
-            background: #e8f5e9;
-            color: var(--primary-green);
-        }
-
-        .view-marks-btn {
-            background: var(--primary-green);
-            color: white;
-            border: none;
-            padding: 0.3rem 0.8rem;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .view-marks-btn:hover {
-            background: var(--dark-green);
-            transform: translateY(-2px);
-        }
-
-        .empty-row td {
-            text-align: center;
-            padding: 2rem;
-            color: var(--medium-gray);
-        }
-
-        @media (max-width: 768px) {
-            body { padding: 1rem; }
-            .classes-table th, .classes-table td { padding: 0.75rem; font-size: 0.75rem; }
-        }
+      }
     </style>
-</head>
-<body>
-
-<div class="container">
-    <div class="header">
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
         <button class="back-btn" onclick="goBack()">← Back to Semesters</button>
-    </div>
+      </div>
 
-    <div class="semester-banner" id="semesterBanner">
+      <div class="semester-banner" id="semesterBanner">
         <h1>Loading semester...</h1>
         <p>Select a class to view student marks</p>
-    </div>
+      </div>
 
-    <div class="stats-row">
+      <div class="stats-row">
         <div class="stat-card">
-            <div class="stat-number" id="totalClasses">0</div>
-            <div class="stat-label">Total Classes</div>
+          <div class="stat-number" id="totalClasses">0</div>
+          <div class="stat-label">Total Classes</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" id="totalStudents">0</div>
-            <div class="stat-label">Total Programmes</div>
+          <div class="stat-number" id="totalStudents">0</div>
+          <div class="stat-label">Total Programmes</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" id="examTypes">0</div>
-            <div class="stat-label">Exam Categories</div>
+          <div class="stat-number" id="examTypes">0</div>
+          <div class="stat-label">Exam Categories</div>
         </div>
-    </div>
+      </div>
 
-    <div class="card">
+      <div class="card">
         <div class="card-header">
-            <h2>📋 My Classes</h2>
+          <h2>📋 My Classes</h2>
         </div>
         <div class="table-wrapper">
-            <table class="classes-table">
-                <thead>
-                    <tr>
-                        <th>Programme Code</th>
-                        <th>Programme Name</th>
-                        <th>Stage</th>
-                        <th>Unit Code</th>
-                        <th>Unit Name</th>
-                        <th>Exam Category</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="classesTableBody">
-                    <tr class="empty-row"><td colspan="7">Loading classes...<\/tr>
-                </tbody>
-            </table>
+          <table class="classes-table">
+            <thead>
+              <tr>
+                <th>Programme Code</th>
+                <th>Programme Name</th>
+                <th>Stage</th>
+                <th>Unit Code</th>
+                <th>Unit Name</th>
+                <th>Exam Category</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="classesTableBody">
+              <tr class="empty-row">
+                <td colspan="7">Loading classes...<\/tr></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
-</div>
 
-<script>
-let currentSemester = null;
-let currentUser = null;
+    <script>
+      let currentSemester = null;
+      let currentUser = null;
 
-// ✅ Get user with fallback + safe response handling
-async function getCurrentUser() {
-    try {
-        const response = await fetch('/api/current-user', {
-            credentials: 'include'
-        });
+      // ✅ Get user with fallback + safe response handling
+      async function getCurrentUser() {
+        try {
+          const response = await fetch("/api/current-user", {
+            credentials: "include",
+          });
 
-        if (!response.ok) {
-            throw new Error('Server error');
-        }
+          if (!response.ok) {
+            throw new Error("Server error");
+          }
 
-        const data = await response.json();
+          const data = await response.json();
 
-        if (data.success && data.user) {
+          if (data.success && data.user) {
             currentUser = data.user;
-            console.log('User from session:', currentUser);
+            console.log("User from session:", currentUser);
             return true;
-        }
+          }
 
-        // fallback to localStorage
-        const pf = localStorage.getItem('userPfNo');
-        const email = localStorage.getItem('userEmail');
+          // fallback to localStorage
+          const pf = localStorage.getItem("userPfNo");
+          const email = localStorage.getItem("userEmail");
 
-        if (pf && email) {
+          if (pf && email) {
             currentUser = { pf_no: pf, email: email };
-            console.log('User from localStorage:', currentUser);
+            console.log("User from localStorage:", currentUser);
             return true;
-        }
+          }
 
-        console.log('No user found, redirecting to login');
-        window.location.href = 'login.html';
-        return false;
+          console.log("No user found, redirecting to login");
+          window.location.href = "login.html";
+          return false;
+        } catch (err) {
+          console.error("Error getting user:", err);
+          const pf = localStorage.getItem("userPfNo");
+          const email = localStorage.getItem("userEmail");
 
-    } catch (err) {
-        console.error('Error getting user:', err);
-        const pf = localStorage.getItem('userPfNo');
-        const email = localStorage.getItem('userEmail');
-
-        if (pf && email) {
+          if (pf && email) {
             currentUser = { pf_no: pf, email: email };
-            console.log('User from localStorage (fallback):', currentUser);
+            console.log("User from localStorage (fallback):", currentUser);
             return true;
+          }
+
+          window.location.href = "login.html";
+          return false;
         }
+      }
 
-        window.location.href = 'login.html';
-        return false;
-    }
-}
+      // ✅ Fetch classes from API
+      async function fetchClasses(semesterName, pf_no) {
+        try {
+          const tbody = document.getElementById("classesTableBody");
+          tbody.innerHTML =
+            '<tr class="empty-row"><td colspan="7">Loading classes...<\/tr>';
 
-// ✅ Fetch classes from API
-async function fetchClasses(semesterName, pf_no) {
-    try {
-        const tbody = document.getElementById('classesTableBody');
-        tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Loading classes...<\/tr>';
-        
-        console.log('Fetching classes for semester:', semesterName);
-        console.log('With PF number:', pf_no);
-        
-        const response = await fetch('/api/classes', {
-            method: 'POST',
-            credentials: 'include', // ✅ IMPORTANT for session
-            headers: { 
-                'Content-Type': 'application/json' 
+          console.log("Fetching classes for semester:", semesterName);
+          console.log("With PF number:", pf_no);
+
+          const response = await fetch("/api/classes", {
+            method: "POST",
+            credentials: "include", // ✅ IMPORTANT for session
+            headers: {
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify({ 
-                semester: semesterName, 
-                pf_no: pf_no 
-            })
-        });
+            body: JSON.stringify({
+              semester: semesterName,
+              pf_no: pf_no,
+            }),
+          });
 
-        if (!response.ok) {
+          if (!response.ok) {
             const errorText = await response.text();
             throw new Error(`Server error: ${response.status} - ${errorText}`);
-        }
+          }
 
-        const data = await response.json();
-        console.log('API Response:', data);
+          const data = await response.json();
+          console.log("API Response:", data);
 
-        if (data.success && data.classes) {
+          if (data.success && data.classes) {
             renderClasses(data.classes);
-        } else {
-            throw new Error(data.error || 'Failed to fetch classes');
-        }
-
-    } catch (err) {
-        console.error('Error fetching classes:', err);
-        document.getElementById('classesTableBody').innerHTML = 
+          } else {
+            throw new Error(data.error || "Failed to fetch classes");
+          }
+        } catch (err) {
+          console.error("Error fetching classes:", err);
+          document.getElementById("classesTableBody").innerHTML =
             `<tr class="empty-row"><td colspan="7">❌ Error: ${err.message}<br>
             <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-green); color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button><\/tr>`;
-    }
-}
+        }
+      }
 
-// ✅ Get exam category styling class
-function getExamCategoryClass(category) {
-    if (category === "DEGREE" || category === "30:70") return "cat-30-70";
-    if (category === "DIPLOMA" || category === "40:60") return "cat-40-60";
-    return "cat-pre";
-}
+      // ✅ Get exam category styling class
+      function getExamCategoryClass(category) {
+        if (category === "DEGREE" || category === "30:70") return "cat-30-70";
+        if (category === "DIPLOMA" || category === "40:60") return "cat-40-60";
+        return "cat-pre";
+      }
 
-// ✅ Format exam category for display
-function formatExamCategory(category) {
-    if (category === "DEGREE") return "Degree Programme";
-    if (category === "DIPLOMA") return "Diploma Programme";
-    if (category === "CERTIFICATE") return "Certificate Programme";
-    return category;
-}
+      // ✅ Format exam category for display
+      function formatExamCategory(category) {
+        if (category === "DEGREE") return "Degree Programme";
+        if (category === "DIPLOMA") return "Diploma Programme";
+        if (category === "CERTIFICATE") return "Certificate Programme";
+        return category;
+      }
 
-// ✅ Render classes to table
-function renderClasses(classes) {
-    const tbody = document.getElementById('classesTableBody');
-    
-    console.log('Rendering classes:', classes.length);
+      // ✅ Render classes to table
+      function renderClasses(classes) {
+        const tbody = document.getElementById("classesTableBody");
 
-    if (!classes || classes.length === 0) {
-        tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No classes found for this semester.<\/tr>';
-        document.getElementById('totalClasses').textContent = '0';
-        document.getElementById('totalStudents').textContent = '0';
-        document.getElementById('examTypes').textContent = '0';
-        return;
-    }
+        console.log("Rendering classes:", classes.length);
 
-    // Calculate statistics
-    const totalClasses = classes.length;
-    const uniqueProgrammes = new Set(classes.map(c => c.programme_code));
-    const uniqueCategories = new Set(classes.map(c => c.exam_category));
-    
-    document.getElementById('totalClasses').textContent = totalClasses;
-    document.getElementById('totalStudents').textContent = uniqueProgrammes.size;
-    document.getElementById('examTypes').textContent = uniqueCategories.size;
-    
-    // Render table rows
-    tbody.innerHTML = classes.map(cls => `
+        if (!classes || classes.length === 0) {
+          tbody.innerHTML =
+            '<tr class="empty-row"><td colspan="7">No classes found for this semester.<\/tr>';
+          document.getElementById("totalClasses").textContent = "0";
+          document.getElementById("totalStudents").textContent = "0";
+          document.getElementById("examTypes").textContent = "0";
+          return;
+        }
+
+        // Calculate statistics
+        const totalClasses = classes.length;
+        const uniqueProgrammes = new Set(classes.map((c) => c.programme_code));
+        const uniqueCategories = new Set(classes.map((c) => c.exam_category));
+
+        document.getElementById("totalClasses").textContent = totalClasses;
+        document.getElementById("totalStudents").textContent =
+          uniqueProgrammes.size;
+        document.getElementById("examTypes").textContent =
+          uniqueCategories.size;
+
+        // Render table rows
+        tbody.innerHTML = classes
+          .map(
+            (cls) => `
         <tr onclick="selectClass('${cls.unit_code}', '${escapeHtml(cls.unit_name)}', '${cls.exam_category}', '${cls.programme_code}', '${escapeHtml(cls.programme_name)}', '${cls.stage}')">
             <td><strong>${escapeHtml(cls.programme_code)}</strong></td>
-            <td>${escapeHtml(cls.programme_name || '-')}</td>
-            <td>${escapeHtml(cls.stage || '-')}</td>
+            <td>${escapeHtml(cls.programme_name || "-")}</td>
+            <td>${escapeHtml(cls.stage || "-")}</td>
             <td><strong>${escapeHtml(cls.unit_code)}</strong></td>
             <td>${escapeHtml(cls.unit_name)}</td>
             <td><span class="exam-category ${getExamCategoryClass(cls.exam_category)}">${formatExamCategory(cls.exam_category)}</span></td>
             <td><button class="view-marks-btn">View Marks →</button></td>
         </tr>
-    `).join('');
-}
+    `,
+          )
+          .join("");
+      }
 
-// ✅ Select class and navigate to marks page
-function selectClass(unitCode, unitName, examCategory, programmeCode, programmeName, stage) {
-    const classData = {
-        semester: currentSemester,
-        unitCode: unitCode,
-        unitName: unitName,
-        examCategory: examCategory,
-        programmeCode: programmeCode,
-        programmeName: programmeName,
-        stage: stage,
-        pf_no: currentUser?.pf_no
-    };
-    console.log('Selected class data being saved:', classData);
-    localStorage.setItem('selectedClass', JSON.stringify(classData));
-    window.location.href = 'marks.html';
-}
+      // ✅ Select class and navigate to marks page
+      function selectClass(
+        unitCode,
+        unitName,
+        examCategory,
+        programmeCode,
+        programmeName,
+        stage,
+      ) {
+        const classData = {
+          semester: currentSemester,
+          unitCode: unitCode,
+          unitName: unitName,
+          examCategory: examCategory,
+          programmeCode: programmeCode,
+          programmeName: programmeName,
+          stage: stage,
+          pf_no: currentUser?.pf_no,
+        };
+        console.log("Selected class data being saved:", classData);
+        localStorage.setItem("selectedClass", JSON.stringify(classData));
+        window.location.href = "marks.html";
+      }
 
-// ✅ Escape HTML to prevent XSS
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-    });
-}
+      // ✅ Escape HTML to prevent XSS
+      function escapeHtml(str) {
+        if (!str) return "";
+        return String(str).replace(/[&<>]/g, function (m) {
+          if (m === "&") return "&amp;";
+          if (m === "<") return "&lt;";
+          if (m === ">") return "&gt;";
+          return m;
+        });
+      }
 
-// ✅ Go back to semesters page
-function goBack() {
-    window.location.href = 'semesters.html';
-}
+      // ✅ Go back to semesters page
+      function goBack() {
+        window.location.href = "semesters.html";
+      }
 
-// ✅ Initialize the page
-async function init() {
-    console.log('=== CLASSES PAGE INIT ===');
-    
-    // Get user from session
-    const userLoaded = await getCurrentUser();
-    if (!userLoaded) return;
+      // ✅ Initialize the page
+      async function init() {
+        console.log("=== CLASSES PAGE INIT ===");
 
-    // Validate PF number
-    if (!currentUser || !currentUser.pf_no) {
-        console.error('No PF number found for user');
-        window.location.href = 'login.html';
-        return;
-    }
+        // Get user from session
+        const userLoaded = await getCurrentUser();
+        if (!userLoaded) return;
 
-    console.log('Current user PF:', currentUser.pf_no);
+        // Validate PF number
+        if (!currentUser || !currentUser.pf_no) {
+          console.error("No PF number found for user");
+          window.location.href = "login.html";
+          return;
+        }
 
-    // Get selected semester from localStorage
-    const saved = localStorage.getItem('selectedSemester');
-    console.log('Saved semester from localStorage:', saved);
-    
-    if (!saved) {
-        console.log('No semester selected, redirecting to semesters page');
-        window.location.href = 'semesters.html';
-        return;
-    }
+        console.log("Current user PF:", currentUser.pf_no);
 
-    currentSemester = JSON.parse(saved);
-    console.log('Current semester:', currentSemester);
+        // Get selected semester from localStorage
+        const saved = localStorage.getItem("selectedSemester");
+        console.log("Saved semester from localStorage:", saved);
 
-    // Update banner
-    const semesterName = currentSemester.semester || currentSemester.name;
-    const academicYear = currentSemester.academic_year || '';
-    
-    document.getElementById('semesterBanner').innerHTML = `
+        if (!saved) {
+          console.log("No semester selected, redirecting to semesters page");
+          window.location.href = "semesters.html";
+          return;
+        }
+
+        currentSemester = JSON.parse(saved);
+        console.log("Current semester:", currentSemester);
+
+        // Update banner
+        const semesterName = currentSemester.semester || currentSemester.name;
+        const academicYear = currentSemester.academic_year || "";
+
+        document.getElementById("semesterBanner").innerHTML = `
         <h1>📖 ${escapeHtml(semesterName)}</h1>
-        <p>${academicYear ? academicYear + ' | ' : ''}Click any class to view student marks</p>
+        <p>${academicYear ? academicYear + " | " : ""}Click any class to view student marks</p>
     `;
 
-    // Fetch classes for this semester
-    await fetchClasses(semesterName, currentUser.pf_no);
-}
+        // Fetch classes for this semester
+        await fetchClasses(semesterName, currentUser.pf_no);
+      }
 
-// Start the app when page loads
-init();
-</script>
-
-</body>
+      // Start the app when page loads
+      init();
+    </script>
+  </body>
 </html>

@@ -86,6 +86,18 @@ app.get('/api/current-user', (req, res) => {
     }
 });
 
+// Logout endpoint
+app.post('/api/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Logout error:', err);
+            return res.status(500).json({ success: false, error: 'Logout failed' });
+        }
+        res.clearCookie('connect.sid');
+        res.json({ success: true, message: 'Logged out successfully' });
+    });
+});
+
 // API Route: Get semesters for logged-in lecturer
 app.get('/api/semesters', async (req, res) => {
     try {

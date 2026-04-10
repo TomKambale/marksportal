@@ -1,545 +1,477 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
     <title>Semesters | Lecturer Dashboard</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family:
+          system-ui, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+      }
 
-        :root {
-            --primary-green: #006400;
-            --secondary-green: #228B22;
-            --light-green: #f0f9f0;
-            --dark-green: #004d00;
-            --accent-gold: #D4AF37;
-            --white: #ffffff;
-            --light-gray: #f8f9fa;
-            --medium-gray: #6c757d;
-            --dark-gray: #343a40;
-            --transition: all 0.3s ease;
-            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            --danger: #dc3545;
-            --warning: #fd7e14;
-            --info: #0dcaf0;
-        }
+      :root {
+        --primary-green: #006400;
+        --secondary-green: #228b22;
+        --light-green: #f0f9f0;
+        --dark-green: #004d00;
+        --accent-gold: #d4af37;
+        --white: #ffffff;
+        --light-gray: #f8f9fa;
+        --medium-gray: #6c757d;
+        --dark-gray: #343a40;
+        --transition: all 0.3s ease;
+        --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        --danger: #dc3545;
+        --warning: #fd7e14;
+        --info: #0dcaf0;
+      }
 
+      body {
+        background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+        min-height: 100vh;
+        padding: 2rem 1.5rem;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .top-bar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 1rem;
+      }
+
+      .logout-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--white);
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--danger);
+        box-shadow: var(--shadow);
+      }
+
+      .logout-btn:hover {
+        background: var(--danger);
+        color: var(--white);
+        transform: translateY(-2px);
+      }
+
+      .header {
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(
+          135deg,
+          var(--primary-green),
+          var(--secondary-green)
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .header p {
+        color: var(--medium-gray);
+        margin-top: 0.5rem;
+      }
+
+      .card {
+        background: var(--white);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        transition: var(--transition);
+        border: 1px solid rgba(0, 100, 0, 0.1);
+      }
+
+      .card-header {
+        background: var(--dark-green);
+        color: white;
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .card-header h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .semester-list {
+        padding: 0;
+      }
+
+      .semester-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--light-gray);
+        transition: var(--transition);
+        cursor: pointer;
+      }
+
+      .semester-item:hover {
+        background: var(--light-green);
+      }
+
+      .semester-item:last-child {
+        border-bottom: none;
+      }
+
+      .semester-info {
+        flex: 1;
+      }
+
+      .semester-name {
+        font-weight: 600;
+        color: var(--dark-green);
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .semester-dates {
+        font-size: 0.75rem;
+        color: var(--medium-gray);
+      }
+
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.7rem;
+        font-weight: 600;
+      }
+
+      .status-open {
+        background: var(--light-green);
+        color: var(--primary-green);
+      }
+
+      .status-closed {
+        background: #f8d7da;
+        color: var(--danger);
+      }
+
+      .view-btn {
+        background: var(--primary-green);
+        color: white;
+        border: none;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-left: 1rem;
+      }
+
+      .view-btn:hover {
+        background: var(--dark-green);
+        transform: translateY(-2px);
+      }
+
+      .stats-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+      }
+
+      .stat-card {
+        background: var(--white);
+        border-radius: 20px;
+        padding: 1rem 1.5rem;
+        flex: 1;
+        min-width: 150px;
+        box-shadow: var(--shadow);
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-green);
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+        color: var(--medium-gray);
+        margin-top: 0.25rem;
+      }
+
+      .lecturer-info {
+        background: var(--light-green);
+        border-radius: 20px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .lecturer-name {
+        font-weight: 600;
+        color: var(--dark-green);
+      }
+
+      .lecturer-dept {
+        font-size: 0.8rem;
+        color: var(--medium-gray);
+      }
+
+      @media (max-width: 700px) {
         body {
-            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
-            min-height: 100vh;
-            padding: 2rem 1.5rem;
+          padding: 1rem;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .header p {
-            color: var(--medium-gray);
-            margin-top: 0.5rem;
-        }
-
-        .card {
-            background: var(--white);
-            border-radius: 24px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            margin-bottom: 1.5rem;
-            transition: var(--transition);
-            border: 1px solid rgba(0, 100, 0, 0.1);
-        }
-
-        .card-header {
-            background: var(--dark-green);
-            color: white;
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .card-header h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .semester-list {
-            padding: 0;
-        }
-
         .semester-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--light-gray);
-            transition: var(--transition);
-            cursor: pointer;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 0.5rem;
         }
-
-        .semester-item:hover {
-            background: var(--light-green);
-        }
-
-        .semester-item:last-child {
-            border-bottom: none;
-        }
-
-        .semester-info {
-            flex: 1;
-        }
-
-        .semester-name {
-            font-weight: 600;
-            color: var(--dark-green);
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .semester-dates {
-            font-size: 0.75rem;
-            color: var(--medium-gray);
-        }
-
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-
-        .status-open {
-            background: var(--light-green);
-            color: var(--primary-green);
-        }
-
-        .status-closed {
-            background: #f8d7da;
-            color: var(--danger);
-        }
-
         .view-btn {
-            background: var(--primary-green);
-            color: white;
-            border: none;
-            padding: 0.4rem 1rem;
-            border-radius: 50px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-left: 1rem;
+          margin-left: 0;
         }
-
-        .view-btn:hover {
-            background: var(--dark-green);
-            transform: translateY(-2px);
-        }
-
-        .stats-row {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .stat-card {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 1rem 1.5rem;
-            flex: 1;
-            min-width: 150px;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-green);
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--medium-gray);
-            margin-top: 0.25rem;
-        }
-
-        .lecturer-info {
-            background: var(--light-green);
-            border-radius: 20px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .lecturer-name {
-            font-weight: 600;
-            color: var(--dark-green);
-        }
-
-        .lecturer-dept {
-            font-size: 0.8rem;
-            color: var(--medium-gray);
-        }
-
-        @media (max-width: 700px) {
-            body { padding: 1rem; }
-            .semester-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-            .view-btn { margin-left: 0; }
-        }
+      }
     </style>
-</head>
-<body>
-<div class="container">
-    <div class="header">
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
         <h1>My Semesters</h1>
-        <p>Select a semester to view your assigned classes</p>
-    </div>
+        <p>A list of all the Semesters I have taught in</p>
+        <div class="top-bar">
+          <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+      </div>
 
-    <div class="lecturer-info">
+      <div class="lecturer-info">
         <div>
-            <div class="lecturer-name">{userName}</div>
-            <div class="lecturer-dept">Faculty of Computing & Informatics</div>
+          <div class="lecturer-name">{userName}</div>
+          <div class="lecturer-dept">Faculty of Computing & Informatics</div>
         </div>
-        <div class="stats-row" style="margin-bottom: 0; gap: 0.5rem;">
-            <div class="stat-card" style="padding: 0.5rem 1rem; min-width: auto;">
-                <div class="stat-number" id="totalSemesters">0</div>
-                <div class="stat-label">Total Semesters</div>
-            </div>
-            <div class="stat-card" style="padding: 0.5rem 1rem; min-width: auto;">
-                <div class="stat-number" id="activeSemesters">0</div>
-                <div class="stat-label">Active</div>
-            </div>
+        <div class="stats-row" style="margin-bottom: 0; gap: 0.5rem">
+          <div class="stat-card" style="padding: 0.5rem 1rem; min-width: auto">
+            <div class="stat-number" id="totalSemesters">0</div>
+            <div class="stat-label">Total Semesters</div>
+          </div>
+          <div class="stat-card" style="padding: 0.5rem 1rem; min-width: auto">
+            <div class="stat-number" id="activeSemesters">0</div>
+            <div class="stat-label">Active</div>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <div class="card">
+      <div class="card">
         <div class="card-header">
-            <h2>📅 Academic Semesters</h2>
-            <span class="status-badge status-open" style="background: var(--light-green);">Click any semester to view classes</span>
+          <h2>📅 Academic Semesters</h2>
+          <span
+            class="status-badge status-open"
+            style="background: var(--light-green)"
+            >Click any semester to view classes</span
+          >
         </div>
         <div class="semester-list" id="semesterList">
-            <!-- Semesters will be loaded here -->
+          <!-- Semesters will be loaded here -->
         </div>
+      </div>
     </div>
-</div>
 
-<!-- <script>
-    // Mock data for semesters taught by lecturer
-    const semesters = [
-        { id: 1, name: "Semester 1 - 2024/2025", startDate: "Sep 2024", endDate: "Dec 2024", status: "open", classesCount: 3 },
-        { id: 2, name: "Semester 2 - 2024/2025", startDate: "Jan 2025", endDate: "Apr 2025", status: "open", classesCount: 4 },
-        { id: 3, name: "Semester 1 - 2023/2024", startDate: "Sep 2023", endDate: "Dec 2023", status: "closed", classesCount: 3 },
-        { id: 4, name: "Semester 2 - 2023/2024", startDate: "Jan 2024", endDate: "Apr 2024", status: "closed", classesCount: 2 },
-        { id: 5, name: "Summer Session - 2024", startDate: "May 2024", endDate: "Aug 2024", status: "closed", classesCount: 1 }
-    ];
+    <script>
+      // Get logged-in user data (from localStorage or session)
+      // You should save this during login
+      const currentUser = {
+        email: localStorage.getItem("userEmail") || "email@example.com",
+        pf_no: localStorage.getItem("userPfNo") || "PF123",
+      };
 
-    function renderSemesters() {
-        const container = document.getElementById('semesterList');
-        const total = semesters.length;
-        const active = semesters.filter(s => s.status === 'open').length;
-        
-        document.getElementById('totalSemesters').textContent = total;
-        document.getElementById('activeSemesters').textContent = active;
-
-        container.innerHTML = semesters.map(semester => `
-            <div class="semester-item" onclick="selectSemester(${semester.id})">
-                <div class="semester-info">
-                    <div class="semester-name">${escapeHtml(semester.name)}</div>
-                    <div class="semester-dates">📅 ${semester.startDate} - ${semester.endDate} | 📖 ${semester.classesCount} classes</div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <span class="status-badge ${semester.status === 'open' ? 'status-open' : 'status-closed'}">
-                        ${semester.status === 'open' ? '● Open' : '● Closed'}
-                    </span>
-                    <button class="view-btn">View Classes →</button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function escapeHtml(str) {
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    function selectSemester(id) {
-        const semester = semesters.find(s => s.id === id);
-        if (semester) {
-            // Store selected semester in localStorage or session for the Classes page
-            localStorage.setItem('selectedSemester', JSON.stringify(semester));
-            window.location.href = 'classes.html';
-        }
-    }
-
-    renderSemesters();
-</script> -->
-
-<script>
-    // Get logged-in user data (from localStorage or session)
-    // You should save this during login
-    const currentUser = {
-        email: localStorage.getItem('userEmail') || 'email@example.com',
-        pf_no: localStorage.getItem('userPfNo') || 'PF123'
-    };
-
-    // Update lecturer info display
-    function updateLecturerInfo(email, pf_no) {
-        document.querySelector('.lecturer-name').textContent = email;
-        document.querySelector('.lecturer-dept').innerHTML = `PF Number: ${pf_no}`;
-    }
-
-    // Fetch semesters from your backend
-    async function fetchSemesters() {
+      // Logout function
+      async function logout() {
         try {
-            // Show loading state
-            const container = document.getElementById('semesterList');
-            container.innerHTML = '<div style="padding: 2rem; text-align: center;">Loading semesters...</div>';
-            
-            // Call your backend API
-            const response = await fetch(`/api/semesters?email=${encodeURIComponent(currentUser.email)}&pf_no=${encodeURIComponent(currentUser.pf_no)}`);
-            
-            if (!response.ok) {
-                throw new Error('Failed to fetch semesters');
-            }
-            
-            const data = await response.json();
-            
-            if (data.success && data.semesters) {
-                renderSemesters(data.semesters);
-                updateStats(data.semesters);
-            } else {
-                throw new Error(data.error || 'No data received');
-            }
-            
+          // Call logout endpoint to clear session
+          const response = await fetch("/api/logout", {
+            method: "POST",
+            credentials: "include",
+          });
+
+          // Clear localStorage
+          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userPfNo");
+          localStorage.removeItem("userName");
+          localStorage.removeItem("selectedSemester");
+          localStorage.removeItem("selectedClass");
+
+          // Redirect to login page
+          window.location.href = "login.html";
         } catch (error) {
-            console.error('Error:', error);
-            document.getElementById('semesterList').innerHTML = `
+          console.error("Logout error:", error);
+          // Still clear localStorage and redirect even if API call fails
+          localStorage.clear();
+          window.location.href = "login.html";
+        }
+      }
+
+      // Update lecturer info display
+      function updateLecturerInfo(email, pf_no) {
+        document.querySelector(".lecturer-name").textContent = email;
+        document.querySelector(".lecturer-dept").innerHTML =
+          `PF Number: ${pf_no}`;
+      }
+
+      // Fetch semesters from your backend
+      async function fetchSemesters() {
+        try {
+          // Show loading state
+          const container = document.getElementById("semesterList");
+          container.innerHTML =
+            '<div style="padding: 2rem; text-align: center;">Loading semesters...</div>';
+
+          // Call your backend API
+          const response = await fetch(
+            `/api/semesters?email=${encodeURIComponent(currentUser.email)}&pf_no=${encodeURIComponent(currentUser.pf_no)}`,
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch semesters");
+          }
+
+          const data = await response.json();
+
+          if (data.success && data.semesters) {
+            renderSemesters(data.semesters);
+            updateStats(data.semesters);
+          } else {
+            throw new Error(data.error || "No data received");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          document.getElementById("semesterList").innerHTML = `
                 <div style="padding: 2rem; text-align: center; color: var(--danger);">
                     ❌ Failed to load semesters: ${error.message}<br>
                     <button onclick="fetchSemesters()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-green); color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button>
                 </div>
             `;
         }
-    }
+      }
 
-    // function renderSemesters(semesters) {
-    //     const container = document.getElementById('semesterList');
-        
-    //     if (!semesters || semesters.length === 0) {
-    //         container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--medium-gray);">📭 No semesters found for this lecturer</div>';
-    //         return;
-    //     }
+      function renderSemesters(semesters) {
+        const container = document.getElementById("semesterList");
 
-    //     // Transform API data to match your display format
-    //     const formattedSemesters = semesters.map((semester, index) => {
-    //         // Parse academic_year and semester format
-    //         const academicYear = semester.academic_year;
-    //         const semesterName = semester.semester;
-            
-    //         // Determine status based on marks_entry_date or is_current
-    //         let status = 'closed';
-    //         let statusText = '● Closed';
-            
-    //         if (semester.is_current === 1) {
-    //             status = 'open';
-    //             statusText = '● Open';
-    //         } else if (semester.marks_entry_date && semester.marks_entry_date !== '1753-01-01T00:00:00') {
-    //             const entryDate = new Date(semester.marks_entry_date);
-    //             const today = new Date();
-    //             if (entryDate > today) {
-    //                 status = 'open';
-    //                 statusText = '● Open';
-    //             }
-    //         }
-            
-    //         // Format dates for display
-    //         const [startYear, endYear] = academicYear.split('/');
-    //         const startDate = `${semesterName.includes('1') ? 'Sep' : 'Jan'} ${startYear}`;
-    //         const endDate = `${semesterName.includes('1') ? 'Dec' : 'Apr'} ${endYear || startYear}`;
-            
-    //         return {
-    //             id: index,
-    //             academic_year: academicYear,
-    //             semester_name: semesterName,
-    //             startDate: startDate,
-    //             endDate: endDate,
-    //             status: status,
-    //             statusText: statusText,
-    //             is_current: semester.is_current,
-    //             marks_entry_date: semester.marks_entry_date,
-    //             lecturer: semester.lecturer,
-    //             raw: semester
-    //         };
-    //     });
-
-    //     container.innerHTML = formattedSemesters.map(semester => `
-    //         <div class="semester-item" onclick="selectSemester(${JSON.stringify(semester.raw).replace(/"/g, '&quot;')})">
-    //             <div class="semester-info">
-    //                 <div class="semester-name">${escapeHtml(semester.semester_name)} (${escapeHtml(semester.academic_year)})</div>
-    //                 <div class="semester-dates">📅 ${semester.startDate} - ${semester.endDate}</div>
-    //             </div>
-    //             <div style="display: flex; align-items: center; gap: 0.75rem;">
-    //                 <span class="status-badge ${semester.status === 'open' ? 'status-open' : 'status-closed'}">
-    //                     ${semester.statusText}
-    //                 </span>
-    //                 <button class="view-btn">View Classes →</button>
-    //             </div>
-    //         </div>
-    //     `).join('');
-    // }
-function renderSemesters(semesters) {
-    const container = document.getElementById('semesterList');
-    
-    if (!semesters || semesters.length === 0) {
-        container.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--medium-gray);">📭 No semesters found for this lecturer</div>';
-        return;
-    }
-
-    container.innerHTML = semesters.map((semester, index) => {
-        // Determine status
-        let status = 'closed';
-        let statusText = '● Closed';
-        
-        if (semester.is_current === 1) {
-            status = 'open';
-            statusText = '● Open';
-        } else if (semester.marks_entry_date && semester.marks_entry_date !== '1753-01-01T00:00:00') {
-            const entryDate = new Date(semester.marks_entry_date);
-            const today = new Date();
-            if (entryDate > today) {
-                status = 'open';
-                statusText = '● Open';
-            }
+        if (!semesters || semesters.length === 0) {
+          container.innerHTML =
+            '<div style="padding: 2rem; text-align: center; color: var(--medium-gray);">📭 No semesters found for this lecturer</div>';
+          return;
         }
-        
-        // Format dates for display
-        const [startYear, endYear] = semester.academic_year.split('/');
-        const startDate = `${semester.semester.includes('1') ? 'Sep' : 'Jan'} ${startYear}`;
-        const endDate = `${semester.semester.includes('1') ? 'Dec' : 'Apr'} ${endYear || startYear}`;
-        
-        return `
-            <div class="semester-item" onclick='selectSemester(${JSON.stringify(semester)})'>
-                <div class="semester-info">
-                    <div class="semester-name">${escapeHtml(semester.semester)} (${escapeHtml(semester.academic_year)})</div>
-                    <div class="semester-dates">📅 ${startDate} - ${endDate}</div>
+
+        container.innerHTML = semesters
+          .map((semester, index) => {
+            // Determine status
+            let status = "closed";
+            let statusText = "● Closed";
+
+            if (semester.is_current === 1) {
+              status = "open";
+              statusText = "● Open";
+            } else if (
+              semester.marks_entry_date &&
+              semester.marks_entry_date !== "1753-01-01T00:00:00"
+            ) {
+              const entryDate = new Date(semester.marks_entry_date);
+              const today = new Date();
+              if (entryDate > today) {
+                status = "open";
+                statusText = "● Open";
+              }
+            }
+
+            // Format dates for display
+            const [startYear, endYear] = semester.academic_year.split("/");
+            const startDate = `${semester.semester.includes("1") ? "Sep" : "Jan"} ${startYear}`;
+            const endDate = `${semester.semester.includes("1") ? "Dec" : "Apr"} ${endYear || startYear}`;
+
+            return `
+                <div class="semester-item" onclick='selectSemester(${JSON.stringify(semester)})'>
+                    <div class="semester-info">
+                        <div class="semester-name">${escapeHtml(semester.semester)} (${escapeHtml(semester.academic_year)})</div>
+                        <div class="semester-dates">📅 ${startDate} - ${endDate}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <span class="status-badge ${status === "open" ? "status-open" : "status-closed"}">
+                            ${statusText}
+                        </span>
+                        <button class="view-btn">View Classes →</button>
+                    </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <span class="status-badge ${status === 'open' ? 'status-open' : 'status-closed'}">
-                        ${statusText}
-                    </span>
-                    <button class="view-btn">View Classes →</button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-    function updateStats(semesters) {
+            `;
+          })
+          .join("");
+      }
+
+      function updateStats(semesters) {
         const total = semesters.length;
-        const active = semesters.filter(s => s.is_current === 1).length;
-        
-        document.getElementById('totalSemesters').textContent = total;
-        document.getElementById('activeSemesters').textContent = active;
-    }
+        const active = semesters.filter((s) => s.is_current === 1).length;
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+        document.getElementById("totalSemesters").textContent = total;
+        document.getElementById("activeSemesters").textContent = active;
+      }
+
+      function escapeHtml(str) {
+        if (!str) return "";
+        return String(str).replace(/[&<>]/g, function (m) {
+          if (m === "&") return "&amp;";
+          if (m === "<") return "&lt;";
+          if (m === ">") return "&gt;";
+          return m;
         });
-    }
+      }
 
-    // function selectSemester(semester) {
-    //     // Store selected semester data for the classes page
-    //     localStorage.setItem('selectedSemester', JSON.stringify(semester));
-    //     // Redirect to classes page
-    //     window.location.href = 'classes.html';
-    // }
-//     function selectSemester(semester) {
-//     // Store the complete semester data as received from API
-//     localStorage.setItem('selectedSemester', JSON.stringify({
-//         semester: semester.semester,
-//         academic_year: semester.academic_year,
-//         is_current: semester.is_current,
-//         marks_entry_date: semester.marks_entry_date,
-//         lecturer: semester.lecturer,
-//         name: semester.semester,  // For display
-//         startDate: semester.academic_year?.split('/')[0] || 'N/A',
-//         endDate: semester.academic_year?.split('/')[1] || 'N/A',
-//         status: semester.is_current === 1 ? 'open' : 'closed'
-//     }));
-//     window.location.href = 'classes.html';
-// }
-// function selectSemester(semester) {
-//     // Store the complete semester data as received from API
-//     // Make sure we store the exact semester string the API expects
-//     const semesterData = {
-//         semester: semester.semester,  // This should be "SEM 1 25/26"
-//         academic_year: semester.academic_year,
-//         is_current: semester.is_current,
-//         marks_entry_date: semester.marks_entry_date,
-//         lecturer: semester.lecturer,
-//         // For display purposes
-//         display_name: `${semester.semester} (${semester.academic_year})`,
-//         status: semester.is_current === 1 ? 'open' : 'closed'
-//     };
-    
-//     console.log('Storing semester data:', semesterData);
-//     localStorage.setItem('selectedSemester', JSON.stringify(semesterData));
-//     window.location.href = 'classes.html';
-// }
-function selectSemester(semester) {
-    console.log('Selected semester:', semester);
-    // Store the complete semester data as received from API
-    localStorage.setItem('selectedSemester', JSON.stringify({
-        semester: semester.semester,
-        academic_year: semester.academic_year,
-        is_current: semester.is_current,
-        marks_entry_date: semester.marks_entry_date,
-        lecturer: semester.lecturer
-    }));
-    window.location.href = 'classes.html';
-}
-    // Initialize page
-    updateLecturerInfo(currentUser.email, currentUser.pf_no);
-    fetchSemesters();
-</script>
-</body>
+      function selectSemester(semester) {
+        console.log("Selected semester:", semester);
+        // Store the complete semester data as received from API
+        localStorage.setItem(
+          "selectedSemester",
+          JSON.stringify({
+            semester: semester.semester,
+            academic_year: semester.academic_year,
+            is_current: semester.is_current,
+            marks_entry_date: semester.marks_entry_date,
+            lecturer: semester.lecturer,
+          }),
+        );
+        window.location.href = "classes.html";
+      }
+
+      // Initialize page
+      updateLecturerInfo(currentUser.email, currentUser.pf_no);
+      fetchSemesters();
+    </script>
+  </body>
 </html>
