@@ -37,8 +37,8 @@ async function handleGoogleSignIn(response) {
         const tokenPayload = parseJwt(data.token);
         console.log('Logged in as:', tokenPayload.name);
         
-        // Redirect to dashboard
-        window.location.href = '/dashboard.html';
+        // Redirect to login
+        window.location.href = '/login.html';
         
     } catch (error) {
         console.error('Authentication error:', error);

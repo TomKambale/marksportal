@@ -16,6 +16,7 @@
     "dotenv": "^17.4.1",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
+    "git-filter-repo": "^0.0.30",
     "mysql2": "^3.20.0",
     "node-fetch": "^3.3.2"
   }

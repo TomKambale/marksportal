@@ -410,11 +410,23 @@
           const data = await response.json();
           console.log("Marks API response:", data);
 
-          if (data.success && data.students) {
-            currentStudents = data.students;
-            renderMarksTable();
-            updateClassBanner();
-          } else {
+          if (data.class_list) {
+  // Map only required fields
+  currentStudents = data.class_list.map((student) => ({
+    adm_no: student.student_no,
+    student_name: student.student_name,
+    cat_marks: student.cat_mark,
+    exam_marks: student.exam_mark,
+  }));
+
+  // Store exam category from API
+  currentClass.examCategory = data.exam_category?.category || "DEGREE";
+  currentClass.examMeta = data.exam_category;
+
+  renderMarksTable();
+  updateClassBanner();
+} 
+          else {
             throw new Error(data.error || "Failed to fetch student marks");
           }
         } catch (err) {
@@ -443,14 +455,15 @@
         return { text: "Fail", class: "status-fail" };
       }
 
-      function getMaxMarks(category) {
-        if (category === "DEGREE" || category === "30:70") {
-          return { cat: 30, exam: 70 };
-        } else if (category === "DIPLOMA" || category === "40:60") {
-          return { cat: 40, exam: 60 };
-        }
-        return { cat: 100, exam: 100 };
-      }
+      function getMaxMarks() {
+  if (currentClass.examMeta) {
+    return {
+      cat: currentClass.examMeta.max_cat_mark || 30,
+      exam: currentClass.examMeta.max_exam_mark || 70,
+    };
+  }
+  return { cat: 30, exam: 70 };
+}
 
       function renderMarksTable() {
         if (!currentStudents || currentStudents.length === 0) {
@@ -660,8 +673,14 @@
                 <span>🏫 ${escapeHtml(currentClass.programmeCode || "")} - ${escapeHtml(currentClass.stage || "")}</span>
             </div>
         `;
-        document.getElementById("examCategoryBadge").textContent = examCategory;
-      }
+const examMeta = currentClass.examMeta;
+
+if (examMeta) {
+  document.getElementById("examCategoryBadge").textContent =
+    `${examMeta.code} • ${examMeta.category} (${examMeta.max_cat_mark}:${examMeta.max_exam_mark})`;
+} else {
+  document.getElementById("examCategoryBadge").textContent = examCategory;
+}      }
 
       function loadClassData() {
         const savedClass = localStorage.getItem("selectedClass");
