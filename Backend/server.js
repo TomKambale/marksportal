@@ -237,16 +237,86 @@ app.post('/api/classes', async (req, res) => {
 });
 
 // API Route: Get student marks for a class
+// app.post('/api/marks', async (req, res) => {
+//     try {
+//         const { unit_code, semester, pf_no, programme_code, stage } = req.body;
+        
+//         console.log('Fetching marks for:', { unit_code, semester, pf_no, programme_code, stage });
+        
+//         const token = await getAccessToken();
+        
+//         // Call the ERP API for student marks
+//         const apiUrl = `https://portal2.ttu.ac.ke/api/exam/v1/lecturer/class-list/`;
+        
+//         const response = await fetch(apiUrl, {
+//             method: 'POST',
+//             headers: {
+//                 'Authorization': `Bearer ${token}`,
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({
+//                 unit_code: unit_code,
+//                 semester: semester,
+//                 pf_no: pf_no,
+//                 programme_code: programme_code,
+//                 stage: stage
+//             })
+//         });
+
+//         console.log('ERP API Response status:', response.status);
+
+//         if (!response.ok) {
+//             const errorText = await response.text();
+//             console.error('API error response:', errorText);
+//             throw new Error(`API request failed: ${response.status} - ${errorText}`);
+//         }
+
+//         const students = await response.json();
+//         console.log('Students received:', students.length);
+        
+//         res.json({
+//             success: true,
+//             students: students
+//         });
+        
+//     } catch (error) {
+//         console.error('Error fetching marks:', error);
+//         res.status(500).json({ 
+//             success: false, 
+//             error: error.message 
+//         });
+//     }
+// });
 app.post('/api/marks', async (req, res) => {
     try {
-        const { unit_code, semester, pf_no, programme_code, stage } = req.body;
+        const { programme_code, semester, stage, unit_code, exam_category } = req.body;
         
-        console.log('Fetching marks for:', { unit_code, semester, pf_no, programme_code, stage });
+        console.log('=== FETCHING MARKS ===');
+        console.log('Received payload:', { programme_code, semester, stage, unit_code, exam_category });
+        
+        // Validate required fields
+        if (!programme_code || !semester || !stage || !unit_code) {
+            console.error('Missing required fields');
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Missing required fields: programme_code, semester, stage, or unit_code' 
+            });
+        }
         
         const token = await getAccessToken();
         
         // Call the ERP API for student marks
         const apiUrl = `https://portal2.ttu.ac.ke/api/exam/v1/lecturer/class-list/`;
+        
+        const requestBody = {
+            programme_code: programme_code,
+            semester: semester,
+            stage: stage,
+            unit_code: unit_code,
+            exam_category: exam_category
+        };
+        
+        console.log('Sending to ERP API:', requestBody);
         
         const response = await fetch(apiUrl, {
             method: 'POST',
@@ -254,13 +324,7 @@ app.post('/api/marks', async (req, res) => {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                unit_code: unit_code,
-                semester: semester,
-                pf_no: pf_no,
-                programme_code: programme_code,
-                stage: stage
-            })
+            body: JSON.stringify(requestBody)
         });
 
         console.log('ERP API Response status:', response.status);
@@ -268,15 +332,21 @@ app.post('/api/marks', async (req, res) => {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('API error response:', errorText);
-            throw new Error(`API request failed: ${response.status} - ${errorText}`);
+            return res.status(response.status).json({ 
+                success: false, 
+                error: `ERP API error: ${response.status} - ${errorText}` 
+            });
         }
 
-        const students = await response.json();
-        console.log('Students received:', students.length);
+        const data = await response.json();
+        console.log('ERP API Response data structure:', Object.keys(data));
+        console.log('class_list length:', data.class_list?.length || 0);
         
+        // Return the data as-is from ERP
         res.json({
             success: true,
-            students: students
+            class_list: data.class_list || [],
+            exam_category: data.exam_category || null
         });
         
     } catch (error) {

@@ -328,6 +328,7 @@
       let currentClass = null;
       let currentStudents = [];
       let currentUser = null;
+      let examMeta = null;
 
       // Get current user from session
       async function getCurrentUser() {
@@ -384,8 +385,7 @@
           // Prepare the exact payload structure
           const payload = {
             programme_code: currentClass.programmeCode,
-            semester:
-              currentClass.semester?.semester || currentClass.semester?.name,
+            semester: currentClass.semester?.semester || currentClass.semester?.name,
             stage: currentClass.stage,
             unit_code: currentClass.unitCode,
             exam_category: currentClass.examCategory,
@@ -408,43 +408,55 @@
           }
 
           const data = await response.json();
-          console.log("Marks API response:", data);
+          console.log("Full API response:", data);
 
-          if (data.class_list) {
-  // Map only required fields
-  currentStudents = data.class_list.map((student) => ({
-    adm_no: student.student_no,
-    student_name: student.student_name,
-    cat_marks: student.cat_mark,
-    exam_marks: student.exam_mark,
-  }));
-
-  // Store exam category from API
-  currentClass.examCategory = data.exam_category?.category || "DEGREE";
-  currentClass.examMeta = data.exam_category;
-
-  renderMarksTable();
-  updateClassBanner();
-} 
-          else {
-            throw new Error(data.error || "Failed to fetch student marks");
+          // Check if we have class_list in the response
+          if (data.class_list && Array.isArray(data.class_list)) {
+            console.log("Found class_list with", data.class_list.length, "students");
+            
+            // Map the data to our student format
+            currentStudents = data.class_list.map((student) => ({
+              adm_no: student.student_no || student.adm_no,
+              student_name: student.student_name || student.name,
+              cat_marks: student.cat_mark || 0,
+              exam_marks: student.exam_mark || 0,
+            }));
+            
+            // Store exam category info
+            examMeta = data.exam_category;
+            
+            console.log("Mapped students:", currentStudents.length);
+            console.log("Exam meta:", examMeta);
+            
+            renderMarksTable();
+            updateClassBanner();
+          } else {
+            console.error("No class_list found in response. Response structure:", Object.keys(data));
+            throw new Error(data.error || "No student data found in response");
           }
         } catch (err) {
           console.error("Error fetching marks:", err);
           document.getElementById("marksTableBody").innerHTML =
             `<tr class="empty-row"><td colspan="6">❌ Error: ${err.message}<br>
-                <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-green); color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button></td></tr>`;
+            <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-green); color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button></td></tr>`;
         }
       }
 
-      function calculateTotal(cat, exam, category) {
-        if (category === "DEGREE" || category === "30:70") {
-          return Math.min(100, (cat || 0) + (exam || 0));
-        } else if (category === "DIPLOMA" || category === "40:60") {
-          return Math.min(100, (cat || 0) + (exam || 0));
-        } else {
-          return Math.min(100, (cat || 0) + (exam || 0));
+      function calculateTotal(cat, exam) {
+        if (examMeta) {
+          // Use the max marks from exam_category info
+          const maxCat = examMeta.max_cat_mark || 30;
+          const maxExam = examMeta.max_exam_mark || 70;
+          
+          // Calculate total based on the actual max marks
+          const catContribution = (cat / maxCat) * (maxCat === 30 ? 30 : 40);
+          const examContribution = (exam / maxExam) * (maxExam === 70 ? 70 : 60);
+          
+          return Math.min(100, Math.max(0, catContribution + examContribution));
         }
+        
+        // Fallback calculation
+        return Math.min(100, (cat || 0) + (exam || 0));
       }
 
       function getStatus(total) {
@@ -456,14 +468,14 @@
       }
 
       function getMaxMarks() {
-  if (currentClass.examMeta) {
-    return {
-      cat: currentClass.examMeta.max_cat_mark || 30,
-      exam: currentClass.examMeta.max_exam_mark || 70,
-    };
-  }
-  return { cat: 30, exam: 70 };
-}
+        if (examMeta) {
+          return {
+            cat: examMeta.max_cat_mark || 30,
+            exam: examMeta.max_exam_mark || 70,
+          };
+        }
+        return { cat: 30, exam: 70 };
+      }
 
       function renderMarksTable() {
         if (!currentStudents || currentStudents.length === 0) {
@@ -479,47 +491,37 @@
         let totalCat = 0,
           totalExam = 0,
           totalFinal = 0;
-        const maxMarks = getMaxMarks(currentClass.examCategory);
+        const maxMarks = getMaxMarks();
 
         const tbody = document.getElementById("marksTableBody");
         tbody.innerHTML = currentStudents
           .map((student, index) => {
-            const cat = student.cat_marks || student.cat || 0;
-            const exam = student.exam_marks || student.exam || 0;
-            const finalTotal = calculateTotal(
-              cat,
-              exam,
-              currentClass.examCategory,
-            );
+            const cat = student.cat_marks || 0;
+            const exam = student.exam_marks || 0;
+            const finalTotal = calculateTotal(cat, exam);
             const status = getStatus(finalTotal);
             totalCat += cat;
             totalExam += exam;
             totalFinal += finalTotal;
 
             return `
-                <tr>
-                    <td><strong>${escapeHtml(student.adm_no || student.admNo || "-")}</strong></td>
-                    <td>${escapeHtml(student.name || student.student_name || "-")}</td>
-                    <td><input type="number" class="marks-input" id="cat_${index}" value="${cat}" step="0.5" min="0" max="${maxMarks.cat}" onchange="updateMarks(${index}, 'cat', this.value)"></td>
-                    <td><input type="number" class="marks-input" id="exam_${index}" value="${exam}" step="0.5" min="0" max="${maxMarks.exam}" onchange="updateMarks(${index}, 'exam', this.value)"></td>
-                    <td class="total-cell" id="total_${index}">${finalTotal.toFixed(1)}</td>
-                    <td class="${status.class}">${status.text}</td>
-                </tr>
+              <tr>
+                <td><strong>${escapeHtml(student.adm_no || "-")}</strong></td>
+                <td>${escapeHtml(student.student_name || "-")}</td>
+                <td><input type="number" class="marks-input" id="cat_${index}" value="${cat}" step="0.5" min="0" max="${maxMarks.cat}" onchange="updateMarks(${index}, 'cat', this.value)"></td>
+                <td><input type="number" class="marks-input" id="exam_${index}" value="${exam}" step="0.5" min="0" max="${maxMarks.exam}" onchange="updateMarks(${index}, 'exam', this.value)"></td>
+                <td class="total-cell" id="total_${index}">${finalTotal.toFixed(1)}</td>
+                <td class="${status.class}">${status.text}</td>
+              </tr>
             `;
           })
           .join("");
 
         const count = currentStudents.length;
         document.getElementById("totalStudents").textContent = count;
-        document.getElementById("avgCat").textContent = (
-          totalCat / count
-        ).toFixed(1);
-        document.getElementById("avgExam").textContent = (
-          totalExam / count
-        ).toFixed(1);
-        document.getElementById("avgTotal").textContent = (
-          totalFinal / count
-        ).toFixed(1);
+        document.getElementById("avgCat").textContent = (totalCat / count).toFixed(1);
+        document.getElementById("avgExam").textContent = (totalExam / count).toFixed(1);
+        document.getElementById("avgTotal").textContent = (totalFinal / count).toFixed(1);
       }
 
       function updateMarks(index, type, value) {
@@ -528,28 +530,15 @@
 
         if (type === "cat") {
           currentStudents[index].cat_marks = numValue;
-          currentStudents[index].cat = numValue;
         } else {
           currentStudents[index].exam_marks = numValue;
-          currentStudents[index].exam = numValue;
         }
 
         // Update total cell
-        const cat =
-          type === "cat"
-            ? numValue
-            : currentStudents[index].cat_marks ||
-              currentStudents[index].cat ||
-              0;
-        const exam =
-          type === "exam"
-            ? numValue
-            : currentStudents[index].exam_marks ||
-              currentStudents[index].exam ||
-              0;
-        const finalTotal = calculateTotal(cat, exam, currentClass.examCategory);
-        document.getElementById(`total_${index}`).textContent =
-          finalTotal.toFixed(1);
+        const cat = currentStudents[index].cat_marks || 0;
+        const exam = currentStudents[index].exam_marks || 0;
+        const finalTotal = calculateTotal(cat, exam);
+        document.getElementById(`total_${index}`).textContent = finalTotal.toFixed(1);
 
         // Update status cell
         const status = getStatus(finalTotal);
@@ -563,38 +552,31 @@
           totalExam = 0,
           totalFinal = 0;
         currentStudents.forEach((s) => {
-          const c = s.cat_marks || s.cat || 0;
-          const e = s.exam_marks || s.exam || 0;
+          const c = s.cat_marks || 0;
+          const e = s.exam_marks || 0;
           totalCat += c;
           totalExam += e;
-          totalFinal += calculateTotal(c, e, currentClass.examCategory);
+          totalFinal += calculateTotal(c, e);
         });
         const count = currentStudents.length;
-        document.getElementById("avgCat").textContent = (
-          totalCat / count
-        ).toFixed(1);
-        document.getElementById("avgExam").textContent = (
-          totalExam / count
-        ).toFixed(1);
-        document.getElementById("avgTotal").textContent = (
-          totalFinal / count
-        ).toFixed(1);
+        document.getElementById("avgCat").textContent = (totalCat / count).toFixed(1);
+        document.getElementById("avgExam").textContent = (totalExam / count).toFixed(1);
+        document.getElementById("avgTotal").textContent = (totalFinal / count).toFixed(1);
       }
 
       async function saveMarks() {
         try {
           // Prepare marks data for API with correct structure
           const marksData = currentStudents.map((student) => ({
-            adm_no: student.adm_no || student.admNo,
-            student_name: student.name || student.student_name,
-            cat_marks: student.cat_marks || student.cat || 0,
-            exam_marks: student.exam_marks || student.exam || 0,
+            student_no: student.adm_no,
+            student_name: student.student_name,
+            cat_mark: student.cat_marks || 0,
+            exam_mark: student.exam_marks || 0,
           }));
 
           const payload = {
             programme_code: currentClass.programmeCode,
-            semester:
-              currentClass.semester?.semester || currentClass.semester?.name,
+            semester: currentClass.semester?.semester || currentClass.semester?.name,
             stage: currentClass.stage,
             unit_code: currentClass.unitCode,
             exam_category: currentClass.examCategory,
@@ -627,18 +609,13 @@
       }
 
       function exportToCSV() {
-        let csvContent =
-          "Admission No.,Student Name,CAT Marks,Exam Marks,Total,Status\n";
+        let csvContent = "Admission No.,Student Name,CAT Marks,Exam Marks,Total,Status\n";
         currentStudents.forEach((student) => {
-          const cat = student.cat_marks || student.cat || 0;
-          const exam = student.exam_marks || student.exam || 0;
-          const finalTotal = calculateTotal(
-            cat,
-            exam,
-            currentClass.examCategory,
-          );
+          const cat = student.cat_marks || 0;
+          const exam = student.exam_marks || 0;
+          const finalTotal = calculateTotal(cat, exam);
           const status = getStatus(finalTotal).text;
-          csvContent += `"${student.adm_no || student.admNo}","${student.name || student.student_name}",${cat},${exam},${finalTotal.toFixed(1)},"${status}"\n`;
+          csvContent += `"${student.adm_no}","${student.student_name}",${cat},${exam},${finalTotal.toFixed(1)},"${status}"\n`;
         });
 
         const blob = new Blob([csvContent], {
@@ -656,31 +633,27 @@
       }
 
       function updateClassBanner() {
-        const unitName =
-          currentClass.unitName || currentClass.unit_name || "Class";
+        const unitName = currentClass.unitName || currentClass.unit_name || "Class";
         const unitCode = currentClass.unitCode;
-        const semesterName =
-          currentClass.semester?.semester ||
-          currentClass.semester?.name ||
-          "Current";
+        const semesterName = currentClass.semester?.semester || currentClass.semester?.name || "Current";
         const examCategory = currentClass.examCategory || "DEGREE";
 
-        document.getElementById("classBanner").innerHTML = `
-            <h1>📖 ${escapeHtml(unitName)}</h1>
-            <div class="class-meta">
-                <span>📚 ${escapeHtml(unitCode)}</span>
-                <span>📅 Semester: ${escapeHtml(semesterName)}</span>
-                <span>🏫 ${escapeHtml(currentClass.programmeCode || "")} - ${escapeHtml(currentClass.stage || "")}</span>
-            </div>
-        `;
-const examMeta = currentClass.examMeta;
+        let badgeText = examCategory;
+        if (examMeta) {
+          badgeText = `${examMeta.code || examCategory} • ${examMeta.category || examCategory} (${examMeta.max_cat_mark}:${examMeta.max_exam_mark})`;
+        }
 
-if (examMeta) {
-  document.getElementById("examCategoryBadge").textContent =
-    `${examMeta.code} • ${examMeta.category} (${examMeta.max_cat_mark}:${examMeta.max_exam_mark})`;
-} else {
-  document.getElementById("examCategoryBadge").textContent = examCategory;
-}      }
+        document.getElementById("classBanner").innerHTML = `
+          <h1>📖 ${escapeHtml(unitName)}</h1>
+          <div class="class-meta">
+            <span>📚 ${escapeHtml(unitCode)}</span>
+            <span>📅 Semester: ${escapeHtml(semesterName)}</span>
+            <span>🏫 ${escapeHtml(currentClass.programmeCode || "")} - ${escapeHtml(currentClass.stage || "")}</span>
+          </div>
+        `;
+        
+        document.getElementById("examCategoryBadge").textContent = badgeText;
+      }
 
       function loadClassData() {
         const savedClass = localStorage.getItem("selectedClass");
