@@ -50,7 +50,8 @@ router.post('/login', (req, res) => {
         user: {
             email: user.email,
             pf_no: user.pf_number,
-            full_name: user.full_name
+            full_name: user.full_name,
+            role: user.role || 'user'
         }
     });
             }

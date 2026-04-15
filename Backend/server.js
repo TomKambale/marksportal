@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 require('dotenv').config();
+const db = require('./db');
 
 const app = express();
 
@@ -96,6 +97,207 @@ app.post('/api/logout', (req, res) => {
         res.clearCookie('connect.sid');
         res.json({ success: true, message: 'Logged out successfully' });
     });
+});
+
+// Get user role by email
+app.get('/api/user-role/:email', async (req, res) => {
+    try {
+        const { email } = req.params;
+        const sql = 'SELECT role FROM users WHERE email = ?';
+        
+        db.query(sql, [email], (err, results) => {
+            if (err) {
+                console.error('Error fetching user role:', err);
+                return res.status(500).json({ success: false, error: 'Database error' });
+            }
+            
+            if (results.length === 0) {
+                return res.status(404).json({ success: false, error: 'User not found' });
+            }
+            
+            res.json({ success: true, role: results[0].role });
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get all users (admin only)
+app.get('/api/admin/users', async (req, res) => {
+    try {
+        // Check if current user is admin
+        const currentUserEmail = req.session.user.email;
+        const checkAdminSql = 'SELECT role FROM users WHERE email = ?';
+        
+        db.query(checkAdminSql, [currentUserEmail], (err, results) => {
+            if (err) {
+                return res.status(500).json({ success: false, error: 'Database error' });
+            }
+            
+            if (results.length === 0 || results[0].role !== 'admin') {
+                return res.status(403).json({ success: false, error: 'Admin access required' });
+            }
+            
+            // Fetch all users
+            const sql = 'SELECT id, email, pf_number, full_name, role, status, created_at FROM users ORDER BY id DESC';
+            db.query(sql, (err, users) => {
+                if (err) {
+                    return res.status(500).json({ success: false, error: 'Database error' });
+                }
+                res.json({ success: true, users });
+            });
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Create new user (admin only)
+app.post('/api/admin/users', async (req, res) => {
+    try {
+        const { email, pf_number, full_name, role, status, password } = req.body;
+        
+        // Validate admin access
+        const currentUserEmail = req.session.user.email;
+        const checkAdminSql = 'SELECT role FROM users WHERE email = ?';
+        
+        db.query(checkAdminSql, [currentUserEmail], async (err, results) => {
+            if (err) {
+                return res.status(500).json({ success: false, error: 'Database error' });
+            }
+            
+            if (results.length === 0 || results[0].role !== 'admin') {
+                return res.status(403).json({ success: false, error: 'Admin access required' });
+            }
+            
+            // Check if user exists
+            const checkSql = 'SELECT id FROM users WHERE email = ? OR pf_number = ?';
+            db.query(checkSql, [email, pf_number], async (err, existing) => {
+                if (err) {
+                    return res.status(500).json({ success: false, error: 'Database error' });
+                }
+                
+                if (existing.length > 0) {
+                    return res.status(409).json({ success: false, error: 'User already exists' });
+                }
+                
+                // Hash password
+                const hashedPassword = password ? await bcrypt.hash(password, 10) : await bcrypt.hash('default123', 10);
+                
+                // Insert new user
+                const insertSql = `
+                    INSERT INTO users (email, pf_number, full_name, password_hash, role, status)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                `;
+                db.query(insertSql, [email, pf_number, full_name, hashedPassword, role, status], (err, result) => {
+                    if (err) {
+                        console.error('Insert error:', err);
+                        return res.status(500).json({ success: false, error: 'Failed to create user' });
+                    }
+                    
+                    res.json({ success: true, message: 'User created successfully', userId: result.insertId });
+                });
+            });
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Update user (admin only)
+app.put('/api/admin/users/:id', async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { email, pf_number, full_name, role, status, password } = req.body;
+        
+        // Validate admin access
+        const currentUserEmail = req.session.user.email;
+        const checkAdminSql = 'SELECT role FROM users WHERE email = ?';
+        
+        db.query(checkAdminSql, [currentUserEmail], async (err, results) => {
+            if (err) {
+                return res.status(500).json({ success: false, error: 'Database error' });
+            }
+            
+            if (results.length === 0 || results[0].role !== 'admin') {
+                return res.status(403).json({ success: false, error: 'Admin access required' });
+            }
+            
+            let updateSql = 'UPDATE users SET email = ?, pf_number = ?, full_name = ?, role = ?, status = ?';
+            let params = [email, pf_number, full_name, role, status];
+            
+            if (password && password.trim() !== '') {
+                const hashedPassword = await bcrypt.hash(password, 10);
+                updateSql += ', password_hash = ?';
+                params.push(hashedPassword);
+            }
+            
+            updateSql += ' WHERE id = ?';
+            params.push(userId);
+            
+            db.query(updateSql, params, (err, result) => {
+                if (err) {
+                    console.error('Update error:', err);
+                    return res.status(500).json({ success: false, error: 'Failed to update user' });
+                }
+                
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({ success: false, error: 'User not found' });
+                }
+                
+                res.json({ success: true, message: 'User updated successfully' });
+            });
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Delete user (admin only)
+app.delete('/api/admin/users/:id', async (req, res) => {
+    try {
+        const userId = req.params.id;
+        
+        // Validate admin access
+        const currentUserEmail = req.session.user.email;
+        const checkAdminSql = 'SELECT role, id FROM users WHERE email = ?';
+        
+        db.query(checkAdminSql, [currentUserEmail], (err, results) => {
+            if (err) {
+                return res.status(500).json({ success: false, error: 'Database error' });
+            }
+            
+            if (results.length === 0 || results[0].role !== 'admin') {
+                return res.status(403).json({ success: false, error: 'Admin access required' });
+            }
+            
+            // Prevent admin from deleting themselves
+            if (results[0].id === parseInt(userId)) {
+                return res.status(400).json({ success: false, error: 'Cannot delete your own account' });
+            }
+            
+            const deleteSql = 'DELETE FROM users WHERE id = ?';
+            db.query(deleteSql, [userId], (err, result) => {
+                if (err) {
+                    console.error('Delete error:', err);
+                    return res.status(500).json({ success: false, error: 'Failed to delete user' });
+                }
+                
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({ success: false, error: 'User not found' });
+                }
+                
+                res.json({ success: true, message: 'User deleted successfully' });
+            });
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
 
 // API Route: Get semesters for logged-in lecturer

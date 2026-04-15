@@ -2,9 +2,9 @@ const db = require('./db');
 const bcrypt = require('bcrypt');
 
 async function fixUserPassword() {
-    const email = 'sanewunasidai@ttu.ac.ke';
-    const pfNumber = 'TTU0075';
-    const correctPassword = 'Password';
+    const email = 'thomas.maghanga@ttu.ac.ke';
+    const pfNumber = '12345';
+    const correctPassword = 'hashedpassword';
     
     // Hash the password
     const saltRounds = 10;
