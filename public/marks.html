@@ -64,10 +64,31 @@
         margin-bottom: 1rem;
         box-shadow: var(--shadow);
       }
+      .upload-btn {
+        /* display: inline-flex; */
+        float: right;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--white);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--primary-green);
+        box-shadow: var(--shadow);
+      }
 
       .back-btn:hover {
         background: var(--light-green);
         transform: translateX(-4px);
+      }
+
+      .upload-btn:hover {
+        background: var(--light-green);
+        transform: translateX(4px);
       }
 
       .class-banner {
@@ -274,6 +295,7 @@
     <div class="container">
       <div class="header">
         <button class="back-btn" onclick="goBack()">← Back to Classes</button>
+        <button class="upload-btn" onclick="window.location.href='fileupload.html'">Bulk Upload</button>
       </div>
 
       <div class="class-banner" id="classBanner">

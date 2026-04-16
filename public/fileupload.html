@@ -61,6 +61,28 @@
             gap: 1.5rem;
         }
 
+        .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--white);
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--primary-green);
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow);
+      }
+
+      .back-btn:hover {
+        background: var(--light-green);
+        transform: translateX(-4px);
+      }
+
         /* Cards */
         .card {
             background: var(--color-background-primary);
@@ -307,6 +329,8 @@
 <div class="page">
     <!-- Header Card -->
     <div class="card">
+        <button class="back-btn" onclick="window.location.href='marks.html'">← Back to Marks</button>
+
         <div class="card-header">
             <div class="card-title">
                 📂 Raw CSV Upload → ERP Sync
