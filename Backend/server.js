@@ -4,6 +4,7 @@ const path = require('path');
 const session = require('express-session');
 require('dotenv').config();
 const db = require('./db');
+const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -249,6 +250,49 @@ app.put('/api/admin/users/:id', async (req, res) => {
                 }
                 
                 res.json({ success: true, message: 'User updated successfully' });
+            });
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Reset user password (admin only)
+app.post('/api/admin/users/:id/reset-password', async (req, res) => {
+    try {
+        const userId = req.params.id;
+        const { password } = req.body;
+        
+        // Validate admin access
+        const currentUserEmail = req.session.user.email;
+        const checkAdminSql = 'SELECT role FROM users WHERE email = ?';
+        
+        db.query(checkAdminSql, [currentUserEmail], async (err, results) => {
+            if (err) {
+                return res.status(500).json({ success: false, error: 'Database error' });
+            }
+            
+            if (results.length === 0 || results[0].role !== 'admin') {
+                return res.status(403).json({ success: false, error: 'Admin access required' });
+            }
+            
+            // Hash the new password
+            const hashedPassword = await bcrypt.hash(password, 10);
+            
+            // Update password
+            const updateSql = 'UPDATE users SET password_hash = ? WHERE id = ?';
+            db.query(updateSql, [hashedPassword, userId], (err, result) => {
+                if (err) {
+                    console.error('Password reset error:', err);
+                    return res.status(500).json({ success: false, error: 'Failed to reset password' });
+                }
+                
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({ success: false, error: 'User not found' });
+                }
+                
+                res.json({ success: true, message: 'Password reset successfully' });
             });
         });
     } catch (error) {
