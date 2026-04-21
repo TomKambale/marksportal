@@ -6,6 +6,10 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=yes"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    />
     <title>Semesters | Lecturer Dashboard</title>
     <style>
       * {
@@ -294,7 +298,7 @@
 
       <div class="card">
         <div class="card-header">
-          <h2>📅 Academic Semesters</h2>
+          <h2><i class="fa-regular fa-calendar-days"></i> Academic Semesters</h2>
           <span
             class="status-badge status-open"
             style="background: var(--light-green)"
@@ -423,7 +427,7 @@
                 <div class="semester-item" onclick='selectSemester(${JSON.stringify(semester)})'>
                     <div class="semester-info">
                         <div class="semester-name">${escapeHtml(semester.semester)} (${escapeHtml(semester.academic_year)})</div>
-                        <div class="semester-dates">📅 ${startDate} - ${endDate}</div>
+                        <div class="semester-dates"><i class="fa-regular fa-calendar-days"></i> ${startDate} - ${endDate}</div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.75rem;">
                         <span class="status-badge ${status === "open" ? "status-open" : "status-closed"}">

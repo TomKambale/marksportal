@@ -6,6 +6,10 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=yes"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    />
     <title>Classes | Lecturer Dashboard</title>
     <style>
       * {
@@ -508,7 +512,7 @@
         const academicYear = currentSemester.academic_year || "";
 
         document.getElementById("semesterBanner").innerHTML = `
-        <h1>📖 ${escapeHtml(semesterName)}</h1>
+        <h1><i class="fa-solid fa-list"></i>  ${escapeHtml(semesterName)}</h1>
         <p>${academicYear ? academicYear + " | " : ""}Click any class to view student marks</p>
     `;
 
