@@ -483,56 +483,6 @@ app.post('/api/classes', async (req, res) => {
 });
 
 // API Route: Get student marks for a class
-// app.post('/api/marks', async (req, res) => {
-//     try {
-//         const { unit_code, semester, pf_no, programme_code, stage } = req.body;
-        
-//         console.log('Fetching marks for:', { unit_code, semester, pf_no, programme_code, stage });
-        
-//         const token = await getAccessToken();
-        
-//         // Call the ERP API for student marks
-//         const apiUrl = `https://portal2.ttu.ac.ke/api/exam/v1/lecturer/class-list/`;
-        
-//         const response = await fetch(apiUrl, {
-//             method: 'POST',
-//             headers: {
-//                 'Authorization': `Bearer ${token}`,
-//                 'Content-Type': 'application/json'
-//             },
-//             body: JSON.stringify({
-//                 unit_code: unit_code,
-//                 semester: semester,
-//                 pf_no: pf_no,
-//                 programme_code: programme_code,
-//                 stage: stage
-//             })
-//         });
-
-//         console.log('ERP API Response status:', response.status);
-
-//         if (!response.ok) {
-//             const errorText = await response.text();
-//             console.error('API error response:', errorText);
-//             throw new Error(`API request failed: ${response.status} - ${errorText}`);
-//         }
-
-//         const students = await response.json();
-//         console.log('Students received:', students.length);
-        
-//         res.json({
-//             success: true,
-//             students: students
-//         });
-        
-//     } catch (error) {
-//         console.error('Error fetching marks:', error);
-//         res.status(500).json({ 
-//             success: false, 
-//             error: error.message 
-//         });
-//     }
-// });
 app.post('/api/marks', async (req, res) => {
     try {
         const { programme_code, semester, stage, unit_code, exam_category } = req.body;
@@ -607,7 +557,7 @@ app.post('/api/marks', async (req, res) => {
 // API Route: Save student marks
 app.post('/api/marks/save', async (req, res) => {
     try {
-        const { unit_code, semester, pf_no, programme_code, stage, exam_category, marks } = req.body;
+        const { unit_code, semester, pf_no, programme_code, stage, exam_category, student_no, cat_marks, exam_marks, academic_year } = req.body;
         
         console.log('Saving marks for:', { unit_code, semester, pf_no, programme_code, stage });
         console.log('Marks data:', marks.length, 'students');
@@ -615,7 +565,7 @@ app.post('/api/marks/save', async (req, res) => {
         const token = await getAccessToken();
         
         // Call the ERP API to save marks
-        const apiUrl = `https://portal2.ttu.ac.ke/api/exam/v1/lecturer/class-list/`;
+        const apiUrl = `https://portal2.ttu.ac.ke/api/exam/v1/lecturer/add-marks/`;
         
         const response = await fetch(apiUrl, {
             method: 'POST',
@@ -629,8 +579,12 @@ app.post('/api/marks/save', async (req, res) => {
                 pf_no: pf_no,
                 programme_code: programme_code,
                 stage: stage,
-                exam_category: exam_category,
-                marks: marks
+                exam_category: exam_categor,
+                // marks: marks,
+                student_no: student_no,
+                cat_marks: cat_marks,
+                exam_marks: exam_marks,
+                academic_year: academic_year
             })
         });
 

@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo.jpg">
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo.jpg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo.jpg">
     <title>Marks Uploader | Raw CSV to ERP</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family:
+          system-ui, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
         }
 
         :root {
@@ -26,8 +31,8 @@
             --danger: #dc3545;
             --warning: #fd7e14;
             --info: #0dcaf0;
-            --font-sans: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-            --font-mono: 'SF Mono', 'Fira Code', monospace;
+            /* --font-sans: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif; */
+            /* --font-mono: 'SF Mono', 'Fira Code', monospace; */
             --color-background-primary: #ffffff;
             --color-background-secondary: #f8f9fa;
             --color-background-tertiary: #f0f2f5;
@@ -422,7 +427,7 @@
     </div>
 
     <footer style="text-align: center; font-size: 0.7rem; color: var(--medium-gray);">
-        Raw uploader — sends exactly what you provide: { "admission_number", "cat", "exam" }
+        Raw file uploader — sends exactly what you provide: { "admission_number", "cat", "exam" }
     </footer>
 </div>
 
@@ -582,7 +587,7 @@
                 const csvText = e.target.result;
                 const records = parseCSVToRawRecords(csvText);
                 setRecords(records);
-                showFeedback(`✅ Successfully loaded ${records.length} student records (raw data, no calculations applied).`);
+                showFeedback(` Successfully loaded ${records.length} student records (raw data, no calculations applied).`);
             } catch (err) {
                 console.error(err);
                 showFeedback(`❌ Error: ${err.message}`, true);
@@ -674,27 +679,96 @@ SE217/2000/2025,,`;
     }
 
     // Simulate ERP push (mock POST request)
+    // async function simulateERPUpload() {
+    //     const payload = buildERPPayload();
+    //     if (!payload || uploadedRecords.length === 0) {
+    //         showFeedback('❌ No records to push. Upload data first.', true);
+    //         return;
+    //     }
+
+    //     showFeedback('⏳ Sending raw data to ERP (simulation)...', false);
+        
+    //     // Simulate network delay
+    //     setTimeout(() => {
+    //         console.log("[ERP MOCK] Raw payload:", payload);
+    //         const successMsg = `✅ SIMULATION: ${payload.total_records} raw student records sent to ERP endpoint. Each record contains admission_number, cat, exam (as uploaded).`;
+    //         showFeedback(successMsg);
+            
+    //         // Also show preview automatically
+    //         const prettyJson = JSON.stringify(payload, null, 2);
+    //         jsonPreview.innerText = prettyJson;
+    //         erpPreviewContainer.style.display = 'block';
+    //     }, 600);
+    // }
     async function simulateERPUpload() {
-        const payload = buildERPPayload();
-        if (!payload || uploadedRecords.length === 0) {
+        if (uploadedRecords.length === 0) {
             showFeedback('❌ No records to push. Upload data first.', true);
             return;
         }
 
-        showFeedback('⏳ Sending raw data to ERP (simulation)...', false);
+        // Get current class data from localStorage
+        const savedClass = localStorage.getItem("selectedClass");
+        if (!savedClass) {
+            showFeedback('❌ No class selected. Please go back and select a class first.', true);
+            return;
+        }
         
-        // Simulate network delay
-        setTimeout(() => {
-            console.log("[ERP MOCK] Raw payload:", payload);
-            const successMsg = `✅ SIMULATION: ${payload.total_records} raw student records sent to ERP endpoint. Each record contains admission_number, cat, exam (as uploaded).`;
-            showFeedback(successMsg);
-            
-            // Also show preview automatically
-            const prettyJson = JSON.stringify(payload, null, 2);
-            jsonPreview.innerText = prettyJson;
-            erpPreviewContainer.style.display = 'block';
-        }, 600);
+        const currentClass = JSON.parse(savedClass);
+        const currentUser = {
+            pf_no: localStorage.getItem("userPfNo")
+        };
+        
+        showFeedback(`⏳ Sending ${uploadedRecords.length} records to ERP...`, false);
+        
+        let successCount = 0;
+        let errorCount = 0;
+        
+        // Send each record individually to match backend expectations
+        for (const record of uploadedRecords) {
+            try {
+                const payload = {
+                    unit_code: currentClass.unitCode,
+                    semester: currentClass.semester?.semester || currentClass.semester?.name,
+                    pf_no: currentUser.pf_no,
+                    programme_code: currentClass.programmeCode,
+                    stage: currentClass.stage,
+                    exam_category: currentClass.examCategory || "DEGREE",
+                    student_no: record.admission_number,
+                    cat_marks: record.cat,
+                    exam_marks: record.exam,
+                    academic_year: currentClass.academic_year || "2024/2025"
+                };
+                
+                const response = await fetch("/api/marks/save", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                    console.error(`Failed for ${record.admission_number}:`, data.error);
+                }
+            } catch (err) {
+                errorCount++;
+                console.error(`Error for ${record.admission_number}:`, err);
+            }
+        }
+        
+        if (successCount > 0) {
+            showFeedback(`✅ ${successCount} records saved successfully!${errorCount > 0 ? ` ⚠️ ${errorCount} failed.` : ''}`);
+        } else {
+            showFeedback(`❌ All ${errorCount} records failed to save.`, true);
+        }
     }
+
 
     // File input handlers
     function setupFileHandlers() {
