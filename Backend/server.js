@@ -74,6 +74,7 @@ async function getAccessToken() {
     }
 };
 
+// Get current user endpoint
 app.get('/api/current-user', (req, res) => {
     if (req.session.user) {
         return res.json({
@@ -579,7 +580,7 @@ app.post('/api/marks/save', async (req, res) => {
                 pf_no: pf_no,
                 programme_code: programme_code,
                 stage: stage,
-                exam_category: exam_categor,
+                exam_category: exam_category,
                 // marks: marks,
                 student_no: student_no,
                 cat_marks: cat_marks,
@@ -614,7 +615,7 @@ app.post('/api/marks/save', async (req, res) => {
     }
 });
 
-// Test route
+// API Route: Get access token (for testing)
 app.get('/get-token', async (req, res) => {
     try {
         const token = await getAccessToken();
@@ -631,6 +632,7 @@ app.get('/get-token', async (req, res) => {
     }
 });
 
+// Test route to verify server is working
 app.get('/test', (req, res) => {
     console.log('TEST ROUTE HIT');
     res.send('Route works');

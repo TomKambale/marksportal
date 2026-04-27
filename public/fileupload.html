@@ -2,10 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
     <link rel="icon" type="image/png" sizes="32x32" href="/logo.jpg">
     <link rel="icon" type="image/png" sizes="16x16" href="/logo.jpg">
     <link rel="apple-touch-icon" sizes="180x180" href="/logo.jpg">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+    />
     <title>Marks Uploader | Raw CSV to ERP</title>
     <style>
         * {
@@ -338,7 +345,7 @@
 
         <div class="card-header">
             <div class="card-title">
-                📂 Raw CSV Upload → ERP Sync
+                <i class="fa-regular fa-folder-open"></i> Raw CSV Upload → ERP Sync
             </div>
             <span class="badge badge-info">No calculations · Raw data only</span>
         </div>
@@ -361,7 +368,7 @@
 
         <div class="btn-group">
             <button class="btn btn-outline" id="downloadTemplateBtn">
-                📥 Download CSV Template
+                <i class="fa-solid fa-file-arrow-down"></i> Download CSV Template
             </button>
             <button class="btn btn-outline" id="sampleDataBtn">
                 Load Sample Data
@@ -411,10 +418,10 @@
 
         <div class="btn-group" style="justify-content: flex-end; margin-top: 1.25rem;">
             <button class="btn btn-outline" id="previewErpBtn">
-                🔍 Preview ERP JSON
+                <i class="fa-solid fa-magnifying-glass"></i> Preview ERP JSON
             </button>
             <button class="btn btn-primary" id="pushToErpBtn">
-                ⬆️ Push to ERP (Simulate)
+                <i class="fa-solid fa-cloud-arrow-up"></i> Upload (Simulate)
             </button>
         </div>
 
@@ -631,7 +638,7 @@ SE217/2000/2025,,`;
             { admission_number: "SE217/2000/2028", cat: 30.0, exam: 85.0 }
         ];
         setRecords(sampleRecords);
-        showFeedback(`📋 Sample data loaded (${sampleRecords.length} students). Raw marks ready for ERP.`);
+        showFeedback(`Sample data loaded (${sampleRecords.length} students). Raw marks ready for ERP.`);
     }
 
     // Clear all data
@@ -816,7 +823,7 @@ SE217/2000/2025,,`;
     // Welcome hint
     setTimeout(() => {
         if (uploadedRecords.length === 0) {
-            showFeedback('💡 Ready: Upload a CSV with columns "Student adm.no, CAT, Exam". No calculations — raw data sent to ERP.', false);
+            showFeedback('Ready: Upload a CSV with columns "Student adm.no, CAT, Exam". No calculations — raw data sent to ERP.', false);
         }
     }, 500);
 </script>
