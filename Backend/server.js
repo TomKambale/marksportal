@@ -74,6 +74,143 @@ async function getAccessToken() {
     }
 };
 
+// Forgot password - Request password reset
+app.post('/api/forgot-password', async (req, res) => {
+    try {
+        const { email, pf_number } = req.body;
+        
+        if (!email || !pf_number) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Email and PF Number are required' 
+            });
+        }
+        
+        // Find user by email and PF number
+        const findUserSql = 'SELECT id, email, pf_number, full_name FROM users WHERE email = ? AND pf_number = ?';
+        
+        db.query(findUserSql, [email, pf_number], async (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ success: false, error: 'Database error' });
+            }
+            
+            if (results.length === 0) {
+                return res.status(404).json({ 
+                    success: false, 
+                    error: 'No user found with these credentials' 
+                });
+            }
+            
+            const user = results[0];
+            
+            // Generate a random reset token
+            const crypto = require('crypto');
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            const tokenExpiry = new Date();
+            tokenExpiry.setHours(tokenExpiry.getHours() + 1); // Token valid for 1 hour
+            
+            // Store token in database (you'll need to add these columns to users table)
+            const updateTokenSql = 'UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?';
+            db.query(updateTokenSql, [resetToken, tokenExpiry, user.id], (updateErr) => {
+                if (updateErr) {
+                    console.error('Error saving reset token:', updateErr);
+                    return res.status(500).json({ success: false, error: 'Failed to process request' });
+                }
+                
+                // In production, send email with reset link
+                // For now, return the token (in production, email this to user)
+                res.json({ 
+                    success: true, 
+                    message: 'Password reset initiated. Use your reset token to set new password.',
+                    resetToken: resetToken, // Remove this in production - should be emailed
+                    userId: user.id
+                });
+            });
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Reset password with token
+app.post('/api/reset-password', async (req, res) => {
+    try {
+        const { resetToken, newPassword, confirmPassword } = req.body;
+        
+        if (!resetToken || !newPassword || !confirmPassword) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Reset token and new password are required' 
+            });
+        }
+        
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Passwords do not match' 
+            });
+        }
+        
+        if (newPassword.length < 6) {
+            return res.status(400).json({ 
+                success: false, 
+                error: 'Password must be at least 6 characters long' 
+            });
+        }
+        
+        // Find user by reset token
+        const findUserSql = 'SELECT id, email, reset_token_expiry FROM users WHERE reset_token = ?';
+        
+        db.query(findUserSql, [resetToken], async (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.status(500).json({ success: false, error: 'Database error' });
+            }
+            
+            if (results.length === 0) {
+                return res.status(404).json({ 
+                    success: false, 
+                    error: 'Invalid or expired reset token' 
+                });
+            }
+            
+            const user = results[0];
+            
+            // Check if token has expired
+            const now = new Date();
+            if (user.reset_token_expiry && new Date(user.reset_token_expiry) < now) {
+                return res.status(400).json({ 
+                    success: false, 
+                    error: 'Reset token has expired. Please request a new one.' 
+                });
+            }
+            
+            // Hash the new password
+            const bcrypt = require('bcrypt');
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            
+            // Update password and clear reset token
+            const updateSql = 'UPDATE users SET password_hash = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?';
+            db.query(updateSql, [hashedPassword, user.id], (updateErr, result) => {
+                if (updateErr) {
+                    console.error('Password reset error:', updateErr);
+                    return res.status(500).json({ success: false, error: 'Failed to reset password' });
+                }
+                
+                res.json({ 
+                    success: true, 
+                    message: 'Password reset successfully! You can now login with your new password.' 
+                });
+            });
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // Get current user endpoint
 app.get('/api/current-user', (req, res) => {
     if (req.session.user) {
@@ -561,7 +698,7 @@ app.post('/api/marks/save', async (req, res) => {
         const { unit_code, semester, pf_no, programme_code, stage, exam_category, student_no, cat_marks, exam_marks, academic_year } = req.body;
         
         console.log('Saving marks for:', { unit_code, semester, pf_no, programme_code, stage });
-        console.log('Marks data:', marks.length, 'students');
+        // console.log('Marks data:', marks.length, 'students');
         
         const token = await getAccessToken();
         

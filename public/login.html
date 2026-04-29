@@ -32,6 +32,7 @@
         --transition: all 0.3s ease;
         --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         --danger: #dc3545;
+        --success: #28a745;
       }
 
       body {
@@ -94,7 +95,8 @@
       }
 
       input[type="text"],
-      input[type="password"] {
+      input[type="password"],
+      input[type="email"] {
         width: 100%;
         padding: 0.8rem 1rem;
         border: 2px solid #e0e0e0;
@@ -104,7 +106,8 @@
       }
 
       input[type="text"]:focus,
-      input[type="password"]:focus {
+      input[type="password"]:focus,
+      input[type="email"]:focus {
         outline: none;
         border-color: #006400;
         box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.1);
@@ -185,6 +188,7 @@
         color: #006400;
         text-decoration: none;
         font-weight: 600;
+        cursor: pointer;
       }
 
       .psw a:hover {
@@ -200,6 +204,200 @@
         margin-bottom: 1rem;
         font-size: 0.9rem;
         text-align: center;
+      }
+
+      .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      .modal-content {
+        background-color: var(--white);
+        margin: 5% auto;
+        padding: 0;
+        border-radius: 28px;
+        width: 90%;
+        max-width: 450px;
+        box-shadow: var(--shadow);
+        animation: slideIn 0.3s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateY(-50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: white;
+        padding: 1.5rem;
+        border-radius: 28px 28px 0 0;
+      }
+
+      .modal-header h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .modal-header p {
+        font-size: 0.85rem;
+        opacity: 0.9;
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+      }
+
+      .modal-footer {
+        padding: 1rem 1.5rem 1.5rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+      }
+
+      .btn-modal {
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+      }
+
+      .btn-primary-modal {
+        background: var(--primary-green);
+        color: white;
+      }
+
+      .btn-primary-modal:hover {
+        background: var(--dark-green);
+        transform: translateY(-2px);
+      }
+
+      .btn-secondary-modal {
+        background: var(--light-gray);
+        color: var(--dark-gray);
+      }
+
+      .btn-secondary-modal:hover {
+        background: var(--medium-gray);
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .close {
+        float: right;
+        font-size: 1.5rem;
+        font-weight: bold;
+        cursor: pointer;
+        color: white;
+        opacity: 0.8;
+        transition: opacity 0.3s ease;
+      }
+
+      .close:hover {
+        opacity: 1;
+      }
+
+      .reset-step {
+        display: none;
+      }
+
+      .reset-step.active {
+        display: block;
+      }
+
+      .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        padding: 0 1rem;
+      }
+
+      .step {
+        text-align: center;
+        flex: 1;
+        position: relative;
+      }
+
+      .step-circle {
+        width: 30px;
+        height: 30px;
+        background: var(--light-gray);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--medium-gray);
+        position: relative;
+        z-index: 1;
+      }
+
+      .step.active .step-circle {
+        background: var(--primary-green);
+        color: white;
+      }
+
+      .step.completed .step-circle {
+        background: var(--success);
+        color: white;
+      }
+
+      .step-label {
+        font-size: 0.7rem;
+        margin-top: 0.5rem;
+        color: var(--medium-gray);
+      }
+
+      .step.active .step-label {
+        color: var(--primary-green);
+        font-weight: 600;
+      }
+
+      .step:not(:last-child):before {
+        content: '';
+        position: absolute;
+        top: 15px;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        background: var(--light-gray);
+        z-index: 0;
+      }
+
+      .step.completed:not(:last-child):before {
+        background: var(--success);
       }
 
       @media (max-width: 480px) {
@@ -223,6 +421,10 @@
         .cancelbtn {
           width: 100%;
         }
+        
+        .modal-content {
+          margin: 10% auto;
+        }
       }
     </style>
   </head>
@@ -239,7 +441,7 @@
 
       <h2>Welcome Back</h2>
 
-      <form action="/login" method="post" class="login-form">
+      <form action="/login" method="post" class="login-form" id="loginForm">
         <div class="form-group">
           <label for="uname">Email</label>
           <input
@@ -286,22 +488,272 @@
         <button type="submit">Login</button>
 
         <div class="action-buttons">
-          <!-- <button type="button" class="cancelbtn" onclick="resetForm()">
-            Cancel
-          </button> -->
-          <span class="psw"><a href="register.html">SignUp?</a></span>
-          <span class="psw">Forgot <a href="#">password?</a></span>
+          <span class="psw"><a href="register.html">Sign Up?</a></span>
+          <span class="psw"><a href="#" id="forgotPasswordLink">Forgot Password?</a></span>
         </div>
       </form>
     </div>
 
+    <!-- Forgot Password Modal -->
+    <div id="resetModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="close" id="closeModalBtn">&times;</span>
+          <h3>Reset Password</h3>
+          <p>We'll help you create a new password</p>
+        </div>
+        
+        <div class="modal-body">
+          <!-- Step 1: Request Reset -->
+          <div id="step1" class="reset-step active">
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="resetEmail" placeholder="Enter your registered email" required>
+            </div>
+            <div class="form-group">
+              <label>PF Number</label>
+              <input type="text" id="resetPfNumber" placeholder="Enter your PF Number" required>
+            </div>
+            <div id="step1Message"></div>
+          </div>
+          
+          <!-- Step 2: Enter Reset Token & New Password -->
+          <div id="step2" class="reset-step">
+            <div class="form-group">
+              <label>Reset Token</label>
+              <input type="text" id="resetToken" placeholder="Enter the reset token from your email" required>
+            </div>
+            <div class="form-group">
+              <label>New Password</label>
+              <input type="password" id="newPassword" placeholder="Enter new password (min. 6 characters)" required>
+            </div>
+            <div class="form-group">
+              <label>Confirm New Password</label>
+              <input type="password" id="confirmPassword" placeholder="Confirm your new password" required>
+            </div>
+            <div id="step2Message"></div>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button class="btn-modal btn-secondary-modal" id="cancelResetBtn">Cancel</button>
+          <button class="btn-modal btn-primary-modal" id="nextStepBtn">Next</button>
+          <button class="btn-modal btn-primary-modal" id="resetPasswordBtn" style="display: none;">Reset Password</button>
+          <button class="btn-modal btn-secondary-modal" id="backStepBtn" style="display: none;">Back</button>
+        </div>
+      </div>
+    </div>
+
     <script>
-      function resetForm() {
-        document.getElementById("uname").value = "";
-        document.getElementById("pf").value = "";
-        document.getElementById("psw").value = "";
-        document.getElementById("remember").checked = true;
+      let resetRequestData = null;
+      let currentStep = 1;
+      
+      // Get modal elements
+      const modal = document.getElementById('resetModal');
+      const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const cancelResetBtn = document.getElementById('cancelResetBtn');
+      const nextStepBtn = document.getElementById('nextStepBtn');
+      const backStepBtn = document.getElementById('backStepBtn');
+      const resetPasswordBtn = document.getElementById('resetPasswordBtn');
+      
+      // Step elements
+      const step1 = document.getElementById('step1');
+      const step2 = document.getElementById('step2');
+      
+      // Input fields
+      const resetEmail = document.getElementById('resetEmail');
+      const resetPfNumber = document.getElementById('resetPfNumber');
+      const resetToken = document.getElementById('resetToken');
+      const newPassword = document.getElementById('newPassword');
+      const confirmPassword = document.getElementById('confirmPassword');
+      
+      // Message containers
+      const step1Message = document.getElementById('step1Message');
+      const step2Message = document.getElementById('step2Message');
+      
+      // Open modal
+      forgotPasswordLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        modal.style.display = 'block';
+        resetForm();
+      });
+      
+      // Close modal
+      function closeModal() {
+        modal.style.display = 'none';
+        resetForm();
+        showStep(1);
       }
+      
+      closeModalBtn.addEventListener('click', closeModal);
+      cancelResetBtn.addEventListener('click', closeModal);
+      
+      // Close modal when clicking outside
+      window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal();
+        }
+      });
+      
+      // Reset form
+      function resetForm() {
+        resetEmail.value = '';
+        resetPfNumber.value = '';
+        resetToken.value = '';
+        newPassword.value = '';
+        confirmPassword.value = '';
+        step1Message.innerHTML = '';
+        step2Message.innerHTML = '';
+        resetRequestData = null;
+      }
+      
+      // Show specific step
+      function showStep(step) {
+        currentStep = step;
+        
+        if (step === 1) {
+          step1.classList.add('active');
+          step2.classList.remove('active');
+          nextStepBtn.style.display = 'block';
+          resetPasswordBtn.style.display = 'none';
+          backStepBtn.style.display = 'none';
+        } else {
+          step1.classList.remove('active');
+          step2.classList.add('active');
+          nextStepBtn.style.display = 'none';
+          resetPasswordBtn.style.display = 'block';
+          backStepBtn.style.display = 'block';
+        }
+      }
+      
+      // Step 1: Request password reset
+      async function requestPasswordReset() {
+        const email = resetEmail.value.trim();
+        const pfNumber = resetPfNumber.value.trim();
+        
+        if (!email || !pfNumber) {
+          step1Message.innerHTML = '<div class="error-message">Please enter both email and PF number</div>';
+          return;
+        }
+        
+        try {
+          const response = await fetch('/api/forgot-password', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: email,
+              pf_number: pfNumber
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            step1Message.innerHTML = `<div class="success-message">
+              ✅ ${data.message}<br>
+              <strong>Token:</strong> ${data.resetToken}<br>
+            </div>`;
+            
+            // Store the reset token for demo purposes
+            if (data.resetToken) {
+              resetToken.value = data.resetToken;
+            }
+            
+            // Auto-advance to step 2 after 2 seconds
+            setTimeout(() => {
+              showStep(2);
+            }, 2000);
+          } else {
+            step1Message.innerHTML = `<div class="error-message">❌ ${data.error}</div>`;
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          step1Message.innerHTML = '<div class="error-message">❌ Network error. Please try again.</div>';
+        }
+      }
+      
+      // Step 2: Reset password with token
+      async function resetPassword() {
+        const token = resetToken.value.trim();
+        const newPwd = newPassword.value;
+        const confirmPwd = confirmPassword.value;
+        
+        if (!token) {
+          step2Message.innerHTML = '<div class="error-message">Please enter the reset token</div>';
+          return;
+        }
+        
+        if (!newPwd || !confirmPwd) {
+          step2Message.innerHTML = '<div class="error-message">Please enter and confirm your new password</div>';
+          return;
+        }
+        
+        if (newPwd !== confirmPwd) {
+          step2Message.innerHTML = '<div class="error-message">Passwords do not match</div>';
+          return;
+        }
+        
+        if (newPwd.length < 6) {
+          step2Message.innerHTML = '<div class="error-message">Password must be at least 6 characters long</div>';
+          return;
+        }
+        
+        try {
+          const response = await fetch('/api/reset-password', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              resetToken: token,
+              newPassword: newPwd,
+              confirmPassword: confirmPwd
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            step2Message.innerHTML = `<div class="success-message">✅ ${data.message}</div>`;
+            
+            // Close modal after 2 seconds and redirect to login
+            setTimeout(() => {
+              closeModal();
+              alert('Password reset successful! Please login with your new password.');
+            }, 2000);
+          } else {
+            step2Message.innerHTML = `<div class="error-message">❌ ${data.error}</div>`;
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          step2Message.innerHTML = '<div class="error-message">❌ Network error. Please try again.</div>';
+        }
+      }
+      
+      // Button handlers
+      nextStepBtn.addEventListener('click', requestPasswordReset);
+      resetPasswordBtn.addEventListener('click', resetPassword);
+      backStepBtn.addEventListener('click', () => showStep(1));
+      
+      // Allow Enter key to submit
+      resetEmail.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') requestPasswordReset();
+      });
+      resetPfNumber.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') requestPasswordReset();
+      });
+      resetToken.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') resetPassword();
+      });
+      newPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') resetPassword();
+      });
+      confirmPassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') resetPassword();
+      });
 
       // Display error message if redirected back with error
       const urlParams = new URLSearchParams(window.location.search);
