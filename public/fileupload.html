@@ -498,13 +498,13 @@
         const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
         
         const admIndex = headers.findIndex(h => 
-            h.includes('adm.no') || h === 'student adm.no' || h === 'adm no' || h === 'admission number' || h === 'admission_no'
+            h.includes('adm.no') || h === 'student adm.no' || h === 'adm no' || h === 'admission number' || h === 'admission_no' || h === 'Admission No' || h === 'Student adm.no'
         );
         const catIndex = headers.findIndex(h => 
-            h === 'cat' || h === 'cat marks' || h === 'cat_marks'
+            h === 'cat' || h === 'cat marks' || h === 'cat_marks' || h === 'CAT' || h === 'CAT Marks'
         );
         const examIndex = headers.findIndex(h => 
-            h === 'exam' || h === 'exam marks' || h === 'exam_marks'
+            h === 'exam' || h === 'exam marks' || h === 'exam_marks' || h === 'Final Exam marks' || h === 'Exam Marks'
         );
 
         if (admIndex === -1 || catIndex === -1 || examIndex === -1) {

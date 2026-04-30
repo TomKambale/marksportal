@@ -396,7 +396,7 @@
 
         if (!semesters || semesters.length === 0) {
           container.innerHTML =
-            '<div style="padding: 2rem; text-align: center; color: var(--medium-gray);">📭 No semesters found for this lecturer</div>';
+            '<div style="padding: 2rem; text-align: center; color: var(--medium-gray);"><i class="fa-solid fa-arrows-rotate"></i> No semesters found for this lecturer</div>';
           return;
         }
 
@@ -408,7 +408,7 @@
 
             if (semester.is_current === 1) {
               status = "open";
-              statusText = "● Open";
+              statusText = "● Active";
             } else if (
               semester.marks_entry_date &&
               semester.marks_entry_date !== "1753-01-01T00:00:00"
@@ -417,7 +417,7 @@
               const today = new Date();
               if (entryDate > today) {
                 status = "open";
-                statusText = "● Open";
+                statusText = "●  Marks Entry Active";
               }
             }
 

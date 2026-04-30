@@ -339,7 +339,7 @@
                 <th>CAT Marks</th>
                 <th>Exam Marks</th>
                 <th>Total (out of 100)</th>
-                <th>Status</th>
+                <!-- <th>Status</th> -->
                 <th>Action</th>
               </tr>
             </thead>
@@ -482,13 +482,13 @@
         return Math.min(100, (cat || 0) + (exam || 0));
       }
 
-      function getStatus(total) {
-        if (total >= 70) return { text: "Pass (A)", class: "status-pass" };
-        if (total >= 60) return { text: "Pass (B)", class: "status-pass" };
-        if (total >= 50) return { text: "Pass (C)", class: "status-pass" };
-        if (total >= 40) return { text: "Supplementary", class: "status-fail" };
-        return { text: "Fail", class: "status-fail" };
-      }
+      // function getStatus(total) {
+      //   if (total >= 70) return { text: "Pass (A)", class: "status-pass" };
+      //   if (total >= 60) return { text: "Pass (B)", class: "status-pass" };
+      //   if (total >= 50) return { text: "Pass (C)", class: "status-pass" };
+      //   if (total >= 40) return { text: "Supplementary", class: "status-fail" };
+      //   return { text: "Fail", class: "status-fail" };
+      // }
 
       function getMaxMarks() {
         if (examMeta) {
@@ -634,7 +634,7 @@
             const cat = student.cat_marks || 0;
             const exam = student.exam_marks || 0;
             const finalTotal = calculateTotal(cat, exam);
-            const status = getStatus(finalTotal);
+            // const status = getStatus(finalTotal);
             totalCat += cat;
             totalExam += exam;
             totalFinal += finalTotal;
@@ -649,7 +649,7 @@
                 <td><input type="number" class="marks-input" id="cat_${index}" value="${cat}" step="0.5" min="0" max="${maxMarks.cat}" onchange="updateMarks(${index}, 'cat', this.value)"></td>
                 <td><input type="number" class="marks-input" id="exam_${index}" value="${exam}" step="0.5" min="0" max="${maxMarks.exam}" onchange="updateMarks(${index}, 'exam', this.value)"></td>
                 <td class="total-cell" id="total_${index}">${finalTotal.toFixed(1)}</td>
-                <td class="${status.class}">${status.text}</td>
+                <!-- <td class="${status.class}">${status.text}</td> -->
                 <td><button class="save-row-btn" onclick="saveSingleMarks(${index})">Save Row</button></td>
               </tr>
             `;
@@ -678,7 +678,7 @@
         const finalTotal = calculateTotal(cat, exam);
         document.getElementById(`total_${index}`).textContent = finalTotal.toFixed(1);
 
-        const status = getStatus(finalTotal);
+        // const status = getStatus(finalTotal);
         const row = document.getElementById(`total_${index}`).parentElement;
         const statusCell = row.cells[5];
         statusCell.className = status.class;
@@ -712,8 +712,8 @@
           const cat = student.cat_marks || 0;
           const exam = student.exam_marks || 0;
           const finalTotal = calculateTotal(cat, exam);
-          const status = getStatus(finalTotal).text;
-          csvContent += `"${student.student_no}","${student.student_name}",${cat},${exam},${finalTotal.toFixed(1)},"${status}"\n`;
+          // const status = getStatus(finalTotal).text;,"${status}"
+          csvContent += `"${student.student_no}","${student.student_name}",${cat},${exam},${finalTotal.toFixed(1)}\n`;
         });
 
         const blob = new Blob([csvContent], {
