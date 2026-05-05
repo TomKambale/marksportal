@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Chair of Department | TTU Marks Portal</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo.jpg">
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #006400;
+            --secondary-green: #228B22;
+            --light-green: #f0f9f0;
+            --dark-green: #004d00;
+            --accent-gold: #D4AF37;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --success: #28a745;
+            --info: #17a2b8;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+            min-height: 100vh;
+            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 280px;
+            background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+            color: white;
+            transition: var(--transition);
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 1.5rem 0;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: rgba(255,255,255,0.9);
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            padding-left: 2rem;
+        }
+
+        .nav-item.active {
+            background: var(--accent-gold);
+            color: var(--dark-green);
+            border-left: 4px solid var(--white);
+        }
+
+        .nav-item i {
+            width: 24px;
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            padding: 1.5rem;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-green);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info span {
+            color: var(--dark-gray);
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--light-green);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon i {
+            font-size: 1.5rem;
+            color: var(--primary-green);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-green);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--medium-gray);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-green);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 1rem;
+        }
+
+        .progress-item {
+            margin-bottom: 1rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .progress-bar {
+            background: var(--light-gray);
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, var(--warning), #ffc107);
+        }
+
+        .progress-fill.danger {
+            background: linear-gradient(90deg, var(--danger), #ff6b6b);
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem;
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--light-gray);
+            font-size: 0.85rem;
+        }
+
+        .data-table tr:hover {
+            background: var(--light-green);
+        }
+
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3e0;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Search Box */
+        .search-box {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 250px;
+            font-size: 0.85rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--white);
+            margin: 5% auto;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--medium-gray);
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1001;
+                background: var(--primary-green);
+                color: white;
+                border: none;
+                padding: 0.5rem;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="/logo.jpg" alt="TTU Logo" onerror="this.src='https://via.placeholder.com/60'">
+            <h3>Chair of Department</h3>
+            <p>Faculty of Computing & Informatics</p>
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-item active" data-page="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-page="programmes">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Programmes</span>
+            </div>
+            <div class="nav-item" data-page="lecturers">
+                <i class="fas fa-chalkboard-user"></i>
+                <span>Lecturers</span>
+            </div>
+            <div class="nav-item" data-page="submissions">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Marks Submissions</span>
+            </div>
+            <!-- <div class="nav-item" data-page="reports">
+                <i class="fas fa-chart-line"></i>
+                <span>Reports</span>
+            </div> -->
+        </div>
+    </div>
+
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" style="display: none;">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-bar">
+            <h1 class="page-title" id="pageTitle">Dashboard Overview</h1>
+            <div class="user-info">
+                <span><i class="fas fa-user"></i> Dr. Alfred Mwangi</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboardPage">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card" onclick="switchPage('programmes')">
+                    <div class="stat-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="stat-value" id="totalProgrammes">0</div>
+                    <div class="stat-label">Academic Programmes</div>
+                </div>
+                <div class="stat-card" onclick="switchPage('lecturers')">
+                    <div class="stat-icon"><i class="fas fa-chalkboard-user"></i></div>
+                    <div class="stat-value" id="totalLecturers">0</div>
+                    <div class="stat-label">Active Lecturers</div>
+                </div>
+                <div class="stat-card" onclick="switchPage('submissions')">
+                    <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="stat-value" id="totalUnits">0</div>
+                    <div class="stat-label">Units Offered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-value" id="totalStudents">0</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+            </div>
+
+            <!-- Marks Submission Progress -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Marks Submission Progress
+                    </div>
+                    <select id="submissionSemester" class="search-box" style="width: auto;">
+                        <option>SEM 1 2024/2025</option>
+                        <option>SEM 2 2024/2025</option>
+                        <option>SEM 1 2025/2026</option>
+                        <option selected>SEM 2 2025/2026</option>
+                    </select>
+                </div>
+                <div class="progress-container" id="submissionProgress">
+                    <!-- Progress items will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Recent Alerts -->
+            <!-- <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-bell"></i>
+                        Recent Alerts & Notifications
+                    </div>
+                </div>
+                <div id="alertsList">
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>⚠️ Deadline approaching: ICS 2301 - Database Systems (2 days left)</span>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span>✅ All marks submitted for ICS 1101 - Programming Fundamentals</span>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+
+        <!-- Programmes Page -->
+        <div id="programmesPage" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        Department Programmes
+                    </div>
+                    <input type="text" id="programmeSearch" class="search-box" placeholder="Search programmes...">
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="programmesTable">
+                        <thead>
+                            <tr>
+                                <th>Programme Code</th>
+                                <th>Programme Name</th>
+                                <th>Duration</th>
+                                <th>Stages</th>
+                                <th>Total Units</th>
+                                <th>Students</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="programmesTableBody">
+                            <tr><td colspan="7" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lecturers Page -->
+        <div id="lecturersPage" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chalkboard-user"></i>
+                        Department Lecturers
+                    </div>
+                    <input type="text" id="lecturerSearch" class="search-box" placeholder="Search lecturers...">
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="lecturersTable">
+                        <thead>
+                            <tr>
+                                <th>PF Number</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Assigned Units</th>
+                                <th>Submission Progress</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lecturersTableBody">
+                            <tr><td colspan="6" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submissions Page -->
+        <div id="submissionsPage" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="submittedUnits">0</div>
+                    <div class="stat-label">Units Submitted</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pendingUnits">0</div>
+                    <div class="stat-label">Pending Submission</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="overdueUnits">0</div>
+                    <div class="stat-label">Overdue</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="submissionRate">0%</div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Unit-wise Marks Submission Status
+                    </div>
+                    <div>
+                        <select id="filterProgramme" class="search-box" style="width: auto;">
+                            <option value="">All Programmes</option>
+                        </select>
+                        <select id="filterStage" class="search-box" style="width: auto;">
+                            <option value="">All Stages</option>
+                            <option>Y1S1</option>
+                            <option>Y1S2</option>
+                            <option>Y2S1</option>
+                            <option>Y2S2</option>
+                            <option>Y3S1</option>
+                            <option>Y3S2</option>
+                            <option>Y4S1</option>
+                            <option>Y4S2</option>
+                        </select>
+                        <button class="btn-export" onclick="exportSubmissionReport()" style="background: var(--primary-green); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer;">
+                            <i class="fas fa-download"></i> Export Report
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="submissionsTable">
+                        <thead>
+                            <tr>
+                                <th>Unit Code</th>
+                                <th>Unit Name</th>
+                                <th>Programme</th>
+                                <th>Stage</th>
+                                <th>Lecturer</th>
+                                <th>Submission Status</th>
+                                <th>Progress</th>
+                                <th>Last Updated</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="submissionsTableBody">
+                            <tr><td colspan="9" style="text-align: center;">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Page -->
+        <div id="reportsPage" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        Submission Analytics
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div>
+                        <canvas id="submissionChart" style="max-height: 300px;"></canvas>
+                    </div>
+                    <div>
+                        <canvas id="programmeChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-file-alt"></i>
+                        Generate Reports
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <button class="btn-report" onclick="generateReport('submission-summary')" style="padding: 1rem; background: var(--light-green); border: none; border-radius: 12px; cursor: pointer;">
+                        <i class="fas fa-chart-simple"></i><br>
+                        <strong>Submission Summary</strong><br>
+                        <small>Overall submission statistics</small>
+                    </button>
+                    <button class="btn-report" onclick="generateReport('lecturer-performance')" style="padding: 1rem; background: var(--light-green); border: none; border-radius: 12px; cursor: pointer;">
+                        <i class="fas fa-user-graduate"></i><br>
+                        <strong>Lecturer Performance</strong><br>
+                        <small>Per lecturer submission rates</small>
+                    </button>
+                    <button class="btn-report" onclick="generateReport('unit-analysis')" style="padding: 1rem; background: var(--light-green); border: none; border-radius: 12px; cursor: pointer;">
+                        <i class="fas fa-book"></i><br>
+                        <strong>Unit Analysis</strong><br>
+                        <small>Detailed unit submission status</small>
+                    </button>
+                    <button class="btn-report" onclick="generateReport('programme-report')" style="padding: 1rem; background: var(--light-green); border: none; border-radius: 12px; cursor: pointer;">
+                        <i class="fas fa-graduation-cap"></i><br>
+                        <strong>Programme Report</strong><br>
+                        <small>Programme-wise submission stats</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lecturer Details Modal -->
+    <div id="lecturerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalLecturerName">Lecturer Details</h3>
+                <span class="close-modal" onclick="closeModal('lecturerModal')">&times;</span>
+            </div>
+            <div class="modal-body" id="lecturerModalBody">
+                <!-- Dynamic content -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close" onclick="closeModal('lecturerModal')" style="padding: 0.5rem 1rem; background: var(--medium-gray); color: white; border: none; border-radius: 8px; cursor: pointer;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - Replace with actual API calls
+        let departmentData = {
+            programmes: [
+                { code: "BSCS", name: "Bachelor of Science in Computer Science", duration: "4 Years", stages: 8, units: 42, students: 456 },
+                { code: "BScIT", name: "Bachelor of Science in Information Technology", duration: "4 Years", stages: 8, units: 40, students: 389 },
+                { code: "BED", name: "Bachelor of Education (ICT)", duration: "4 Years", stages: 8, units: 38, students: 234 },
+                { code: "DCS", name: "Diploma in Computer Science", duration: "2 Years", stages: 4, units: 20, students: 178 }
+            ],
+            lecturers: [
+                { pf_no: "TTU0001", name: "Dr. Jane Mwangi", email: "j.mwangi@ttu.ac.ke", units: 3, submitted: 2, total: 3 },
+                { pf_no: "TTU0002", name: "Prof. John Otieno", email: "j.otieno@ttu.ac.ke", units: 4, submitted: 4, total: 4 },
+                { pf_no: "TTU0003", name: "Dr. Alfred Mwangi", email: "alfred@ttu.ac.ke", units: 2, submitted: 1, total: 2 },
+                { pf_no: "TTU0045", name: "Dr. Sarah Wanjiku", email: "s.wanjiku@ttu.ac.ke", units: 3, submitted: 1, total: 3 }
+            ],
+            units: [
+                { code: "ICS 1101", name: "Programming Fundamentals", programme: "BSCS", stage: "Y1S1", lecturer: "Dr. Jane Mwangi", status: "submitted", progress: 100, lastUpdated: "2025-04-15" },
+                { code: "ICS 1104", name: "Data Structures and Algorithms", programme: "BSCS", stage: "Y1S1", lecturer: "Dr. Jane Mwangi", status: "submitted", progress: 54, lastUpdated: "2025-04-15" },
+                { code: "ICS 1102", name: "Discrete Mathematics", programme: "BSCS", stage: "Y1S1", lecturer: "Prof. John Otieno", status: "submitted", progress: 100, lastUpdated: "2025-04-14" },
+                { code: "ICS 2301", name: "Database Systems", programme: "BSCS", stage: "Y2S1", lecturer: "Dr. Sarah Wanjiku", status: "pending", progress: 65, lastUpdated: "2025-04-10" },
+                { code: "ICS 2302", name: "Data Structures", programme: "BSCS", stage: "Y2S2", lecturer: "Dr. Alfred Mwangi", status: "pending", progress: 30, lastUpdated: "2025-04-05" },
+                { code: "ICS 3401", name: "Software Engineering", programme: "BSCS", stage: "Y3S1", lecturer: "Dr. Jane Mwangi", status: "overdue", progress: 20, lastUpdated: "2025-04-01" },
+                { code: "BIT 1101", name: "Introduction to IT", programme: "BScIT", stage: "Y1S1", lecturer: "Prof. John Otieno", status: "submitted", progress: 100, lastUpdated: "2025-04-16" },
+                { code: "BIT 2101", name: "Web Development", programme: "BScIT", stage: "Y2S1", lecturer: "Dr. Sarah Wanjiku", status: "pending", progress: 45, lastUpdated: "2025-04-08" }
+            ]
+        };
+
+        let currentPage = 'dashboard';
+        let submissionChart = null;
+        let programmeChart = null;
+
+        // Initialize page
+        function init() {
+            updateDashboardStats();
+            renderProgrammes();
+            renderLecturers();
+            renderSubmissions();
+            renderSubmissionProgress();
+            initCharts();
+            setupEventListeners();
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('totalProgrammes').textContent = departmentData.programmes.length;
+            document.getElementById('totalLecturers').textContent = departmentData.lecturers.length;
+            document.getElementById('totalUnits').textContent = departmentData.units.length;
+            const totalStudents = departmentData.programmes.reduce((sum, p) => sum + p.students, 0);
+            document.getElementById('totalStudents').textContent = totalStudents;
+        }
+
+        function renderProgrammes() {
+            const tbody = document.getElementById('programmesTableBody');
+            tbody.innerHTML = departmentData.programmes.map(p => `
+                <tr>
+                    <td><strong>${p.code}</strong></td>
+                    <td>${p.name}</td>
+                    <td>${p.duration}</td>
+                    <td>${p.stages}</td>
+                    <td>${p.units}</td>
+                    <td>${p.students}</td>
+                    <td><button class="badge badge-info" onclick="viewProgrammeDetails('${p.code}')">View Details</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderLecturers() {
+            const tbody = document.getElementById('lecturersTableBody');
+            tbody.innerHTML = departmentData.lecturers.map(l => {
+                const progress = (l.submitted / l.total) * 100;
+                return `
+                    <tr>
+                        <td>${l.pf_no}</td>
+                        <td><strong>${l.name}</strong></td>
+                        <td>${l.email}</td>
+                        <td>${l.units}</td>
+                        <td style="width: 150px;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                            <small>${l.submitted}/${l.total} units</small>
+                        </td>
+                        <td><button class="badge badge-info" onclick="viewLecturerDetails('${l.pf_no}')">View Units</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderSubmissions() {
+            const tbody = document.getElementById('submissionsTableBody');
+            const filterProgramme = document.getElementById('filterProgramme')?.value || '';
+            const filterStage = document.getElementById('filterStage')?.value || '';
+            
+            let filteredUnits = departmentData.units;
+            if (filterProgramme) {
+                filteredUnits = filteredUnits.filter(u => u.programme === filterProgramme);
+            }
+            if (filterStage) {
+                filteredUnits = filteredUnits.filter(u => u.stage === filterStage);
+            }
+            
+            const submitted = filteredUnits.filter(u => u.status === 'submitted').length;
+            const pending = filteredUnits.filter(u => u.status === 'pending').length;
+            const overdue = filteredUnits.filter(u => u.status === 'overdue').length;
+            const total = filteredUnits.length;
+            
+            document.getElementById('submittedUnits').textContent = submitted;
+            document.getElementById('pendingUnits').textContent = pending;
+            document.getElementById('overdueUnits').textContent = overdue;
+            document.getElementById('submissionRate').textContent = total > 0 ? Math.round((submitted / total) * 100) + '%' : '0%';
+            
+            tbody.innerHTML = filteredUnits.map(u => `
+                <tr>
+                    <td><strong>${u.code}</strong></td>
+                    <td>${u.name}</td>
+                    <td>${u.programme}</td>
+                    <td>${u.stage}</td>
+                    <td>${u.lecturer}</td>
+                    <td>
+                        <span class="badge ${u.status === 'submitted' ? 'badge-success' : (u.status === 'pending' ? 'badge-warning' : 'badge-danger')}">
+                            ${u.status === 'submitted' ? '✓ Submitted' : (u.status === 'pending' ? '⏳ In Progress' : '⚠️ Overdue')}
+                        </span>
+                    </td>
+                    <td style="width: 120px;">
+                        <div class="progress-bar">
+                            <div class="progress-fill ${u.status === 'overdue' ? 'danger' : (u.status === 'pending' ? 'warning' : '')}" style="width: ${u.progress}%"></div>
+                        </div>
+                        <small>${u.progress}%</small>
+                    </td>
+                    <td>${u.lastUpdated}</td>
+                    <td><button class="badge badge-info" onclick="viewUnitDetails('${u.code}')">View</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderSubmissionProgress() {
+            const container = document.getElementById('submissionProgress');
+            const unitsByLecturer = {};
+            
+            departmentData.units.forEach(unit => {
+                if (!unitsByLecturer[unit.lecturer]) {
+                    unitsByLecturer[unit.lecturer] = { total: 0, submitted: 0 };
+                }
+                unitsByLecturer[unit.lecturer].total++;
+                if (unit.status === 'submitted') {
+                    unitsByLecturer[unit.lecturer].submitted++;
+                }
+            });
+            
+            container.innerHTML = Object.entries(unitsByLecturer).map(([lecturer, data]) => {
+                const progress = (data.submitted / data.total) * 100;
+                return `
+                    <div class="progress-item">
+                        <div class="progress-header">
+                            <span><i class="fas fa-chalkboard-user"></i> ${lecturer}</span>
+                            <span>${data.submitted}/${data.total} units (${Math.round(progress)}%)</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function initCharts() {
+            const ctx1 = document.getElementById('submissionChart').getContext('2d');
+            const ctx2 = document.getElementById('programmeChart').getContext('2d');
+            
+            const statusCounts = {
+                submitted: departmentData.units.filter(u => u.status === 'submitted').length,
+                pending: departmentData.units.filter(u => u.status === 'pending').length,
+                overdue: departmentData.units.filter(u => u.status === 'overdue').length
+            };
+            
+            submissionChart = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Submitted', 'Pending', 'Overdue'],
+                    datasets: [{
+                        data: [statusCounts.submitted, statusCounts.pending, statusCounts.overdue],
+                        backgroundColor: ['#28a745', '#fd7e14', '#dc3545'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Overall Submission Status' }
+                    }
+                }
+            });
+            
+            const programmeStats = departmentData.programmes.map(p => {
+                const units = departmentData.units.filter(u => u.programme === p.code);
+                const submitted = units.filter(u => u.status === 'submitted').length;
+                return { name: p.code, submitted, total: units.length };
+            });
+            
+            programmeChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: programmeStats.map(p => p.name),
+                    datasets: [{
+                        label: 'Submitted Units',
+                        data: programmeStats.map(p => p.submitted),
+                        backgroundColor: '#28a745',
+                        borderRadius: 8
+                    }, {
+                        label: 'Total Units',
+                        data: programmeStats.map(p => p.total),
+                        backgroundColor: '#006400',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Programme-wise Submission Status' }
+                    }
+                }
+            });
+        }
+
+        function viewLecturerDetails(pfNo) {
+            const lecturer = departmentData.lecturers.find(l => l.pf_no === pfNo);
+            const units = departmentData.units.filter(u => u.lecturer === lecturer.name);
+            
+            document.getElementById('modalLecturerName').textContent = lecturer.name;
+            document.getElementById('lecturerModalBody').innerHTML = `
+                <p><strong>PF Number:</strong> ${lecturer.pf_no}</p>
+                <p><strong>Email:</strong> ${lecturer.email}</p>
+                <p><strong>Total Assigned Units:</strong> ${lecturer.units}</p>
+                <hr>
+                <h4>Assigned Units</h4>
+                <table class="data-table" style="width: 100%; font-size: 0.8rem;">
+                    <thead>
+                        <tr><th>Unit Code</th><th>Unit Name</th><th>Programme</th><th>Stage</th><th>Status</th><th>Progress</th></tr>
+                    </thead>
+                    <tbody>
+                        ${units.map(u => `
+                            <tr>
+                                <td>${u.code}</td>
+                                <td>${u.name}</td>
+                                <td>${u.programme}</td>
+                                <td>${u.stage}</td>
+                                <td><span class="badge ${u.status === 'submitted' ? 'badge-success' : 'badge-warning'}">${u.status}</span></td>
+                                <td>${u.progress}%</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('lecturerModal').style.display = 'block';
+        }
+
+        function viewProgrammeDetails(code) {
+            alert(`View Class Lists for programme: ${code}\n\nThis will require the user to select the semester and stage to call the right API.`);
+        }
+
+        function viewUnitDetails(code) {
+            const unit = departmentData.units.find(u => u.code === code);
+            alert(`Unit Details:\nClass List \nCode: ${unit.code}\nName: ${unit.name}\nProgramme: ${unit.programme}\nStage: ${unit.stage}\nLecturer: ${unit.lecturer}\nStatus: ${unit.status}\nProgress: ${unit.progress}%`);
+        }
+
+        function exportSubmissionReport() {
+            let csv = "Unit Code,Unit Name,Programme,Stage,Lecturer,Status,Progress,Last Updated\n";
+            departmentData.units.forEach(u => {
+                csv += `${u.code},${u.name},${u.programme},${u.stage},${u.lecturer},${u.status},${u.progress}%,${u.lastUpdated}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `submission_report_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        }
+
+        function generateReport(type) {
+            alert(`Generating ${type} report...\n\nThis will download a detailed report in Excel/PDF format.`);
+        }
+
+        function switchPage(page) {
+            currentPage = page;
+            const pages = ['dashboard', 'programmes', 'lecturers', 'submissions', 'reports'];
+            pages.forEach(p => {
+                document.getElementById(`${p}Page`).style.display = p === page ? 'block' : 'none';
+            });
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                if (item.getAttribute('data-page') === page) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            
+            const titles = {
+                dashboard: 'Dashboard Overview',
+                programmes: 'Programme Management',
+                lecturers: 'Lecturer Management',
+                submissions: 'Marks Submission Monitoring',
+                reports: 'Reports & Analytics'
+            };
+            document.getElementById('pageTitle').textContent = titles[page];
+            
+            if (page === 'reports') {
+                if (submissionChart) submissionChart.update();
+                if (programmeChart) programmeChart.update();
+            }
+            
+            if (page === 'submissions') {
+                const programmeSelect = document.getElementById('filterProgramme');
+                programmeSelect.innerHTML = '<option value="">All Programmes</option>' + 
+                    departmentData.programmes.map(p => `<option value="${p.code}">${p.code} - ${p.name}</option>`).join('');
+            }
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => switchPage(item.getAttribute('data-page')));
+            });
+            
+            const programmeSearch = document.getElementById('programmeSearch');
+            if (programmeSearch) {
+                programmeSearch.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const rows = document.querySelectorAll('#programmesTableBody tr');
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+            }
+            
+            const lecturerSearch = document.getElementById('lecturerSearch');
+            if (lecturerSearch) {
+                lecturerSearch.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    const rows = document.querySelectorAll('#lecturersTableBody tr');
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+            }
+            
+            const filterProgramme = document.getElementById('filterProgramme');
+            const filterStage = document.getElementById('filterStage');
+            if (filterProgramme) filterProgramme.addEventListener('change', () => renderSubmissions());
+            if (filterStage) filterStage.addEventListener('change', () => renderSubmissions());
+            
+            const submissionSemester = document.getElementById('submissionSemester');
+            if (submissionSemester) {
+                submissionSemester.addEventListener('change', () => {
+                    alert(`Loading data for ${submissionSemester.value}`);
+                    renderSubmissionProgress();
+                });
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function logout() {
+            window.location.href = 'login.html';
+        }
+
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+        });
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>
