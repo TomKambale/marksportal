@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes"
+    />
     <link rel="icon" type="image/png" sizes="32x32" href="/logo.jpg">
     <link rel="icon" type="image/png" sizes="16x16" href="/logo.jpg">
     <link rel="apple-touch-icon" sizes="180x180" href="/logo.jpg">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
     <title>Marks Uploader | Raw CSV to ERP</title>
     <style>
         * {
@@ -303,162 +309,21 @@
             text-align: center;
             margin-top: 1rem;
         }
-        
-        /* Progress Modal */
-        .progress-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .progress-container {
-            background: var(--white);
-            border-radius: 24px;
-            padding: 2rem;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        
-        .progress-circle {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 1rem;
-            position: relative;
-        }
-        
-        .progress-circle svg {
-            transform: rotate(-90deg);
-        }
-        
-        .progress-circle circle {
-            fill: none;
-            stroke-width: 8;
-        }
-        
-        .progress-circle .bg-circle {
-            stroke: var(--light-gray);
-        }
-        
-        .progress-circle .progress-circle-fill {
-            stroke: var(--primary-green);
-            stroke-dasharray: 314;
-            stroke-dashoffset: 314;
-            transition: stroke-dashoffset 0.3s ease;
-        }
-        
-        .progress-percentage {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-green);
-        }
-        
-        .progress-stats {
-            margin: 1rem 0;
-            padding: 1rem;
-            background: var(--light-gray);
-            border-radius: 12px;
-        }
-        
-        .progress-bar-container {
-            background: var(--light-gray);
-            border-radius: 10px;
-            height: 30px;
-            overflow: hidden;
-            margin: 1rem 0;
-        }
-        
-        .progress-bar-fill {
-            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .upload-log {
-            background: #1e2a1e;
-            color: #d4ffd4;
-            border-radius: 12px;
-            padding: 0.75rem;
-            margin-top: 1rem;
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.7rem;
-            text-align: left;
-        }
-        
-        .upload-log-entry {
-            padding: 0.25rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .upload-log-entry.success {
-            color: #90ee90;
-        }
-        
-        .upload-log-entry.error {
-            color: #ff9999;
-        }
-        
-        .warning-message {
-            background: #fff3cd;
-            color: #856404;
-            padding: 0.75rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            font-size: 0.8rem;
-            display: none;
-        }
-        
-        .btn-disable {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .progress-container {
-                margin: 1rem;
+
+        @media (max-width: 700px) {
+            body {
                 padding: 1rem;
+            }
+            .stats-bar {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
 <div class="page">
-    <!-- Existing HTML content remains the same -->
     <div class="card">
-        <button class="back-btn" onclick="confirmAndLeave()">← Back to Marks</button>
+        <button class="back-btn" onclick="window.location.href='marks.html'">← Back to Marks</button>
 
         <div class="card-header">
             <div class="card-title">
@@ -502,7 +367,6 @@
         <div id="feedbackMessage" class="alert-message" style="display: none;"></div>
     </div>
 
-    <!-- Preview Card -->
     <div class="card" id="previewCard" style="display: none;">
         <div class="card-header">
             <div class="card-title">
@@ -527,16 +391,16 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr class="empty-row"><td colspan="3">No data uploaded yet<\/td><\/tr>
+                    <tr class="empty-row"><td colspan="3">No data uploaded yet</td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="btn-group" style="justify-content: flex-end; margin-top: 1.25rem;">
-            <button class="btn btn-outline" id="previewErpBtn">
+            <!-- <button class="btn btn-outline" id="previewErpBtn">
                 <i class="fas fa-search"></i> Preview ERP JSON
-            </button>
-            <button class="btn btn-primary" id="pushToErpBtn" onclick="startUpload()">
+            </button> -->
+            <button class="btn btn-primary" id="pushToErpBtn">
                 <i class="fas fa-cloud-upload-alt"></i> Upload to ERP
             </button>
         </div>
@@ -549,58 +413,6 @@
         </div>
     </div>
 
-    <!-- Progress Modal -->
-    <div id="progressModal" class="progress-modal">
-        <div class="progress-container">
-            <h3><i class="fas fa-cloud-upload-alt"></i> Uploading to ERP</h3>
-            <p style="color: var(--medium-gray); margin-bottom: 1rem;">Please do not close this page until upload completes</p>
-            
-            <div class="progress-circle">
-                <svg width="120" height="120">
-                    <circle class="bg-circle" cx="60" cy="60" r="50" stroke="var(--light-gray)"/>
-                    <circle class="progress-circle-fill" id="progressCircleFill" cx="60" cy="60" r="50" stroke="var(--primary-green)"/>
-                </svg>
-                <div class="progress-percentage" id="progressPercentage">0%</div>
-            </div>
-            
-            <div class="progress-stats">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span><i class="fas fa-users"></i> Records Processed</span>
-                    <span><strong id="processedCount">0</strong> / <strong id="totalRecords">0</strong></span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span><i class="fas fa-check-circle"></i> Successful</span>
-                    <span><strong id="successCount">0</strong> <span style="color: var(--success);">✓</span></span>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span><i class="fas fa-exclamation-triangle"></i> Failed</span>
-                    <span><strong id="errorCount">0</strong> <span style="color: var(--danger);">✗</span></span>
-                </div>
-            </div>
-            
-            <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="progressBarFill">0%</div>
-            </div>
-            
-            <div class="upload-log" id="uploadLog">
-                <div class="upload-log-entry">🟢 Initializing upload...</div>
-            </div>
-            
-            <div class="warning-message" id="warningMessage">
-                <i class="fas fa-exclamation-triangle"></i> Upload in progress! Do not close this page.
-            </div>
-            
-            <div class="btn-group" style="margin-top: 1rem;">
-                <button class="btn btn-danger" id="cancelUploadBtn" onclick="cancelUpload()" style="display: none;">
-                    <i class="fas fa-stop"></i> Cancel Upload
-                </button>
-                <button class="btn btn-primary" id="closeModalBtn" onclick="closeProgressModal()" style="display: none;">
-                    <i class="fas fa-check"></i> Close
-                </button>
-            </div>
-        </div>
-    </div>
-
     <footer style="text-align: center; font-size: 0.7rem; color: var(--medium-gray);">
         Raw file uploader — sends exactly what you provide: { "admission_number", "cat", "exam" }
     </footer>
@@ -609,9 +421,6 @@
 <script>
     let uploadedRecords = [];
     let currentUser = null;
-    let isUploading = false;
-    let uploadCancelled = false;
-    let currentUploadId = null;
 
     // DOM Elements
     const fileInput = document.getElementById('csvFileInput');
@@ -734,7 +543,7 @@
 
     function renderTable() {
         if (!uploadedRecords.length) {
-            tableBody.innerHTML = `<tr class="empty-row"><td colspan="3">📭 No student data. Upload a CSV or load sample.<\/tr><\/td>`;
+            tableBody.innerHTML = `<tr class="empty-row"><td colspan="3">📭 No student data. Upload a CSV or load sample.</td></tr>`;
             totalStudentsSpan.innerText = '0';
             avgCatSpan.innerText = '—';
             avgExamSpan.innerText = '—';
@@ -755,10 +564,10 @@
             totalExam += r.exam;
             htmlRows += `
                 <tr>
-                    <td><strong>${escapeHtml(r.admission_number)}<\/strong><\/td>
-                    <td>${r.cat.toFixed(2)}<\/td>
-                    <td>${r.exam.toFixed(2)}<\/td>
-                <\/tr>
+                    <td><strong>${escapeHtml(r.admission_number)}</strong></td>
+                    <td>${r.cat.toFixed(2)}</td>
+                    <td>${r.exam.toFixed(2)}</td>
+                </tr>
             `;
         }
         
@@ -799,7 +608,11 @@
     }
 
     function downloadTemplate() {
-        const templateContent = `Student adm.no,CAT,Exam\nSE217/2000/2022,,\nSE217/2000/2023,,\nSE217/2000/2024,,\nSE217/2000/2025,,`;
+        const templateContent = `Student adm.no,CAT,Exam
+SE217/2000/2022,,
+SE217/2000/2023,,
+SE217/2000/2024,,
+SE217/2000/2025,,`;
         const blob = new Blob([templateContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
@@ -837,142 +650,42 @@
         }
     }
 
-    // Progress Modal Functions
-    function showProgressModal(totalRecords) {
-        const modal = document.getElementById('progressModal');
-        const totalRecordsSpan = document.getElementById('totalRecords');
-        const progressCircle = document.getElementById('progressCircleFill');
-        const progressPercentage = document.getElementById('progressPercentage');
-        const progressBarFill = document.getElementById('progressBarFill');
-        const uploadLog = document.getElementById('uploadLog');
-        const warningMessage = document.getElementById('warningMessage');
+    function buildERPPayload() {
+        if (uploadedRecords.length === 0) return null;
         
-        // Reset all values
-        totalRecordsSpan.innerText = totalRecords;
-        document.getElementById('processedCount').innerText = '0';
-        document.getElementById('successCount').innerText = '0';
-        document.getElementById('errorCount').innerText = '0';
-        progressPercentage.innerText = '0%';
-        progressBarFill.style.width = '0%';
-        progressBarFill.innerText = '0%';
-        progressCircle.style.strokeDashoffset = 314;
-        uploadLog.innerHTML = '<div class="upload-log-entry">🟢 Initializing upload...</div>';
-        warningMessage.style.display = 'block';
-        document.getElementById('cancelUploadBtn').style.display = 'inline-block';
-        document.getElementById('closeModalBtn').style.display = 'none';
-        
-        modal.style.display = 'flex';
-        
-        // Prevent closing via escape key
-        document.addEventListener('keydown', preventEscClose);
-        
-        // Show warning before page unload
-        window.addEventListener('beforeunload', showUnloadWarning);
-    }
-    
-    function updateProgress(processed, total, success, errors, logEntry) {
-        const percentage = (processed / total) * 100;
-        const circumference = 314;
-        const offset = circumference - (percentage / 100) * circumference;
-        
-        document.getElementById('processedCount').innerText = processed;
-        document.getElementById('successCount').innerText = success;
-        document.getElementById('errorCount').innerText = errors;
-        document.getElementById('progressPercentage').innerText = `${Math.round(percentage)}%`;
-        document.getElementById('progressBarFill').style.width = `${percentage}%`;
-        document.getElementById('progressBarFill').innerText = `${Math.round(percentage)}%`;
-        document.getElementById('progressCircleFill').style.strokeDashoffset = offset;
-        
-        if (logEntry) {
-            const uploadLog = document.getElementById('uploadLog');
-            const logDiv = document.createElement('div');
-            logDiv.className = 'upload-log-entry ' + (logEntry.type || '');
-            logDiv.innerHTML = logEntry.text;
-            uploadLog.appendChild(logDiv);
-            uploadLog.scrollTop = uploadLog.scrollHeight;
-        }
-    }
-    
-    function completeUpload(successCount, errorCount) {
-        const warningMessage = document.getElementById('warningMessage');
-        const cancelBtn = document.getElementById('cancelUploadBtn');
-        const closeBtn = document.getElementById('closeModalBtn');
-        
-        warningMessage.style.display = 'none';
-        cancelBtn.style.display = 'none';
-        closeBtn.style.display = 'inline-block';
-        
-        const uploadLog = document.getElementById('uploadLog');
-        if (errorCount === 0) {
-            uploadLog.innerHTML += `<div class="upload-log-entry success">✅ Upload completed successfully! All ${successCount} records saved.</div>`;
-        } else {
-            uploadLog.innerHTML += `<div class="upload-log-entry error">⚠️ Upload completed with ${errorCount} errors. ${successCount} records saved successfully.</div>`;
-        }
-        
-        // Remove unload warning
-        window.removeEventListener('beforeunload', showUnloadWarning);
-        document.removeEventListener('keydown', preventEscClose);
-        
-        // Refresh the preview table to show updated original values
-        renderTable();
-    }
-    
-    function closeProgressModal() {
-        document.getElementById('progressModal').style.display = 'none';
-        if (!isUploading) {
-            // Refresh page data if needed
-            location.reload();
-        }
-    }
-    
-    function cancelUpload() {
-        if (confirm('⚠️ Are you sure you want to cancel the upload?\n\nThis will stop the upload process. Already processed records will remain saved.')) {
-            uploadCancelled = true;
-            isUploading = false;
-            const uploadLog = document.getElementById('uploadLog');
-            uploadLog.innerHTML += `<div class="upload-log-entry error">❌ Upload cancelled by user.</div>`;
-            document.getElementById('cancelUploadBtn').style.display = 'none';
-            document.getElementById('closeModalBtn').style.display = 'inline-block';
-            window.removeEventListener('beforeunload', showUnloadWarning);
-        }
-    }
-    
-    function preventEscClose(e) {
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            if (isUploading) {
-                alert('Upload in progress! Please wait or use the Cancel button.');
-            }
-        }
-    }
-    
-    function showUnloadWarning(e) {
-        if (isUploading) {
-            e.preventDefault();
-            e.returnValue = 'Upload in progress! If you leave now, the upload will be interrupted. Are you sure you want to leave?';
-            return e.returnValue;
-        }
-    }
-    
-    function confirmAndLeave() {
-        if (isUploading) {
-            const confirmLeave = confirm('Upload in progress! If you leave now, the upload will be interrupted.\n\nAre you sure you want to leave?');
-            if (confirmLeave) {
-                window.location.href = 'marks.html';
-            }
-        } else {
-            window.location.href = 'marks.html';
-        }
+        const payload = {
+            module: "marks_raw_upload",
+            timestamp: new Date().toISOString(),
+            total_records: uploadedRecords.length,
+            marks_data: uploadedRecords.map(record => ({
+                admission_number: record.admission_number,
+                cat: record.cat,
+                exam: record.exam
+            }))
+        };
+        return payload;
     }
 
-    // Main Upload Function with Progress Tracking
-    async function startUpload() {
+    function showERPPreview() {
+        const payload = buildERPPayload();
+        if (!payload || uploadedRecords.length === 0) {
+            showFeedback('No data to preview. Upload a CSV or load sample first.', true);
+            erpPreviewContainer.style.display = 'none';
+            return;
+        }
+        const prettyJson = JSON.stringify(payload, null, 2);
+        jsonPreview.innerText = prettyJson;
+        erpPreviewContainer.style.display = 'block';
+        showFeedback('📡 ERP payload ready — raw CAT and Exam values (no calculations).');
+    }
+
+    async function simulateERPUpload() {
         if (uploadedRecords.length === 0) {
-            showFeedback('❌ No records to upload. Please upload a CSV file first.', true);
+            showFeedback('❌ No records to push. Upload data first.', true);
             return;
         }
 
-        // Get current class data from localStorage
+        // Get current class data from localStorage with validation
         const savedClass = localStorage.getItem("selectedClass");
         if (!savedClass) {
             showFeedback('❌ No class selected. Please go back and select a class first.', true);
@@ -987,14 +700,29 @@
             return;
         }
         
-        // Validate required class data
+        // Validate required class data with proper null/undefined checking
         const unitCode = currentClass.unitCode || currentClass.unit_code;
         const semester = (currentClass.semester?.semester || currentClass.semester?.name || currentClass.semester);
         const programmeCode = currentClass.programmeCode || currentClass.programme_code;
         const stage = currentClass.stage;
         
-        if (!unitCode || !semester || !programmeCode || !stage) {
-            showFeedback('❌ Missing class information. Please go back and select a class again.', true);
+        if (!unitCode) {
+            showFeedback('❌ Missing Unit Code. Please go back and select a class again.', true);
+            return;
+        }
+        
+        if (!semester) {
+            showFeedback('❌ Missing Semester information. Please go back and select a class again.', true);
+            return;
+        }
+        
+        if (!programmeCode) {
+            showFeedback('❌ Missing Programme Code. Please go back and select a class again.', true);
+            return;
+        }
+        
+        if (!stage) {
+            showFeedback('❌ Missing Stage information. Please go back and select a class again.', true);
             return;
         }
         
@@ -1007,19 +735,13 @@
         const examCategory = currentClass.examCategory || "DEGREE";
         const academicYear = currentClass.academic_year || "2024/2025";
         
-        // Show progress modal
-        showProgressModal(uploadedRecords.length);
-        
-        isUploading = true;
-        uploadCancelled = false;
+        showFeedback(`⏳ Sending ${uploadedRecords.length} records to ERP...`, false);
         
         let successCount = 0;
         let errorCount = 0;
-        let processedCount = 0;
+        let errors = [];
         
         for (const record of uploadedRecords) {
-            if (uploadCancelled) break;
-            
             try {
                 const payload = {
                     unit_code: String(unitCode),
@@ -1034,10 +756,7 @@
                     academic_year: String(academicYear)
                 };
                 
-                updateProgress(processedCount, uploadedRecords.length, successCount, errorCount, {
-                    text: `⏳ Uploading: ${record.admission_number}...`,
-                    type: ''
-                });
+                console.log('Sending payload for student:', record.admission_number, payload);
                 
                 const response = await fetch("/api/marks/save", {
                     method: "POST",
@@ -1049,74 +768,37 @@
                 });
                 
                 const data = await response.json();
-                processedCount++;
                 
-                if (response.status === 409 || (data.errorType === 'duplicate_marks')) {
-                    errorCount++;
-                    updateProgress(processedCount, uploadedRecords.length, successCount, errorCount, {
-                        text: `⚠️ ${record.admission_number}: ${data.error.substring(0, 100)}`,
-                        type: 'error'
-                    });
-                } else if (data.success) {
+                if (data.success) {
                     successCount++;
-                    updateProgress(processedCount, uploadedRecords.length, successCount, errorCount, {
-                        text: `✅ ${record.admission_number}: ${data.message || 'Saved successfully'}`,
-                        type: 'success'
-                    });
                 } else {
                     errorCount++;
-                    updateProgress(processedCount, uploadedRecords.length, successCount, errorCount, {
-                        text: `❌ ${record.admission_number}: ${data.error || 'Unknown error'}`,
-                        type: 'error'
-                    });
+                    errors.push(`${record.admission_number}: ${data.error}`);
+                    console.error(`Failed for ${record.admission_number}:`, data.error);
                 }
             } catch (err) {
-                processedCount++;
                 errorCount++;
-                updateProgress(processedCount, uploadedRecords.length, successCount, errorCount, {
-                    text: `❌ ${record.admission_number}: Network error - ${err.message}`,
-                    type: 'error'
-                });
+                errors.push(`${record.admission_number}: ${err.message}`);
                 console.error(`Error for ${record.admission_number}:`, err);
             }
         }
         
-        isUploading = false;
-        completeUpload(successCount, errorCount);
-        
-        // Show final feedback
-        if (successCount > 0 && errorCount === 0) {
-            showFeedback(`✅ Upload complete! ${successCount} records saved successfully.`);
-        } else if (successCount > 0 && errorCount > 0) {
-            showFeedback(`⚠️ Upload complete: ${successCount} succeeded, ${errorCount} failed. Check the log for details.`, true);
+        if (successCount > 0) {
+            let message = `✅ ${successCount} records saved successfully!`;
+            if (errorCount > 0) {
+                message += `\n⚠️ ${errorCount} failed.`;
+                if (errors.length <= 3) {
+                    message += `\n\nErrors:\n${errors.join('\n')}`;
+                } else {
+                    message += `\n\nFirst few errors:\n${errors.slice(0, 3).join('\n')}`;
+                }
+            }
+            showFeedback(message, errorCount > 0);
         } else {
-            showFeedback(`❌ Upload failed: All ${errorCount} records failed to save.`, true);
+            showFeedback(`❌ All ${errorCount} records failed to save.\n\nFirst error: ${errors[0]}`, true);
         }
     }
 
-    function showERPPreview() {
-        if (!uploadedRecords.length) {
-            showFeedback('No data to preview. Upload a CSV or load sample first.', true);
-            return;
-        }
-        
-        const payload = {
-            module: "marks_raw_upload",
-            timestamp: new Date().toISOString(),
-            total_records: uploadedRecords.length,
-            marks_data: uploadedRecords.map(record => ({
-                admission_number: record.admission_number,
-                cat: record.cat,
-                exam: record.exam
-            }))
-        };
-        
-        jsonPreview.innerText = JSON.stringify(payload, null, 2);
-        erpPreviewContainer.style.display = 'block';
-        showFeedback('📡 ERP payload ready — raw CAT and Exam values (no calculations).');
-    }
-
-    // Event Listeners
     function setupFileHandlers() {
         uploadZone.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => {
@@ -1151,6 +833,7 @@
     sampleBtn.addEventListener('click', loadSampleData);
     clearBtn.addEventListener('click', clearAllData);
     previewErpBtn.addEventListener('click', showERPPreview);
+    pushToErpBtn.addEventListener('click', simulateERPUpload);
     
     async function init() {
         await getCurrentUser();
