@@ -327,7 +327,7 @@
 
       <div class="card">
         <div class="card-header">
-          <h2>Student Marks</h2>
+          <h2>Unit ClassList</h2>
           <span class="exam-badge" id="examCategoryBadge">Exam Category</span>
         </div>
         <div class="table-wrapper">
@@ -731,14 +731,14 @@
       }
 
       function updateClassBanner() {
-        const unitName = currentClass.unitName || currentClass.unit_name || "Class";
-        const unitCode = currentClass.unitCode;
-        const semesterName = currentClass.semester?.semester || currentClass.semester?.name || "Current";
-        const examCategory = currentClass.examCategory || "DEGREE";
+        const unitName = currentClass.unitName || currentClass.unit_name || "sampleClass";
+        const unitCode = currentClass.unitCode || "sampleUnit";
+        const semesterName = currentClass.semester?.semester || currentClass.semester?.name || "sampleCurrent";
+        const examCategory = currentClass.examCategory || "sampleDEGREE";
 
         let badgeText = examCategory;
         if (examMeta) {
-          badgeText = `${examMeta.code || examCategory} • ${examMeta.category || examCategory} (${examMeta.max_cat_mark}:${examMeta.max_exam_mark})`;
+          badgeText = `Marks Contribution : ${examMeta.category || examCategory} (${examMeta.max_cat_mark}:${examMeta.max_exam_mark})`;
         }
 
         document.getElementById("classBanner").innerHTML = `

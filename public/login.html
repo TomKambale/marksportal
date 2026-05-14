@@ -11,6 +11,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/logo.jpg">
     <title>Login | Marks Management System</title>
     <style>
+      /* Your existing styles remain the same */
       * {
         margin: 0;
         padding: 0;
@@ -162,24 +163,6 @@
         border-top: 1px solid #e0e0e0;
       }
 
-      .cancelbtn {
-        background: #f8f9fa;
-        color: #343a40;
-        padding: 0.7rem 1.5rem;
-        border: none;
-        border-radius: 12px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .cancelbtn:hover {
-        background: #6c757d;
-        color: white;
-        transform: translateY(-2px);
-      }
-
       .psw {
         font-size: 0.9rem;
       }
@@ -216,7 +199,6 @@
         text-align: center;
       }
 
-      /* Modal Styles */
       .modal {
         display: none;
         position: fixed;
@@ -337,91 +319,20 @@
         display: block;
       }
 
-      .step-indicator {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 2rem;
-        padding: 0 1rem;
-      }
-
-      .step {
-        text-align: center;
-        flex: 1;
-        position: relative;
-      }
-
-      .step-circle {
-        width: 30px;
-        height: 30px;
-        background: var(--light-gray);
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-        color: var(--medium-gray);
-        position: relative;
-        z-index: 1;
-      }
-
-      .step.active .step-circle {
-        background: var(--primary-green);
-        color: white;
-      }
-
-      .step.completed .step-circle {
-        background: var(--success);
-        color: white;
-      }
-
-      .step-label {
-        font-size: 0.7rem;
-        margin-top: 0.5rem;
-        color: var(--medium-gray);
-      }
-
-      .step.active .step-label {
-        color: var(--primary-green);
-        font-weight: 600;
-      }
-
-      .step:not(:last-child):before {
-        content: '';
-        position: absolute;
-        top: 15px;
-        left: 50%;
-        width: 100%;
-        height: 2px;
-        background: var(--light-gray);
-        z-index: 0;
-      }
-
-      .step.completed:not(:last-child):before {
-        background: var(--success);
-      }
-
       @media (max-width: 480px) {
         .login-container {
           margin: 1rem;
         }
-
         .login-form {
           padding: 1.5rem;
         }
-
         h2 {
           font-size: 1.5rem;
         }
-
         .action-buttons {
           flex-direction: column;
           gap: 1rem;
         }
-
-        .cancelbtn {
-          width: 100%;
-        }
-        
         .modal-content {
           margin: 10% auto;
         }
@@ -504,7 +415,6 @@
         </div>
         
         <div class="modal-body">
-          <!-- Step 1: Request Reset -->
           <div id="step1" class="reset-step active">
             <div class="form-group">
               <label>Email Address</label>
@@ -517,7 +427,6 @@
             <div id="step1Message"></div>
           </div>
           
-          <!-- Step 2: Enter Reset Token & New Password -->
           <div id="step2" class="reset-step">
             <div class="form-group">
               <label>Reset Token</label>
@@ -548,7 +457,6 @@
       let resetRequestData = null;
       let currentStep = 1;
       
-      // Get modal elements
       const modal = document.getElementById('resetModal');
       const forgotPasswordLink = document.getElementById('forgotPasswordLink');
       const closeModalBtn = document.getElementById('closeModalBtn');
@@ -557,29 +465,24 @@
       const backStepBtn = document.getElementById('backStepBtn');
       const resetPasswordBtn = document.getElementById('resetPasswordBtn');
       
-      // Step elements
       const step1 = document.getElementById('step1');
       const step2 = document.getElementById('step2');
       
-      // Input fields
       const resetEmail = document.getElementById('resetEmail');
       const resetPfNumber = document.getElementById('resetPfNumber');
       const resetToken = document.getElementById('resetToken');
       const newPassword = document.getElementById('newPassword');
       const confirmPassword = document.getElementById('confirmPassword');
       
-      // Message containers
       const step1Message = document.getElementById('step1Message');
       const step2Message = document.getElementById('step2Message');
       
-      // Open modal
       forgotPasswordLink.addEventListener('click', (e) => {
         e.preventDefault();
         modal.style.display = 'block';
         resetForm();
       });
       
-      // Close modal
       function closeModal() {
         modal.style.display = 'none';
         resetForm();
@@ -589,14 +492,12 @@
       closeModalBtn.addEventListener('click', closeModal);
       cancelResetBtn.addEventListener('click', closeModal);
       
-      // Close modal when clicking outside
       window.addEventListener('click', (e) => {
         if (e.target === modal) {
           closeModal();
         }
       });
       
-      // Reset form
       function resetForm() {
         resetEmail.value = '';
         resetPfNumber.value = '';
@@ -608,7 +509,6 @@
         resetRequestData = null;
       }
       
-      // Show specific step
       function showStep(step) {
         currentStep = step;
         
@@ -627,7 +527,6 @@
         }
       }
       
-      // Step 1: Request password reset
       async function requestPasswordReset() {
         const email = resetEmail.value.trim();
         const pfNumber = resetPfNumber.value.trim();
@@ -657,12 +556,10 @@
               <strong>Token:</strong> ${data.resetToken}<br>
             </div>`;
             
-            // Store the reset token for demo purposes
             if (data.resetToken) {
               resetToken.value = data.resetToken;
             }
             
-            // Auto-advance to step 2 after 2 seconds
             setTimeout(() => {
               showStep(2);
             }, 2000);
@@ -675,7 +572,6 @@
         }
       }
       
-      // Step 2: Reset password with token
       async function resetPassword() {
         const token = resetToken.value.trim();
         const newPwd = newPassword.value;
@@ -719,7 +615,6 @@
           if (data.success) {
             step2Message.innerHTML = `<div class="success-message">✅ ${data.message}</div>`;
             
-            // Close modal after 2 seconds and redirect to login
             setTimeout(() => {
               closeModal();
               alert('Password reset successful! Please login with your new password.');
@@ -733,12 +628,10 @@
         }
       }
       
-      // Button handlers
       nextStepBtn.addEventListener('click', requestPasswordReset);
       resetPasswordBtn.addEventListener('click', resetPassword);
       backStepBtn.addEventListener('click', () => showStep(1));
       
-      // Allow Enter key to submit
       resetEmail.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') requestPasswordReset();
       });
@@ -755,7 +648,6 @@
         if (e.key === 'Enter') resetPassword();
       });
 
-      // Display error message if redirected back with error
       const urlParams = new URLSearchParams(window.location.search);
       const error = urlParams.get("error");
       if (error) {

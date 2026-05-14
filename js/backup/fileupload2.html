@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <title>Marks Uploader | Raw CSV to ERP</title>
     <style>
-        /* Your existing styles remain the same */
         * {
             margin: 0;
             padding: 0;
@@ -272,7 +271,7 @@
 
         .alert-message {
             background: #fff3e0;
-            border-left: 4px solid var(--warning);
+            border-left: var(--warning);
             padding: 0.75rem 1rem;
             border-radius: 12px;
             margin-top: 1rem;
@@ -457,6 +456,7 @@
 </head>
 <body>
 <div class="page">
+    <!-- Existing HTML content remains the same -->
     <div class="card">
         <button class="back-btn" onclick="confirmAndLeave()">← Back to Marks</button>
 
@@ -533,8 +533,11 @@
         </div>
 
         <div class="btn-group" style="justify-content: flex-end; margin-top: 1.25rem;">
+            <!-- <button class="btn btn-outline" id="previewErpBtn">
+                <i class="fas fa-search"></i> Preview ERP JSON
+            </button> -->
             <button class="btn btn-outline" id="viewHistoryBtn" onclick="openHistoryModal()">
-                <i class="fas fa-history"></i> Upload History
+                <i class="fas fa-search"></i> Upload History
             </button>
             <button class="btn btn-primary" id="pushToErpBtn" onclick="startUpload()">
                 <i class="fas fa-cloud-upload-alt"></i> Upload to ERP
@@ -600,48 +603,47 @@
             </div>
         </div>
     </div>
-    
     <!-- Upload History Modal -->
-    <div id="historyModal" class="progress-modal">
-        <div class="progress-container" style="max-width: 900px; max-height: 80vh; overflow-y: auto;">
-            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3><i class="fas fa-history"></i> Upload History</h3>
-                <span class="close-modal" onclick="closeHistoryModal()" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
-            </div>
-            
-            <div id="historyList">
-                <!-- History items will be loaded here -->
-            </div>
-            
-            <div class="btn-group" style="margin-top: 1rem;">
-                <button class="btn btn-outline" onclick="closeHistoryModal()">Close</button>
-            </div>
+<div id="historyModal" class="progress-modal">
+    <div class="progress-container" style="max-width: 900px; max-height: 80vh; overflow-y: auto;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3><i class="fas fa-history"></i> Upload History</h3>
+            <span class="close-modal" onclick="closeHistoryModal()" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+        </div>
+        
+        <div id="historyList">
+            <!-- History items will be loaded here -->
+        </div>
+        
+        <div class="btn-group" style="margin-top: 1rem;">
+            <button class="btn btn-outline" onclick="closeHistoryModal()">Close</button>
         </div>
     </div>
+</div>
 
-    <!-- Batch Details Modal -->
-    <div id="batchDetailsModal" class="progress-modal">
-        <div class="progress-container" style="max-width: 1000px; max-height: 80vh; overflow-y: auto;">
-            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 id="batchDetailsTitle">Batch Details</h3>
-                <span class="close-modal" onclick="closeBatchDetailsModal()" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
-            </div>
-            
-            <div id="batchDetailsContent">
-                <!-- Batch details will be loaded here -->
-            </div>
-            
-            <div class="btn-group" style="margin-top: 1rem;">
-                <button class="btn btn-primary" id="exportBatchBtn" onclick="exportBatchReport()">
-                    <i class="fas fa-download"></i> Export as CSV
-                </button>
-                <button class="btn btn-danger" id="deleteBatchBtn" onclick="deleteBatch()">
-                    <i class="fas fa-trash"></i> Delete Report
-                </button>
-                <button class="btn btn-outline" onclick="closeBatchDetailsModal()">Close</button>
-            </div>
+<!-- Batch Details Modal -->
+<div id="batchDetailsModal" class="progress-modal">
+    <div class="progress-container" style="max-width: 1000px; max-height: 80vh; overflow-y: auto;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 id="batchDetailsTitle">Batch Details</h3>
+            <span class="close-modal" onclick="closeBatchDetailsModal()" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+        </div>
+        
+        <div id="batchDetailsContent">
+            <!-- Batch details will be loaded here -->
+        </div>
+        
+        <div class="btn-group" style="margin-top: 1rem;">
+            <button class="btn btn-primary" id="exportBatchBtn" onclick="exportBatchReport()">
+                <i class="fas fa-download"></i> Export as CSV
+            </button>
+            <button class="btn btn-danger" id="deleteBatchBtn" onclick="deleteBatch()">
+                <i class="fas fa-trash"></i> Delete Report
+            </button>
+            <button class="btn btn-outline" onclick="closeBatchDetailsModal()">Close</button>
         </div>
     </div>
+</div>
 
     <footer style="text-align: center; font-size: 0.7rem; color: var(--medium-gray);">
         Raw file uploader
@@ -654,7 +656,6 @@
     let isUploading = false;
     let uploadCancelled = false;
     let currentUploadId = null;
-    let currentBatchId = null;
 
     // DOM Elements
     const fileInput = document.getElementById('csvFileInput');
@@ -669,6 +670,7 @@
     const downloadBtn = document.getElementById('downloadTemplateBtn');
     const sampleBtn = document.getElementById('sampleDataBtn');
     const clearBtn = document.getElementById('clearDataBtn');
+    // const previewErpBtn = document.getElementById('previewErpBtn');
     const pushToErpBtn = document.getElementById('pushToErpBtn');
     const erpPreviewContainer = document.getElementById('erpPreviewContainer');
     const jsonPreview = document.getElementById('jsonPreview');
@@ -764,10 +766,7 @@
             records.push({
                 admission_number: String(admissionNumber),
                 cat: catValue,
-                exam: examValue,
-                status: 'pending', // Initialize status
-                error_message: null,
-                error_code: null
+                exam: examValue
             });
         }
         
@@ -860,13 +859,13 @@
 
     function loadSampleData() {
         const sampleRecords = [
-            { admission_number: "SE217/2000/2022", cat: 24.5, exam: 68.0, status: 'pending' },
-            { admission_number: "SE217/2000/2023", cat: 18.0, exam: 55.5, status: 'pending' },
-            { admission_number: "SE217/2000/2024", cat: 29.0, exam: 72.0, status: 'pending' },
-            { admission_number: "SE217/2000/2025", cat: 12.0, exam: 41.0, status: 'pending' },
-            { admission_number: "SE217/2000/2026", cat: 27.5, exam: 79.0, status: 'pending' },
-            { admission_number: "SE217/2000/2027", cat: 8.5, exam: 33.0, status: 'pending' },
-            { admission_number: "SE217/2000/2028", cat: 30.0, exam: 85.0, status: 'pending' }
+            { admission_number: "SE217/2000/2022", cat: 24.5, exam: 68.0 },
+            { admission_number: "SE217/2000/2023", cat: 18.0, exam: 55.5 },
+            { admission_number: "SE217/2000/2024", cat: 29.0, exam: 72.0 },
+            { admission_number: "SE217/2000/2025", cat: 12.0, exam: 41.0 },
+            { admission_number: "SE217/2000/2026", cat: 27.5, exam: 79.0 },
+            { admission_number: "SE217/2000/2027", cat: 8.5, exam: 33.0 },
+            { admission_number: "SE217/2000/2028", cat: 30.0, exam: 85.0 }
         ];
         setRecords(sampleRecords);
         showFeedback(`📋 Sample data loaded (${sampleRecords.length} students). Raw marks ready for ERP.`);
@@ -892,6 +891,7 @@
         const uploadLog = document.getElementById('uploadLog');
         const warningMessage = document.getElementById('warningMessage');
         
+        // Reset all values
         totalRecordsSpan.innerText = totalRecords;
         document.getElementById('processedCount').innerText = '0';
         document.getElementById('successCount').innerText = '0';
@@ -907,12 +907,15 @@
         
         modal.style.display = 'flex';
         
+        // Prevent closing via escape key
         document.addEventListener('keydown', preventEscClose);
+        
+        // Show warning before page unload
         window.addEventListener('beforeunload', showUnloadWarning);
     }
     
     function updateProgress(processed, total, success, errors, logEntry) {
-        const percentage = total > 0 ? (processed / total) * 100 : 0;
+        const percentage = (processed / total) * 100;
         const circumference = 314;
         const offset = circumference - (percentage / 100) * circumference;
         
@@ -950,15 +953,18 @@
             uploadLog.innerHTML += `<div class="upload-log-entry error">⚠️ Upload completed with ${errorCount} errors. ${successCount} records saved successfully.</div>`;
         }
         
+        // Remove unload warning
         window.removeEventListener('beforeunload', showUnloadWarning);
         document.removeEventListener('keydown', preventEscClose);
         
+        // Refresh the preview table to show updated original values
         renderTable();
     }
     
     function closeProgressModal() {
         document.getElementById('progressModal').style.display = 'none';
         if (!isUploading) {
+            // Refresh page data if needed
             location.reload();
         }
     }
@@ -1003,78 +1009,18 @@
         }
     }
 
-    // Generate unique batch ID
-    function generateBatchId() {
-        const date = new Date();
-        const timestamp = date.toISOString().replace(/[-:]/g, '').replace('T', '_').slice(0, 15);
-        const random = Math.random().toString(36).substring(2, 6);
-        return `BATCH_${timestamp}_${random}`;
-    }
-
-    // Save upload batch after completion
-    async function saveUploadBatch(records, successCount, errorCount, startTime, batchId = null) {
-        try {
-            const savedClass = localStorage.getItem("selectedClass");
-            const currentClass = JSON.parse(savedClass);
-            
-            const recordsForDb = records.map(record => ({
-                student_no: record.admission_number,
-                student_name: null,
-                cat_marks: record.cat,
-                exam_marks: record.exam,
-                status: record.status || (record.error ? 'error' : 'success'),
-                error_message: record.error_message || null,
-                error_code: record.error_code || null,
-                erp_response: null,
-                erp_status_code: null
-            }));
-            
-            const batchData = {
-                batch_id: batchId || generateBatchId(),
-                unit_code: currentClass.unitCode,
-                unit_name: currentClass.unitName || currentClass.unit_name,
-                semester: currentClass.semester?.semester || currentClass.semester?.name,
-                academic_year: currentClass.academic_year || "2024/2025",
-                programme_code: currentClass.programmeCode,
-                stage: currentClass.stage,
-                exam_category: currentClass.examCategory || "DEGREE",
-                records: recordsForDb,
-                success_count: successCount,
-                error_count: errorCount,
-                duplicate_count: records.filter(r => r.status === 'duplicate').length || 0,
-                started_at: startTime || new Date(),
-                completed_at: new Date()
-            };
-            
-            const response = await fetch('/api/upload/save-batch', {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(batchData)
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                console.log('Upload batch saved:', data.batch_id);
-                return data.batch_id;
-            } else {
-                console.error('Failed to save batch:', data.error);
-                return null;
-            }
-        } catch (error) {
-            console.error('Error saving batch:', error);
-            return null;
-        }
-    }
-
     // Main Upload Function with Progress Tracking
+    const uploadStartTime = new Date();
+
+// Then when calling saveUploadBatch, pass the start time:
+const savedBatchId = await saveUploadBatch(uploadResults, successCount, errorCount, uploadStartTime);
     async function startUpload() {
         if (uploadedRecords.length === 0) {
             showFeedback('❌ No records to upload. Please upload a CSV file first.', true);
             return;
         }
 
+        // Get current class data from localStorage
         const savedClass = localStorage.getItem("selectedClass");
         if (!savedClass) {
             showFeedback('❌ No class selected. Please go back and select a class first.', true);
@@ -1089,6 +1035,7 @@
             return;
         }
         
+        // Validate required class data
         const unitCode = currentClass.unitCode || currentClass.unit_code;
         const semester = (currentClass.semester?.semester || currentClass.semester?.name || currentClass.semester);
         const programmeCode = currentClass.programmeCode || currentClass.programme_code;
@@ -1108,16 +1055,15 @@
         const examCategory = currentClass.examCategory || "DEGREE";
         const academicYear = currentClass.academic_year || "2024/2025";
         
+        // Show progress modal
         showProgressModal(uploadedRecords.length);
         
         isUploading = true;
         uploadCancelled = false;
         
-        const uploadStartTime = new Date();
         let successCount = 0;
         let errorCount = 0;
         let processedCount = 0;
-        let uploadResults = []; // Track results for each record
         
         for (const record of uploadedRecords) {
             if (uploadCancelled) break;
@@ -1155,44 +1101,18 @@
                 
                 if (response.status === 409 || (data.errorType === 'duplicate_marks')) {
                     errorCount++;
-                    record.status = 'error';
-                    record.error_message = data.error;
-                    uploadResults.push({
-                        admission_number: record.admission_number,
-                        cat: record.cat,
-                        exam: record.exam,
-                        status: 'error',
-                        error_message: data.error
-                    });
                     updateProgress(processedCount, uploadedRecords.length, successCount, errorCount, {
                         text: `⚠️ ${record.admission_number}: ${data.error.substring(0, 100)}`,
                         type: 'error'
                     });
                 } else if (data.success) {
                     successCount++;
-                    record.status = 'success';
-                    uploadResults.push({
-                        admission_number: record.admission_number,
-                        cat: record.cat,
-                        exam: record.exam,
-                        status: 'success',
-                        error_message: null
-                    });
                     updateProgress(processedCount, uploadedRecords.length, successCount, errorCount, {
                         text: `✅ ${record.admission_number}: ${data.message || 'Saved successfully'}`,
                         type: 'success'
                     });
                 } else {
                     errorCount++;
-                    record.status = 'error';
-                    record.error_message = data.error;
-                    uploadResults.push({
-                        admission_number: record.admission_number,
-                        cat: record.cat,
-                        exam: record.exam,
-                        status: 'error',
-                        error_message: data.error
-                    });
                     updateProgress(processedCount, uploadedRecords.length, successCount, errorCount, {
                         text: `❌ ${record.admission_number}: ${data.error || 'Unknown error'}`,
                         type: 'error'
@@ -1201,15 +1121,6 @@
             } catch (err) {
                 processedCount++;
                 errorCount++;
-                record.status = 'error';
-                record.error_message = err.message;
-                uploadResults.push({
-                    admission_number: record.admission_number,
-                    cat: record.cat,
-                    exam: record.exam,
-                    status: 'error',
-                    error_message: err.message
-                });
                 updateProgress(processedCount, uploadedRecords.length, successCount, errorCount, {
                     text: `❌ ${record.admission_number}: Network error - ${err.message}`,
                     type: 'error'
@@ -1221,11 +1132,7 @@
         isUploading = false;
         completeUpload(successCount, errorCount);
         
-        // Save the batch to history
-        if (uploadResults.length > 0) {
-            await saveUploadBatch(uploadResults, successCount, errorCount, uploadStartTime);
-        }
-        
+        // Show final feedback
         if (successCount > 0 && errorCount === 0) {
             showFeedback(`✅ Upload complete! ${successCount} records saved successfully.`);
         } else if (successCount > 0 && errorCount > 0) {
@@ -1235,184 +1142,320 @@
         }
     }
 
-    // Open history modal and load history
-    async function openHistoryModal() {
-        const modal = document.getElementById('historyModal');
-        modal.style.display = 'flex';
-        await loadUploadHistory();
-    }
-
-    function closeHistoryModal() {
-        document.getElementById('historyModal').style.display = 'none';
-    }
-
-    async function loadUploadHistory() {
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Loading history...</div>';
+    
+    function showERPPreview() {
+        if (!uploadedRecords.length) {
+            showFeedback('No data to preview. Upload a CSV or load sample first.', true);
+            return;
+        }
         
-        try {
-            const response = await fetch('/api/upload/history', {
-                credentials: 'include'
-            });
-            const data = await response.json();
-            
-            if (data.success && data.batches.length > 0) {
-                historyList.innerHTML = data.batches.map(batch => `
-                    <div class="card" style="margin-bottom: 1rem; cursor: pointer;" onclick="viewBatchDetails('${batch.batch_id}')">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                            <div>
-                                <strong style="color: var(--primary-green);">${batch.unit_code}</strong>
-                                <div style="font-size: 0.85rem; color: var(--medium-gray);">
-                                    ${batch.unit_name || 'Unit'} | ${batch.semester} | ${batch.academic_year}
-                                </div>
+        const payload = {
+            module: "marks_raw_upload",
+            timestamp: new Date().toISOString(),
+            total_records: uploadedRecords.length,
+            marks_data: uploadedRecords.map(record => ({
+                admission_number: record.admission_number,
+                cat: record.cat,
+                exam: record.exam
+            }))
+        };
+        
+        jsonPreview.innerText = JSON.stringify(payload, null, 2);
+        erpPreviewContainer.style.display = 'block';
+        showFeedback('📡 ERP payload ready — raw CAT and Exam values (no calculations).');
+    }
+
+    let currentBatchId = null;
+
+// Save upload batch after completion
+// async function saveUploadBatch(records, successCount, errorCount, batchId = null) {
+//     try {
+//         const savedClass = localStorage.getItem("selectedClass");
+//         const currentClass = JSON.parse(savedClass);
+        
+//         const batchData = {
+//             batch_id: batchId || generateBatchId(),
+//             unit_code: currentClass.unitCode,
+//             unit_name: currentClass.unitName || currentClass.unit_name,
+//             semester: currentClass.semester?.semester || currentClass.semester?.name,
+//             academic_year: currentClass.academic_year || "2024/2025",
+//             programme_code: currentClass.programmeCode,
+//             stage: currentClass.stage,
+//             exam_category: currentClass.examCategory || "DEGREE",
+//             records: records,
+//             success_count: successCount,
+//             error_count: errorCount
+//         };
+        
+//         const response = await fetch('/api/upload/save-batch', {
+//             method: 'POST',
+//             credentials: 'include',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(batchData)
+//         });
+        
+//         const data = await response.json();
+        
+//         if (data.success) {
+//             console.log('Upload batch saved:', data.batch_id);
+//             return data.batch_id;
+//         } else {
+//             console.error('Failed to save batch:', data.error);
+//             return null;
+//         }
+//     } catch (error) {
+//         console.error('Error saving batch:', error);
+//         return null;
+//     }
+// }
+
+// Save upload batch after completion (updated version)
+async function saveUploadBatch(records, successCount, errorCount, startTime, batchId = null) {
+    try {
+        const savedClass = localStorage.getItem("selectedClass");
+        const currentClass = JSON.parse(savedClass);
+        
+        // Prepare records with detailed status information
+        const recordsForDb = records.map(record => ({
+            student_no: record.admission_number,
+            student_name: record.student_name || null,
+            cat_marks: record.cat,
+            exam_marks: record.exam,
+            status: record.status || (record.error ? 'error' : 'success'),
+            error_message: record.error_message || null,
+            error_code: record.error_code || null,
+            erp_response: record.erp_response || null,
+            erp_status_code: record.erp_status_code || null
+        }));
+        
+        const batchData = {
+            batch_id: batchId || generateBatchId(),
+            unit_code: currentClass.unitCode,
+            unit_name: currentClass.unitName || currentClass.unit_name,
+            semester: currentClass.semester?.semester || currentClass.semester?.name,
+            academic_year: currentClass.academic_year || "2024/2025",
+            programme_code: currentClass.programmeCode,
+            stage: currentClass.stage,
+            exam_category: currentClass.examCategory || "DEGREE",
+            records: recordsForDb,
+            success_count: successCount,
+            error_count: errorCount,
+            duplicate_count: records.filter(r => r.status === 'duplicate').length || 0,
+            started_at: startTime || new Date(),
+            completed_at: new Date()
+        };
+        
+        const response = await fetch('/api/upload/save-batch', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(batchData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log('Upload batch saved:', data.batch_id);
+            return data.batch_id;
+        } else {
+            console.error('Failed to save batch:', data.error);
+            return null;
+        }
+    } catch (error) {
+        console.error('Error saving batch:', error);
+        return null;
+    }
+}
+
+// Generate unique batch ID
+function generateBatchId() {
+    const date = new Date();
+    const timestamp = date.toISOString().replace(/[-:]/g, '').replace('T', '_').slice(0, 15);
+    const random = Math.random().toString(36).substring(2, 6);
+    return `BATCH_${timestamp}_${random}`;
+}
+
+// Open history modal and load history
+async function openHistoryModal() {
+    const modal = document.getElementById('historyModal');
+    modal.style.display = 'flex';
+    await loadUploadHistory();
+}
+
+function closeHistoryModal() {
+    document.getElementById('historyModal').style.display = 'none';
+}
+
+// Load upload history from server
+async function loadUploadHistory() {
+    const historyList = document.getElementById('historyList');
+    historyList.innerHTML = '<div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Loading history...</div>';
+    
+    try {
+        const response = await fetch('/api/upload/history', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success && data.batches.length > 0) {
+            historyList.innerHTML = data.batches.map(batch => `
+                <div class="card" style="margin-bottom: 1rem; cursor: pointer;" onclick="viewBatchDetails('${batch.batch_id}')">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <strong style="color: var(--primary-green);">${batch.unit_code}</strong>
+                            <div style="font-size: 0.85rem; color: var(--medium-gray);">
+                                ${batch.unit_name || 'Unit'} | ${batch.semester} | ${batch.academic_year}
                             </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 1.25rem; font-weight: 700; color: ${batch.success_records === batch.total_records ? 'var(--success)' : 'var(--warning)'}">
-                                    ${batch.success_records}/${batch.total_records}
-                                </div>
-                                <div style="font-size: 0.7rem;">Records Saved</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 1.25rem; font-weight: 700; color: ${batch.success_records === batch.total_records ? 'var(--success)' : 'var(--warning)'}">
+                                ${batch.success_records}/${batch.total_records}
                             </div>
-                            <div>
-                                <span class="badge ${batch.status === 'completed' ? 'badge-success' : 'badge-warning'}">
-                                    ${batch.status}
-                                </span>
-                                <div style="font-size: 0.7rem; margin-top: 0.25rem;">
-                                    ${new Date(batch.upload_date).toLocaleString()}
-                                </div>
+                            <div style="font-size: 0.7rem;">Records Saved</div>
+                        </div>
+                        <div>
+                            <span class="badge ${batch.status === 'completed' ? 'badge-success' : 'badge-warning'}">
+                                ${batch.status}
+                            </span>
+                            <div style="font-size: 0.7rem; margin-top: 0.25rem;">
+                                ${new Date(batch.upload_date).toLocaleString()}
                             </div>
                         </div>
                     </div>
-                `).join('');
-            } else {
-                historyList.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--medium-gray);">No upload history found. Start by uploading some marks!</div>';
-            }
-        } catch (error) {
-            console.error('Error loading history:', error);
-            historyList.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--danger);">Error loading history. Please try again.</div>';
+                </div>
+            `).join('');
+        } else {
+            historyList.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--medium-gray);">No upload history found. Start by uploading some marks!</div>';
         }
+    } catch (error) {
+        console.error('Error loading history:', error);
+        historyList.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--danger);">Error loading history. Please try again.</div>';
     }
+}
 
-    async function viewBatchDetails(batchId) {
-        currentBatchId = batchId;
-        const modal = document.getElementById('batchDetailsModal');
-        const content = document.getElementById('batchDetailsContent');
-        const title = document.getElementById('batchDetailsTitle');
+// View batch details
+async function viewBatchDetails(batchId) {
+    currentBatchId = batchId;
+    const modal = document.getElementById('batchDetailsModal');
+    const content = document.getElementById('batchDetailsContent');
+    const title = document.getElementById('batchDetailsTitle');
+    
+    modal.style.display = 'flex';
+    title.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading batch details...';
+    content.innerHTML = '<div style="text-align: center; padding: 2rem;">Loading...</div>';
+    
+    try {
+        const response = await fetch(`/api/upload/batch/${batchId}`, {
+            credentials: 'include'
+        });
+        const data = await response.json();
         
-        modal.style.display = 'flex';
-        title.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading batch details...';
-        content.innerHTML = '<div style="text-align: center; padding: 2rem;">Loading...</div>';
-        
-        try {
-            const response = await fetch(`/api/upload/batch/${batchId}`, {
-                credentials: 'include'
-            });
-            const data = await response.json();
+        if (data.success) {
+            const batch = data.batch;
+            title.innerHTML = `<i class="fas fa-file-upload"></i> ${batch.unit_code} - ${batch.upload_date}`;
             
-            if (data.success) {
-                const batch = data.batch;
-                title.innerHTML = `<i class="fas fa-file-upload"></i> ${batch.unit_code} - ${new Date(batch.upload_date).toLocaleString()}`;
+            content.innerHTML = `
+                <div class="stats-bar" style="margin-bottom: 1rem;">
+                    <div class="stat-item">📚 Unit: <strong>${batch.unit_code} - ${batch.unit_name || 'N/A'}</strong></div>
+                    <div class="stat-item">📅 Semester: <strong>${batch.semester}</strong></div>
+                    <div class="stat-item">🎓 Programme: <strong>${batch.programme_code} - ${batch.stage}</strong></div>
+                </div>
                 
-                content.innerHTML = `
-                    <div class="stats-bar" style="margin-bottom: 1rem;">
-                        <div class="stat-item">📚 Unit: <strong>${batch.unit_code} - ${batch.unit_name || 'N/A'}</strong></div>
-                        <div class="stat-item">📅 Semester: <strong>${batch.semester}</strong></div>
-                        <div class="stat-item">🎓 Programme: <strong>${batch.programme_code} - ${batch.stage}</strong></div>
+                <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1rem;">
+                    <div class="stat-card" style="text-align: center; padding: 1rem;">
+                        <div class="stat-value" style="font-size: 1.5rem;">${batch.total_records}</div>
+                        <div class="stat-label">Total Records</div>
                     </div>
-                    
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
-                        <div class="stat-card" style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 12px;">
-                            <div style="font-size: 1.5rem; font-weight: 700;">${batch.total_records}</div>
-                            <div class="stat-label">Total Records</div>
-                        </div>
-                        <div class="stat-card" style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 12px;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">${batch.success_count}</div>
-                            <div class="stat-label">Successful</div>
-                        </div>
-                        <div class="stat-card" style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 12px;">
-                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--danger);">${batch.error_count}</div>
-                            <div class="stat-label">Failed</div>
-                        </div>
+                    <div class="stat-card" style="text-align: center; padding: 1rem;">
+                        <div class="stat-value" style="font-size: 1.5rem; color: var(--success);">${batch.success_count}</div>
+                        <div class="stat-label">Successful</div>
                     </div>
-                    
-                    <div class="table-wrapper">
-                        <table class="marks-table">
-                            <thead>
+                    <div class="stat-card" style="text-align: center; padding: 1rem;">
+                        <div class="stat-value" style="font-size: 1.5rem; color: var(--danger);">${batch.error_count}</div>
+                        <div class="stat-label">Failed</div>
+                    </div>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table class="marks-table">
+                        <thead>
+                            <tr>
+                                <th>Student No</th>
+                                <th>Student Name</th>
+                                <th>CAT Marks</th>
+                                <th>Exam Marks</th>
+                                <th>Status</th>
+                                <th>Error Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.records.map(record => `
                                 <tr>
-                                    <th>Student No</th>
-                                    <th>Student Name</th>
-                                    <th>CAT Marks</th>
-                                    <th>Exam Marks</th>
-                                    <th>Status</th>
-                                    <th>Error Message</th>
+                                    <td>${record.student_no || '-'}</td>
+                                    <td>${record.student_name || '-'}</td>
+                                    <td>${record.cat_marks}</td>
+                                    <td>${record.exam_marks}</td>
+                                    <td><span class="badge ${record.status === 'success' ? 'badge-success' : 'badge-danger'}">
+                                        ${record.status}
+                                    </span></td>
+                                    <td><small>${record.error_message || '-'}</small></td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                ${data.records.map(record => `
-                                    <tr>
-                                        <td>${record.student_no || '-'}</td>
-                                        <td>${record.student_name || '-'}</td>
-                                        <td>${record.cat_marks}</td>
-                                        <td>${record.exam_marks}</td>
-                                        <td><span class="badge ${record.status === 'success' ? 'badge-success' : 'badge-danger'}">
-                                            ${record.status}
-                                        </span></td>
-                                        <td><small>${record.error_message || '-'}</small></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            } else {
-                content.innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--danger);">Error: ${data.error}</div>`;
-            }
-        } catch (error) {
-            console.error('Error loading batch details:', error);
-            content.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--danger);">Error loading batch details. Please try again.</div>';
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        } else {
+            content.innerHTML = `<div style="text-align: center; padding: 2rem; color: var(--danger);">Error: ${data.error}</div>`;
         }
+    } catch (error) {
+        console.error('Error loading batch details:', error);
+        content.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--danger);">Error loading batch details. Please try again.</div>';
     }
+}
 
-    function closeBatchDetailsModal() {
-        document.getElementById('batchDetailsModal').style.display = 'none';
-        currentBatchId = null;
+function closeBatchDetailsModal() {
+    document.getElementById('batchDetailsModal').style.display = 'none';
+    currentBatchId = null;
+}
+
+// Export batch report
+async function exportBatchReport() {
+    if (!currentBatchId) return;
+    
+    try {
+        window.open(`/api/upload/export/${currentBatchId}`, '_blank');
+    } catch (error) {
+        console.error('Error exporting report:', error);
+        alert('Error exporting report. Please try again.');
     }
+}
 
-    async function exportBatchReport() {
-        if (!currentBatchId) return;
+// Delete batch
+async function deleteBatch() {
+    if (!currentBatchId) return;
+    
+    if (!confirm('⚠️ Are you sure you want to delete this upload report?\n\nThis action cannot be undone.')) return;
+    
+    try {
+        const response = await fetch(`/api/upload/batch/${currentBatchId}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+        const data = await response.json();
         
-        try {
-            window.open(`/api/upload/export/${currentBatchId}`, '_blank');
-        } catch (error) {
-            console.error('Error exporting report:', error);
-            alert('Error exporting report. Please try again.');
+        if (data.success) {
+            alert('✅ Report deleted successfully');
+            closeBatchDetailsModal();
+            await loadUploadHistory();
+        } else {
+            alert('❌ Error deleting report: ' + data.error);
         }
+    } catch (error) {
+        console.error('Error deleting batch:', error);
+        alert('Error deleting report. Please try again.');
     }
-
-    async function deleteBatch() {
-        if (!currentBatchId) return;
-        
-        if (!confirm('⚠️ Are you sure you want to delete this upload report?\n\nThis action cannot be undone.')) return;
-        
-        try {
-            const response = await fetch(`/api/upload/batch/${currentBatchId}`, {
-                method: 'DELETE',
-                credentials: 'include'
-            });
-            const data = await response.json();
-            
-            if (data.success) {
-                alert('✅ Report deleted successfully');
-                closeBatchDetailsModal();
-                await loadUploadHistory();
-            } else {
-                alert('❌ Error deleting report: ' + data.error);
-            }
-        } catch (error) {
-            console.error('Error deleting batch:', error);
-            alert('Error deleting report. Please try again.');
-        }
-    }
-
+}
     // Event Listeners
     function setupFileHandlers() {
         uploadZone.addEventListener('click', () => fileInput.click());
@@ -1447,6 +1490,7 @@
     downloadBtn.addEventListener('click', downloadTemplate);
     sampleBtn.addEventListener('click', loadSampleData);
     clearBtn.addEventListener('click', clearAllData);
+    // previewErpBtn.addEventListener('click', showERPPreview);
     
     async function init() {
         await getCurrentUser();

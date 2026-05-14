@@ -769,6 +769,712 @@ app.get('/get-token', async (req, res) => {
     }
 });
 
+// Reports Start
+app.post('/api/upload/save-batch', async (req, res) => {
+    let connection;
+    try {
+        const {
+            batch_id,
+            unit_code,
+            unit_name,
+            semester,
+            academic_year,
+            programme_code,
+            stage,
+            exam_category,
+            records,
+            success_count,
+            error_count,
+            duplicate_count = 0
+        } = req.body;
+        
+        const lecturerId = req.session.user.id;
+        const lecturerName = req.session.user.full_name;
+        const lecturerPf = req.session.user.pf_no;
+        const startedAt = req.body.started_at || new Date();
+        const completedAt = new Date();
+        
+        // Get connection for transaction
+        connection = await db.promise().getConnection();
+        await connection.beginTransaction();
+        
+        // 1. Insert into upload_batches
+        const batchSql = `
+            INSERT INTO upload_batches 
+            (batch_id, unit_code, unit_name, semester, academic_year, 
+             programme_code, stage, exam_category, lecturer_id, lecturer_name, 
+             lecturer_pf, total_records, success_count, error_count, 
+             duplicate_count, status, started_at, completed_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?)
+        `;
+        
+        await connection.query(batchSql, [
+            batch_id, unit_code, unit_name, semester, academic_year,
+            programme_code, stage, exam_category, lecturerId, lecturerName,
+            lecturerPf, records.length, success_count, error_count,
+            duplicate_count, startedAt, completedAt
+        ]);
+        
+        // 2. Insert individual records into upload_records
+        if (records.length > 0) {
+            const recordSql = `
+                INSERT INTO upload_records 
+                (batch_id, student_no, student_name, cat_marks, exam_marks, 
+                 status, error_message, error_code, erp_response, erp_status_code)
+                VALUES ?
+            `;
+            
+            const recordValues = records.map(record => [
+                batch_id,
+                record.student_no,
+                record.student_name || null,
+                record.cat_marks || 0,
+                record.exam_marks || 0,
+                record.status || 'success',
+                record.error_message || null,
+                record.error_code || null,
+                record.erp_response || null,
+                record.erp_status_code || null
+            ]);
+            
+            await connection.query(recordSql, [recordValues]);
+        }
+        
+        // 3. Update or insert unit_performance
+        const unitPerfSql = `
+            INSERT INTO unit_performance 
+            (unit_code, unit_name, semester, academic_year, total_uploads, 
+             total_students_uploaded, avg_cat_marks, avg_exam_marks, 
+             lecturers, last_upload_date)
+            VALUES (?, ?, ?, ?, 1, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                total_uploads = total_uploads + 1,
+                total_students_uploaded = total_students_uploaded + VALUES(total_students_uploaded),
+                avg_cat_marks = (avg_cat_marks * (total_uploads - 1) + VALUES(avg_cat_marks)) / total_uploads,
+                avg_exam_marks = (avg_exam_marks * (total_uploads - 1) + VALUES(avg_exam_marks)) / total_uploads,
+                lecturers = JSON_ARRAY_APPEND(lecturers, '$', ?),
+                last_upload_date = VALUES(last_upload_date)
+        `;
+        
+        // Calculate averages for this batch
+        let totalCat = 0, totalExam = 0;
+        records.forEach(record => {
+            if (record.status === 'success') {
+                totalCat += record.cat_marks || 0;
+                totalExam += record.exam_marks || 0;
+            }
+        });
+        const avgCat = records.filter(r => r.status === 'success').length > 0 
+            ? totalCat / records.filter(r => r.status === 'success').length 
+            : 0;
+        const avgExam = records.filter(r => r.status === 'success').length > 0 
+            ? totalExam / records.filter(r => r.status === 'success').length 
+            : 0;
+        
+        await connection.query(unitPerfSql, [
+            unit_code, unit_name, semester, academic_year,
+            records.filter(r => r.status === 'success').length,
+            avgCat, avgExam,
+            JSON.stringify({ id: lecturerId, name: lecturerName, pf: lecturerPf }),
+            completedAt
+        ]);
+        
+        // 4. Update or insert lecturer_upload_activity
+        const lecturerActivitySql = `
+            INSERT INTO lecturer_upload_activity 
+            (lecturer_id, lecturer_name, total_uploads, total_students_uploaded, 
+             total_successful_uploads, total_failed_uploads, last_upload_date, 
+             first_upload_date, success_rate)
+            VALUES (?, ?, 1, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                total_uploads = total_uploads + 1,
+                total_students_uploaded = total_students_uploaded + VALUES(total_students_uploaded),
+                total_successful_uploads = total_successful_uploads + VALUES(total_successful_uploads),
+                total_failed_uploads = total_failed_uploads + VALUES(total_failed_uploads),
+                last_upload_date = VALUES(last_upload_date),
+                success_rate = ((total_successful_uploads + VALUES(total_successful_uploads)) / 
+                               (total_students_uploaded + VALUES(total_students_uploaded))) * 100
+        `;
+        
+        await connection.query(lecturerActivitySql, [
+            lecturerId, lecturerName,
+            records.filter(r => r.status === 'success').length,
+            success_count, error_count,
+            completedAt, completedAt,
+            (success_count / records.length) * 100
+        ]);
+        
+        // 5. Log errors to upload_errors_log if any
+        if (error_count > 0) {
+            const errorRecords = records.filter(r => r.status === 'error');
+            for (const errorRecord of errorRecords) {
+                const errorLogSql = `
+                    INSERT INTO upload_errors_log 
+                    (error_code, error_message, error_type, occurrence_count, 
+                     first_seen, last_seen, affected_students, affected_units)
+                    VALUES (?, ?, ?, 1, NOW(), NOW(), ?, ?)
+                    ON DUPLICATE KEY UPDATE
+                        occurrence_count = occurrence_count + 1,
+                        last_seen = NOW(),
+                        affected_students = JSON_ARRAY_APPEND(affected_students, '$', ?),
+                        affected_units = JSON_ARRAY_APPEND(affected_units, '$', ?)
+                `;
+                
+                await connection.query(errorLogSql, [
+                    errorRecord.error_code || 'UNKNOWN_ERROR',
+                    errorRecord.error_message || 'Unknown error occurred',
+                    errorRecord.error_type || 'unknown',
+                    JSON_ARRAY(errorRecord.student_no),
+                    JSON_ARRAY(unit_code),
+                    errorRecord.student_no,
+                    unit_code
+                ]);
+            }
+        }
+        
+        // 6. Update dashboard metrics cache
+        await updateDashboardMetricsCache(connection);
+        
+        await connection.commit();
+        
+        res.json({
+            success: true,
+            message: 'Upload batch saved successfully',
+            batch_id: batch_id,
+            stats: {
+                total: records.length,
+                success: success_count,
+                errors: error_count,
+                duplicates: duplicate_count
+            }
+        });
+        
+    } catch (error) {
+        if (connection) await connection.rollback();
+        console.error('Error saving upload batch:', error);
+        res.status(500).json({ success: false, error: error.message });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Helper function to update dashboard cache
+async function updateDashboardMetricsCache(connection) {
+    try {
+        // Get today's summary
+        const [todaySummary] = await connection.query(`
+            SELECT 
+                COUNT(DISTINCT batch_id) as batches,
+                SUM(total_records) as records,
+                SUM(success_count) as successful,
+                SUM(error_count) as errors
+            FROM upload_batches
+            WHERE DATE(created_at) = CURDATE()
+        `);
+        
+        // Get weekly summary
+        const [weekSummary] = await connection.query(`
+            SELECT 
+                COUNT(DISTINCT batch_id) as batches,
+                SUM(total_records) as records,
+                SUM(success_count) as successful,
+                SUM(error_count) as errors
+            FROM upload_batches
+            WHERE YEARWEEK(created_at) = YEARWEEK(CURDATE())
+        `);
+        
+        // Get overall success rate
+        const [overallStats] = await connection.query(`
+            SELECT 
+                SUM(total_records) as total_records,
+                SUM(success_count) as total_successful,
+                ROUND(AVG(success_count / NULLIF(total_records, 0)) * 100, 2) as avg_success_rate
+            FROM upload_batches
+            WHERE status = 'completed'
+        `);
+        
+        const cacheData = {
+            today: todaySummary[0] || { batches: 0, records: 0, successful: 0, errors: 0 },
+            week: weekSummary[0] || { batches: 0, records: 0, successful: 0, errors: 0 },
+            overall: overallStats[0] || { total_records: 0, total_successful: 0, avg_success_rate: 0 },
+            last_updated: new Date()
+        };
+        
+        await connection.query(`
+            INSERT INTO dashboard_metrics_cache (metric_key, metric_value)
+            VALUES ('dashboard_summary', ?)
+            ON DUPLICATE KEY UPDATE metric_value = ?
+        `, [JSON.stringify(cacheData), JSON.stringify(cacheData)]);
+        
+    } catch (error) {
+        console.error('Error updating dashboard cache:', error);
+    }
+}
+
+// Get upload history with filters
+app.get('/api/upload/history', async (req, res) => {
+    try {
+        const lecturerId = req.session.user.id;
+        const { 
+            limit = 50, 
+            offset = 0, 
+            unit_code, 
+            semester, 
+            status,
+            start_date,
+            end_date 
+        } = req.query;
+        
+        let sql = `
+            SELECT 
+                b.*,
+                (SELECT COUNT(*) FROM upload_records WHERE batch_id = b.batch_id) as total_records_count,
+                (SELECT COUNT(*) FROM upload_records WHERE batch_id = b.batch_id AND status = 'success') as success_records,
+                (SELECT COUNT(*) FROM upload_records WHERE batch_id = b.batch_id AND status = 'error') as error_records,
+                (SELECT COUNT(*) FROM upload_records WHERE batch_id = b.batch_id AND status = 'duplicate') as duplicate_records,
+                ROUND((SELECT COUNT(*) FROM upload_records WHERE batch_id = b.batch_id AND status = 'success') / 
+                      NULLIF((SELECT COUNT(*) FROM upload_records WHERE batch_id = b.batch_id), 0) * 100, 2) as success_rate
+            FROM upload_batches b
+            WHERE b.lecturer_id = ?
+        `;
+        
+        const params = [lecturerId];
+        
+        if (unit_code) {
+            sql += ` AND b.unit_code = ?`;
+            params.push(unit_code);
+        }
+        
+        if (semester) {
+            sql += ` AND b.semester = ?`;
+            params.push(semester);
+        }
+        
+        if (status) {
+            sql += ` AND b.status = ?`;
+            params.push(status);
+        }
+        
+        if (start_date && end_date) {
+            sql += ` AND DATE(b.created_at) BETWEEN ? AND ?`;
+            params.push(start_date, end_date);
+        }
+        
+        sql += ` ORDER BY b.created_at DESC LIMIT ? OFFSET ?`;
+        params.push(parseInt(limit), parseInt(offset));
+        
+        const [batches] = await db.promise().query(sql, params);
+        
+        // Get total count for pagination
+        const [countResult] = await db.promise().query(
+            `SELECT COUNT(*) as total FROM upload_batches WHERE lecturer_id = ?`,
+            [lecturerId]
+        );
+        
+        res.json({
+            success: true,
+            batches: batches,
+            total: countResult[0].total,
+            limit: parseInt(limit),
+            offset: parseInt(offset)
+        });
+        
+    } catch (error) {
+        console.error('Error fetching upload history:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get detailed batch report
+app.get('/api/upload/batch/:batchId', async (req, res) => {
+    try {
+        const { batchId } = req.params;
+        const lecturerId = req.session.user.id;
+        
+        // Get batch details
+        const [batch] = await db.promise().query(
+            `SELECT * FROM upload_batches WHERE batch_id = ? AND lecturer_id = ?`,
+            [batchId, lecturerId]
+        );
+        
+        if (batch.length === 0) {
+            return res.status(404).json({ success: false, error: 'Batch not found' });
+        }
+        
+        // Get records with pagination
+        const { page = 1, limit = 100 } = req.query;
+        const offset = (page - 1) * limit;
+        
+        const [records] = await db.promise().query(
+            `SELECT * FROM upload_records WHERE batch_id = ? ORDER BY uploaded_at DESC LIMIT ? OFFSET ?`,
+            [batchId, parseInt(limit), parseInt(offset)]
+        );
+        
+        const [totalCount] = await db.promise().query(
+            `SELECT COUNT(*) as total FROM upload_records WHERE batch_id = ?`,
+            [batchId]
+        );
+        
+        res.json({
+            success: true,
+            batch: batch[0],
+            records: records,
+            pagination: {
+                current_page: parseInt(page),
+                per_page: parseInt(limit),
+                total: totalCount[0].total,
+                total_pages: Math.ceil(totalCount[0].total / limit)
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error fetching batch details:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get dashboard metrics
+app.get('/api/upload/dashboard-metrics', async (req, res) => {
+    try {
+        const lecturerId = req.session.user.id;
+        
+        // Try to get from cache first
+        const [cached] = await db.promise().query(
+            `SELECT metric_value FROM dashboard_metrics_cache WHERE metric_key = 'dashboard_summary'`
+        );
+        
+        if (cached.length > 0) {
+            const cacheAge = Date.now() - new Date(cached[0].last_updated).getTime();
+            if (cacheAge < 300000) { // Cache valid for 5 minutes
+                return res.json({
+                    success: true,
+                    metrics: JSON.parse(cached[0].metric_value),
+                    from_cache: true
+                });
+            }
+        }
+        
+        // Get fresh metrics
+        const [todayStats] = await db.promise().query(`
+            SELECT 
+                COUNT(DISTINCT batch_id) as total_batches,
+                SUM(total_records) as total_records,
+                SUM(success_count) as successful_records,
+                SUM(error_count) as error_records,
+                ROUND(AVG(success_count / NULLIF(total_records, 0)) * 100, 2) as success_rate
+            FROM upload_batches
+            WHERE lecturer_id = ? AND DATE(created_at) = CURDATE()
+        `, [lecturerId]);
+        
+        const [weekStats] = await db.promise().query(`
+            SELECT 
+                COUNT(DISTINCT batch_id) as total_batches,
+                SUM(total_records) as total_records,
+                SUM(success_count) as successful_records,
+                SUM(error_count) as error_records,
+                ROUND(AVG(success_count / NULLIF(total_records, 0)) * 100, 2) as success_rate
+            FROM upload_batches
+            WHERE lecturer_id = ? AND YEARWEEK(created_at) = YEARWEEK(CURDATE())
+        `, [lecturerId]);
+        
+        const [overallStats] = await db.promise().query(`
+            SELECT 
+                COUNT(DISTINCT batch_id) as total_batches,
+                SUM(total_records) as total_records,
+                SUM(success_count) as successful_records,
+                SUM(error_count) as error_records,
+                ROUND(AVG(success_count / NULLIF(total_records, 0)) * 100, 2) as success_rate,
+                MAX(created_at) as last_upload
+            FROM upload_batches
+            WHERE lecturer_id = ? AND status = 'completed'
+        `, [lecturerId]);
+        
+        const [topUnits] = await db.promise().query(`
+            SELECT 
+                unit_code,
+                unit_name,
+                COUNT(*) as upload_count,
+                SUM(total_records) as total_students
+            FROM upload_batches
+            WHERE lecturer_id = ?
+            GROUP BY unit_code, unit_name
+            ORDER BY upload_count DESC
+            LIMIT 5
+        `, [lecturerId]);
+        
+        const metrics = {
+            today: todayStats[0] || { total_batches: 0, total_records: 0, successful_records: 0, error_records: 0, success_rate: 0 },
+            week: weekStats[0] || { total_batches: 0, total_records: 0, successful_records: 0, error_records: 0, success_rate: 0 },
+            overall: overallStats[0] || { total_batches: 0, total_records: 0, successful_records: 0, error_records: 0, success_rate: 0 },
+            top_units: topUnits,
+            last_updated: new Date()
+        };
+        
+        res.json({
+            success: true,
+            metrics: metrics,
+            from_cache: false
+        });
+        
+    } catch (error) {
+        console.error('Error fetching dashboard metrics:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get lecturer performance report
+app.get('/api/upload/lecturer-performance', async (req, res) => {
+    try {
+        const lecturerId = req.session.user.id;
+        
+        const [performance] = await db.promise().query(`
+            SELECT 
+                lecturer_name,
+                total_uploads,
+                total_students_uploaded,
+                total_successful_uploads,
+                total_failed_uploads,
+                ROUND(success_rate, 2) as success_rate,
+                last_upload_date,
+                first_upload_date,
+                units_taught
+            FROM lecturer_upload_activity
+            WHERE lecturer_id = ?
+        `, [lecturerId]);
+        
+        res.json({
+            success: true,
+            performance: performance[0] || null
+        });
+        
+    } catch (error) {
+        console.error('Error fetching lecturer performance:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get unit performance report
+app.get('/api/upload/unit-performance', async (req, res) => {
+    try {
+        const lecturerId = req.session.user.id;
+        const { unit_code } = req.query;
+        
+        let sql = `
+            SELECT 
+                u.unit_code,
+                u.unit_name,
+                u.semester,
+                u.academic_year,
+                u.total_uploads,
+                u.total_students_uploaded,
+                ROUND(u.avg_cat_marks, 2) as avg_cat_marks,
+                ROUND(u.avg_exam_marks, 2) as avg_exam_marks,
+                u.last_upload_date,
+                b.success_count as last_upload_success,
+                b.total_records as last_upload_total
+            FROM unit_performance u
+            LEFT JOIN upload_batches b ON u.unit_code = b.unit_code 
+                AND u.semester = b.semester 
+                AND u.academic_year = b.academic_year
+                AND b.lecturer_id = ?
+            WHERE u.unit_code IN (SELECT DISTINCT unit_code FROM upload_batches WHERE lecturer_id = ?)
+        `;
+        
+        const params = [lecturerId, lecturerId];
+        
+        if (unit_code) {
+            sql += ` AND u.unit_code = ?`;
+            params.push(unit_code);
+        }
+        
+        sql += ` ORDER BY u.last_upload_date DESC`;
+        
+        const [units] = await db.promise().query(sql, params);
+        
+        res.json({
+            success: true,
+            units: units
+        });
+        
+    } catch (error) {
+        console.error('Error fetching unit performance:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Delete upload batch
+app.delete('/api/upload/batch/:batchId', async (req, res) => {
+    let connection;
+    try {
+        const { batchId } = req.params;
+        const lecturerId = req.session.user.id;
+        
+        connection = await db.promise().getConnection();
+        await connection.beginTransaction();
+        
+        // Check if batch exists and belongs to user
+        const [batch] = await connection.query(
+            `SELECT * FROM upload_batches WHERE batch_id = ? AND lecturer_id = ?`,
+            [batchId, lecturerId]
+        );
+        
+        if (batch.length === 0) {
+            return res.status(404).json({ success: false, error: 'Batch not found' });
+        }
+        
+        // Delete records (cascade will handle upload_records)
+        await connection.query(`DELETE FROM upload_batches WHERE batch_id = ?`, [batchId]);
+        
+        await connection.commit();
+        
+        // Update cache after deletion
+        await updateDashboardMetricsCache(connection);
+        
+        res.json({ success: true, message: 'Batch deleted successfully' });
+        
+    } catch (error) {
+        if (connection) await connection.rollback();
+        console.error('Error deleting batch:', error);
+        res.status(500).json({ success: false, error: error.message });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Export batch report as CSV
+app.get('/api/upload/export/:batchId', async (req, res) => {
+    try {
+        const { batchId } = req.params;
+        const lecturerId = req.session.user.id;
+        
+        const [batch] = await db.promise().query(
+            `SELECT * FROM upload_batches WHERE batch_id = ? AND lecturer_id = ?`,
+            [batchId, lecturerId]
+        );
+        
+        if (batch.length === 0) {
+            return res.status(404).json({ success: false, error: 'Batch not found' });
+        }
+        
+        const [records] = await db.promise().query(
+            `SELECT * FROM upload_records WHERE batch_id = ? ORDER BY uploaded_at`,
+            [batchId]
+        );
+        
+        // Generate CSV
+        let csv = 'Student No,Student Name,CAT Marks,Exam Marks,Status,Error Message,Uploaded At\n';
+        records.forEach(record => {
+            csv += `"${record.student_no}","${record.student_name || ''}",${record.cat_marks},${record.exam_marks},${record.status},"${record.error_message || ''}","${record.uploaded_at}"\n`;
+        });
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename=upload_report_${batchId}.csv`);
+        res.send(csv);
+        
+    } catch (error) {
+        console.error('Error exporting batch:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get summary report by type
+app.get('/api/upload/summary-report', async (req, res) => {
+    try {
+        const lecturerId = req.session.user.id;
+        const { report_type = 'monthly', period_start, period_end } = req.query;
+        
+        let startDate, endDate;
+        
+        if (period_start && period_end) {
+            startDate = period_start;
+            endDate = period_end;
+        } else {
+            // Default to current month
+            startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+            endDate = new Date();
+        }
+        
+        // Check if cached report exists
+        const [cachedReport] = await db.promise().query(`
+            SELECT * FROM upload_summary_reports 
+            WHERE lecturer_id = ? AND report_type = ? 
+                AND DATE(period_start) = DATE(?) 
+                AND DATE(period_end) = DATE(?)
+            ORDER BY generated_at DESC LIMIT 1
+        `, [lecturerId, report_type, startDate, endDate]);
+        
+        if (cachedReport.length > 0) {
+            const reportAge = Date.now() - new Date(cachedReport[0].generated_at).getTime();
+            if (reportAge < 3600000) { // Cache valid for 1 hour
+                return res.json({
+                    success: true,
+                    report: cachedReport[0],
+                    from_cache: true
+                });
+            }
+        }
+        
+        // Generate fresh report
+        const [data] = await db.promise().query(`
+            SELECT 
+                COUNT(DISTINCT batch_id) as total_batches,
+                SUM(total_records) as total_records_uploaded,
+                SUM(success_count) as total_successful,
+                SUM(error_count) as total_errors,
+                SUM(duplicate_count) as total_duplicates,
+                ROUND(AVG(success_count / NULLIF(total_records, 0)) * 100, 2) as avg_success_rate,
+                AVG(TIMESTAMPDIFF(SECOND, started_at, completed_at)) as avg_upload_time_seconds,
+                JSON_OBJECTAGG(unit_code, total_records) as unit_breakdown,
+                JSON_OBJECTAGG(programme_code, total_records) as programme_breakdown
+            FROM upload_batches
+            WHERE lecturer_id = ? 
+                AND DATE(created_at) BETWEEN ? AND ?
+                AND status = 'completed'
+        `, [lecturerId, startDate, endDate]);
+        
+        const reportData = data[0];
+        
+        // Save to cache
+        const reportId = `RPT_${report_type}_${Date.now()}`;
+        await db.promise().query(`
+            INSERT INTO upload_summary_reports 
+            (report_id, lecturer_id, report_type, period_start, period_end, 
+             total_batches, total_records_uploaded, total_successful, 
+             total_errors, total_duplicates, avg_success_rate, 
+             avg_upload_time_seconds, unit_breakdown, programme_breakdown)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+            reportId, lecturerId, report_type, startDate, endDate,
+            reportData.total_batches || 0,
+            reportData.total_records_uploaded || 0,
+            reportData.total_successful || 0,
+            reportData.total_errors || 0,
+            reportData.total_duplicates || 0,
+            reportData.avg_success_rate || 0,
+            reportData.avg_upload_time_seconds || 0,
+            reportData.unit_breakdown || '{}',
+            reportData.programme_breakdown || '{}'
+        ]);
+        
+        res.json({
+            success: true,
+            report: {
+                report_id: reportId,
+                report_type: report_type,
+                period_start: startDate,
+                period_end: endDate,
+                ...reportData
+            },
+            from_cache: false
+        });
+        
+    } catch (error) {
+        console.error('Error generating summary report:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Reports end
 // Test route to verify server is working
 app.get('/test', (req, res) => {
     console.log('TEST ROUTE HIT');

@@ -11,7 +11,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/logo.jpg">
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
     <title>Semesters | Lecturer Dashboard</title>
     <style>
@@ -54,7 +54,30 @@
       .top-bar {
         display: flex;
         justify-content: flex-end;
+        gap: 1rem;
         margin-bottom: 1rem;
+      }
+
+      .admin-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--white);
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        color: var(--accent-gold);
+        box-shadow: var(--shadow);
+      }
+
+      .admin-btn:hover {
+        background: var(--accent-gold);
+        color: var(--white);
+        transform: translateY(-2px);
       }
 
       .logout-btn {
@@ -248,11 +271,26 @@
       .lecturer-name {
         font-weight: 600;
         color: var(--dark-green);
+        font-size: 1.1rem;
       }
 
       .lecturer-dept {
         font-size: 0.8rem;
         color: var(--medium-gray);
+      }
+
+      .loading-spinner {
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .fa-spin {
+        animation: fa-spin 2s infinite linear;
+      }
+
+      @keyframes fa-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
 
       @media (max-width: 700px) {
@@ -273,19 +311,19 @@
   <body>
     <div class="container">
       <div class="header">
-        <h1>My Semesters</h1>
+        <h1><i class="fas fa-chalkboard-user"></i> My Semesters</h1>
         <p>A list of all the Semesters I have taught in</p>
-        <div class="top-bar">
-          <!-- <a href="admin.html" class="logout-btn" >👑 Admin Panel</a> -->
-          <button class="logout-btn" onclick="window.location.href='admin.html'">Admin Panel</button>
-          <button class="logout-btn" onclick="logout()"><i class="fa-solid fa-door-open"></i>Logout</button>
+        <div class="top-bar" id="actionButtons">
+          <!-- Admin button will be dynamically inserted here if user is admin -->
+          <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
       </div>
 
-      <div class="lecturer-info">
+      <div class="lecturer-info" id="lecturerInfo">
         <div>
-          <div class="lecturer-name">{userName}</div>
-          <div class="lecturer-dept">Faculty of Computing & Informatics</div>
+          <div class="lecturer-name" id="lecturerName">
+            <i class="fas fa-spinner fa-spin"></i> Loading...
+          </div>
         </div>
         <div class="stats-row" style="margin-bottom: 0; gap: 0.5rem">
           <div class="stat-card" style="padding: 0.5rem 1rem; min-width: auto">
@@ -301,7 +339,7 @@
 
       <div class="card">
         <div class="card-header">
-          <h2><i class="fa-regular fa-calendar-days"></i> Academic Semesters</h2>
+          <h2><i class="fas fa-calendar-alt"></i> Academic Semesters</h2>
           <span
             class="status-badge status-open"
             style="background: var(--light-green)"
@@ -309,63 +347,144 @@
           >
         </div>
         <div class="semester-list" id="semesterList">
-          <!-- Semesters will be loaded here -->
+          <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i> Loading semesters...
+          </div>
         </div>
       </div>
     </div>
 
     <script>
-      // Get logged-in user data (from localStorage or session)
-      // You should save this during login
-      const currentUser = {
-        email: localStorage.getItem("userEmail") || "email@example.com",
-        pf_no: localStorage.getItem("userPfNo") || "PF123",
-      };
+      let currentUser = null;
+      let userRole = null;
 
-      // Logout function
-      async function logout() {
+      // Get current user from session
+      async function getCurrentUser() {
         try {
-          // Call logout endpoint to clear session
-          const response = await fetch("/api/logout", {
-            method: "POST",
+          const response = await fetch("/api/current-user", {
             credentials: "include",
           });
 
-          // Clear localStorage
-          localStorage.removeItem("userEmail");
-          localStorage.removeItem("userPfNo");
-          localStorage.removeItem("userName");
-          localStorage.removeItem("selectedSemester");
-          localStorage.removeItem("selectedClass");
+          if (!response.ok) {
+            throw new Error("Not authenticated");
+          }
 
-          // Redirect to login page
-          window.location.href = "index.html";
-        } catch (error) {
-          console.error("Logout error:", error);
-          // Still clear localStorage and redirect even if API call fails
-          localStorage.clear();
+          const data = await response.json();
+
+          if (data.success && data.user) {
+            currentUser = data.user;
+            console.log("User loaded:", currentUser);
+            
+            // Store in localStorage for other pages
+            localStorage.setItem("userEmail", currentUser.email);
+            localStorage.setItem("userPfNo", currentUser.pf_no);
+            localStorage.setItem("userName", currentUser.full_name || currentUser.email);
+            
+            return true;
+          }
+          
+          // Fallback to localStorage if session fails
+          const email = localStorage.getItem("userEmail");
+          const pf = localStorage.getItem("userPfNo");
+          
+          if (email && pf) {
+            currentUser = { email: email, pf_no: pf };
+            return true;
+          }
+          
           window.location.href = "login.html";
+          return false;
+        } catch (err) {
+          console.error("Error getting user:", err);
+          const email = localStorage.getItem("userEmail");
+          const pf = localStorage.getItem("userPfNo");
+          
+          if (email && pf) {
+            currentUser = { email: email, pf_no: pf };
+            return true;
+          }
+          
+          window.location.href = "login.html";
+          return false;
+        }
+      }
+
+      // Fetch user role from backend
+      async function fetchUserRole(email) {
+        try {
+          const response = await fetch(`/api/user-role/${encodeURIComponent(email)}`, {
+            method: "GET",
+            credentials: "include",
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+              userRole = data.role;
+              localStorage.setItem("userRole", userRole);
+              return userRole;
+            }
+          }
+          return null;
+        } catch (error) {
+          console.error("Error fetching user role:", error);
+          return null;
+        }
+      }
+
+      // Show/hide admin button based on role
+      async function updateAdminButton() {
+        const userEmail = currentUser?.email;
+        if (!userEmail) return;
+
+        const role = await fetchUserRole(userEmail);
+        const topBar = document.getElementById("actionButtons");
+        
+        if (role === "admin") {
+          // Create admin button if it doesn't exist
+          if (!document.getElementById("adminBtn")) {
+            const adminBtn = document.createElement("button");
+            adminBtn.id = "adminBtn";
+            adminBtn.className = "admin-btn";
+            adminBtn.innerHTML = '<i class="fas fa-crown"></i> Admin Panel';
+            adminBtn.onclick = () => {
+              window.location.href = "admin.html";
+            };
+            // Insert admin button before logout button
+            topBar.insertBefore(adminBtn, topBar.firstChild);
+          }
+        } else {
+          // Remove admin button if it exists
+          const existingAdminBtn = document.getElementById("adminBtn");
+          if (existingAdminBtn) {
+            existingAdminBtn.remove();
+          }
         }
       }
 
       // Update lecturer info display
-      function updateLecturerInfo(email, pf_no) {
-        document.querySelector(".lecturer-name").textContent = email;
-        document.querySelector(".lecturer-dept").innerHTML =
-          `PF Number: ${pf_no}`;
+      function updateLecturerInfo() {
+        if (currentUser) {
+          const nameElement = document.getElementById("lecturerName");
+          const deptElement = document.getElementById("lecturerDept");
+          
+          // Display email and PF number
+          nameElement.innerHTML = `<i class="fas fa-envelope"></i> ${currentUser.email}<br>
+                                    <small style="font-size: 0.8rem;"><i class="fas fa-id-card"></i> ${currentUser.pf_no}</small>`;
+        }
       }
 
       // Fetch semesters from your backend
       async function fetchSemesters() {
         try {
-          // Show loading state
           const container = document.getElementById("semesterList");
-          container.innerHTML =
-            '<div style="padding: 2rem; text-align: center;">Loading semesters...</div>';
+          container.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading semesters...</div>';
 
-          // Call your backend API
           const response = await fetch(
             `/api/semesters?email=${encodeURIComponent(currentUser.email)}&pf_no=${encodeURIComponent(currentUser.pf_no)}`,
+            {
+              credentials: "include",
+            }
           );
 
           if (!response.ok) {
@@ -383,11 +502,13 @@
         } catch (error) {
           console.error("Error:", error);
           document.getElementById("semesterList").innerHTML = `
-                <div style="padding: 2rem; text-align: center; color: var(--danger);">
-                    ❌ Failed to load semesters: ${error.message}<br>
-                    <button onclick="fetchSemesters()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-green); color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button>
-                </div>
-            `;
+            <div style="padding: 2rem; text-align: center; color: var(--danger);">
+              <i class="fas fa-exclamation-triangle"></i> ❌ Failed to load semesters: ${error.message}<br>
+              <button onclick="fetchSemesters()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: var(--primary-green); color: white; border: none; border-radius: 8px; cursor: pointer;">
+                <i class="fas fa-sync-alt"></i> Retry
+              </button>
+            </div>
+          `;
         }
       }
 
@@ -395,20 +516,22 @@
         const container = document.getElementById("semesterList");
 
         if (!semesters || semesters.length === 0) {
-          container.innerHTML =
-            '<div style="padding: 2rem; text-align: center; color: var(--medium-gray);"><i class="fa-solid fa-arrows-rotate"></i> No semesters found for this lecturer</div>';
+          container.innerHTML = `
+            <div style="padding: 2rem; text-align: center; color: var(--medium-gray);">
+              <i class="fas fa-folder-open"></i> No semesters found for this lecturer
+            </div>
+          `;
           return;
         }
 
         container.innerHTML = semesters
           .map((semester, index) => {
-            // Determine status
             let status = "closed";
-            let statusText = "● Closed";
+            let statusText = "● Semester Closed";
 
             if (semester.is_current === 1) {
               status = "open";
-              statusText = "● Active";
+              statusText = "● Semester Active";
             } else if (
               semester.marks_entry_date &&
               semester.marks_entry_date !== "1753-01-01T00:00:00"
@@ -417,28 +540,33 @@
               const today = new Date();
               if (entryDate > today) {
                 status = "open";
-                statusText = "●  Marks Entry Active";
+                statusText = "● Marks Entry Open";
               }
             }
 
-            // Format dates for display
             const [startYear, endYear] = semester.academic_year.split("/");
             const startDate = `${semester.semester.includes("1") ? "Sep" : "Jan"} ${startYear}`;
             const endDate = `${semester.semester.includes("1") ? "Dec" : "Apr"} ${endYear || startYear}`;
 
             return `
-                <div class="semester-item" onclick='selectSemester(${JSON.stringify(semester)})'>
-                    <div class="semester-info">
-                        <div class="semester-name">${escapeHtml(semester.semester)} (${escapeHtml(semester.academic_year)})</div>
-                        <div class="semester-dates"><i class="fa-regular fa-calendar-days"></i> ${startDate} - ${endDate}</div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <span class="status-badge ${status === "open" ? "status-open" : "status-closed"}">
-                            ${statusText}
-                        </span>
-                        <button class="view-btn">View Classes →</button>
-                    </div>
+              <div class="semester-item" onclick='selectSemester(${JSON.stringify(semester)})'>
+                <div class="semester-info">
+                  <div class="semester-name">
+                    <i class="fas fa-graduation-cap"></i> ${escapeHtml(semester.semester)} (${escapeHtml(semester.academic_year)})
+                  </div>
+                  <div class="semester-dates">
+                    <i class="fas fa-calendar-week"></i> ${startDate} - ${endDate}
+                  </div>
                 </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <span class="status-badge ${status === "open" ? "status-open" : "status-closed"}">
+                    ${statusText}
+                  </span>
+                  <button class="view-btn">
+                    <i class="fas fa-eye"></i> View Classes →
+                  </button>
+                </div>
+              </div>
             `;
           })
           .join("");
@@ -464,7 +592,6 @@
 
       function selectSemester(semester) {
         console.log("Selected semester:", semester);
-        // Store the complete semester data as received from API
         localStorage.setItem(
           "selectedSemester",
           JSON.stringify({
@@ -478,9 +605,43 @@
         window.location.href = "classes.html";
       }
 
+      // Logout function
+      async function logout() {
+        try {
+          const response = await fetch("/api/logout", {
+            method: "POST",
+            credentials: "include",
+          });
+
+          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userPfNo");
+          localStorage.removeItem("userName");
+          localStorage.removeItem("userRole");
+          localStorage.removeItem("selectedSemester");
+          localStorage.removeItem("selectedClass");
+
+          window.location.href = "index.html";
+        } catch (error) {
+          console.error("Logout error:", error);
+          localStorage.clear();
+          window.location.href = "index.html";
+        }
+      }
+
       // Initialize page
-      updateLecturerInfo(currentUser.email, currentUser.pf_no);
-      fetchSemesters();
+      async function init() {
+        console.log("=== SEMESTERS PAGE INIT ===");
+        
+        const userLoaded = await getCurrentUser();
+        if (!userLoaded) return;
+        
+        updateLecturerInfo();
+        await updateAdminButton();
+        await fetchSemesters();
+      }
+
+      // Start the initialization
+      init();
     </script>
   </body>
 </html>

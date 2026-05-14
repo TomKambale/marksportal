@@ -2,15 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>TTU EMP | Lecturer Dashboard System</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/logo.jpg">
     <link rel="icon" type="image/png" sizes="16x16" href="/logo.jpg">
     <link rel="apple-touch-icon" sizes="180x180" href="/logo.jpg">
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -79,7 +76,7 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            padding: 1rem 2rem;
+            padding: 1rem;
         }
 
         .nav-container {
@@ -89,7 +86,6 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
         }
 
         .logo {
@@ -98,19 +94,15 @@
             gap: 0.75rem;
         }
 
-        .logo-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        .logo img {
+            width: 50px;
+            height: 50px;
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+            object-fit: cover;
         }
 
         .logo-text {
-            font-size: 1.25rem;
+            font-size: 1.1rem;
             font-weight: 700;
             background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
             background-clip: text;
@@ -118,9 +110,22 @@
             color: transparent;
         }
 
+        /* Mobile Menu Button */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1001;
+        }
+
         .nav-links {
             display: flex;
             gap: 1rem;
+            transition: var(--transition);
         }
 
         .nav-btn {
@@ -130,6 +135,7 @@
             text-decoration: none;
             transition: var(--transition);
             border: 2px solid var(--primary-green);
+            white-space: nowrap;
         }
 
         .nav-btn-login {
@@ -163,7 +169,7 @@
         /* Hero Section */
         .hero {
             text-align: center;
-            padding: 3rem 1rem;
+            padding: 2rem 1rem;
             animation: fadeInUp 0.8s ease;
         }
 
@@ -184,27 +190,29 @@
             color: var(--dark-green);
             padding: 0.4rem 1rem;
             border-radius: 50px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
         }
 
         .hero h1 {
-            font-size: 3rem;
+            font-size: clamp(1.8rem, 5vw, 3rem);
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary-green), var(--secondary-green), var(--accent-gold));
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
             margin-bottom: 1rem;
+            line-height: 1.2;
         }
 
         .hero-subtitle {
-            font-size: 1.2rem;
+            font-size: clamp(0.9rem, 4vw, 1.2rem);
             color: var(--dark-gray);
             max-width: 600px;
             margin: 0 auto 2rem;
             line-height: 1.6;
+            padding: 0 1rem;
         }
 
         .hero-buttons {
@@ -214,10 +222,8 @@
             flex-wrap: wrap;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
-            color: var(--white);
-            padding: 0.8rem 2rem;
+        .btn-primary, .btn-secondary {
+            padding: 0.8rem 1.5rem;
             border-radius: 50px;
             font-weight: 600;
             text-decoration: none;
@@ -225,6 +231,12 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: clamp(0.85rem, 3.5vw, 1rem);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: var(--white);
             box-shadow: var(--shadow);
         }
 
@@ -236,15 +248,7 @@
         .btn-secondary {
             background: transparent;
             color: var(--primary-green);
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: var(--transition);
             border: 2px solid var(--primary-green);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
         .btn-secondary:hover {
@@ -254,27 +258,28 @@
 
         /* Features Section */
         .features {
-            padding: 4rem 0;
+            padding: 3rem 0;
         }
 
         .section-title {
             text-align: center;
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 5vw, 2rem);
             font-weight: 700;
             color: var(--dark-green);
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
         }
 
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
         .feature-card {
             background: var(--white);
-            border-radius: 24px;
-            padding: 2rem;
+            border-radius: 20px;
+            padding: 1.5rem;
             text-align: center;
             transition: var(--transition);
             box-shadow: var(--shadow);
@@ -282,157 +287,256 @@
         }
 
         .feature-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-5px);
             box-shadow: var(--shadow-hover);
         }
 
         .feature-icon {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             background: linear-gradient(135deg, var(--light-green), var(--white));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 2rem;
+            margin: 0 auto 1rem;
+            font-size: 1.8rem;
         }
 
         .feature-card h3 {
             color: var(--dark-green);
-            margin-bottom: 0.75rem;
-            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
         }
 
         .feature-card p {
             color: var(--medium-gray);
-            line-height: 1.6;
-            font-size: 0.9rem;
+            line-height: 1.5;
+            font-size: 0.85rem;
         }
 
         /* Stats Section */
         .stats {
             background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
-            border-radius: 32px;
-            padding: 3rem 2rem;
-            margin: 3rem 0;
+            border-radius: 24px;
+            padding: 2rem 1.5rem;
+            margin: 2rem 0;
             color: var(--white);
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
             text-align: center;
         }
 
         .stat-number {
-            font-size: 2.5rem;
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
             font-weight: 800;
             margin-bottom: 0.5rem;
             transition: all 0.3s ease;
         }
 
         .stat-label {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             opacity: 0.9;
         }
 
         /* How It Works */
         .how-it-works {
-            padding: 3rem 0;
+            padding: 2rem 0;
         }
 
         .steps {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
         }
 
         .step {
             text-align: center;
             position: relative;
+            padding: 1rem;
         }
 
         .step-number {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             background: var(--accent-gold);
             color: var(--dark-green);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            margin: 0 auto 1rem;
+            margin: 0 auto 0.8rem;
         }
 
         .step h4 {
             color: var(--dark-green);
             margin-bottom: 0.5rem;
+            font-size: 1rem;
         }
 
         .step p {
             color: var(--medium-gray);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            line-height: 1.5;
         }
 
         /* CTA Section */
         .cta {
             background: var(--white);
-            border-radius: 32px;
-            padding: 3rem 2rem;
+            border-radius: 24px;
+            padding: 2rem 1.5rem;
             text-align: center;
-            margin: 3rem 0;
+            margin: 2rem 0;
             box-shadow: var(--shadow);
         }
 
         .cta h2 {
             color: var(--dark-green);
-            margin-bottom: 1rem;
+            margin-bottom: 0.8rem;
+            font-size: clamp(1.2rem, 5vw, 1.8rem);
         }
 
         .cta p {
             color: var(--medium-gray);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
         }
 
         /* Footer */
         .footer {
             background: var(--dark-green);
             color: var(--white);
-            padding: 2rem;
+            padding: 1.5rem;
             text-align: center;
-            margin-top: 4rem;
-            border-radius: 32px 32px 0 0;
+            margin-top: 3rem;
+            border-radius: 24px 24px 0 0;
         }
 
         .footer p {
             opacity: 0.8;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
         }
 
-        /* Responsive */
+        /* Mobile Menu Styles */
         @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 0.75rem;
+                box-shadow: var(--shadow);
+                border-radius: 0 0 20px 20px;
+                z-index: 1000;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-btn {
+                text-align: center;
+                width: 100%;
+                white-space: normal;
+            }
+
             .container {
                 padding: 1rem;
             }
-            
-            .hero h1 {
-                font-size: 2rem;
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
             }
-            
-            .hero-subtitle {
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .steps {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-primary, .btn-secondary {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+
+        /* Small mobile adjustments */
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .logo img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .logo-text {
                 font-size: 1rem;
             }
-            
-            .nav-container {
-                flex-direction: column;
+
+            .hero {
+                padding: 1rem;
             }
-            
-            .section-title {
-                font-size: 1.5rem;
+
+            .feature-card {
+                padding: 1.2rem;
+            }
+        }
+
+        /* Touch-friendly adjustments */
+        @media (hover: none) and (pointer: coarse) {
+            .btn-primary, .btn-secondary, .nav-btn, .feature-card {
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .feature-card:active {
+                transform: scale(0.98);
+            }
+
+            .btn-primary:active, .btn-secondary:active {
+                transform: translateY(-2px);
+            }
+        }
+
+        /* Landscape mode adjustments */
+        @media (max-width: 900px) and (orientation: landscape) {
+            .hero {
+                padding: 1rem;
+            }
+
+            .features {
+                padding: 1rem 0;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             }
         }
     </style>
@@ -444,10 +548,13 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <img src="logo.jpg" alt="TTU Logo" width="60" height="60">
+                <img src="logo.jpg" alt="TTU Logo" onerror="this.src='https://via.placeholder.com/50'">
                 <div class="logo-text">TTU E.M.P.</div>
             </div>
-            <div class="nav-links">
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links" id="navLinks">
                 <a href="#features" class="nav-btn nav-btn-login">Features</a>
                 <a href="#how-it-works" class="nav-btn nav-btn-login">How It Works</a>
                 <a href="login.html" class="nav-btn nav-btn-login">Login</a>
@@ -530,7 +637,7 @@
                     <div class="stat-label">Students Managed</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number" data-target="247">24/7</div>
+                    <div class="stat-number" data-type="247">24/7</div>
                     <div class="stat-label">System Availability</div>
                 </div>
             </div>
@@ -541,7 +648,7 @@
             <h2 class="section-title">How It Works</h2>
             <div class="steps">
                 <div class="step">
-                    <div class="step-number">1 </div>
+                    <div class="step-number">1</div>
                     <h4>Register & Login to Your Account</h4>
                     <p>Create your lecturer account using your official TTU email address and staff credentials, then Login.</p>
                 </div>
@@ -580,8 +687,34 @@
         <p style="margin-top: 0.5rem;">A secure platform for academic marks management | Taita Taveta University</p>
     </footer>
 
-    <!-- Smooth Scroll & Stats Animation Script -->
     <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                const icon = menuToggle.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('fa-bars');
+                    icon.classList.toggle('fa-times');
+                }
+            });
+        }
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                const icon = menuToggle?.querySelector('i');
+                if (icon) {
+                    icon.classList.add('fa-bars');
+                    icon.classList.remove('fa-times');
+                }
+            });
+        });
+
         // Smooth scroll for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -600,13 +733,11 @@
         function animateStats() {
             const statNumbers = document.querySelectorAll('.stat-number');
             
-            // Store original target values and handle 24/7 stat
             statNumbers.forEach(stat => {
                 const targetValue = parseInt(stat.getAttribute('data-target'));
                 const is247 = stat.getAttribute('data-type') === '247';
                 
                 if (is247) {
-                    // For 24/7 stat, just set it directly and mark as animated
                     stat.setAttribute('data-animated', 'true');
                     stat.textContent = '24/7';
                 } else if (targetValue && !stat.hasAttribute('data-animated')) {
@@ -627,19 +758,17 @@
                         const numbers = statsContainer.querySelectorAll('.stat-number');
                         
                         numbers.forEach(num => {
-                            // Only animate if not already animated and not a 24/7 stat
                             if (!num.hasAttribute('data-animated') && num.getAttribute('data-type') !== '247') {
                                 const targetValue = parseInt(num.getAttribute('data-target-value'));
                                 
                                 if (targetValue) {
                                     let currentValue = 0;
-                                    const duration = 2000; // 2 seconds
-                                    const increment = targetValue / (duration / 16); // 60fps
+                                    const duration = 2000;
+                                    const increment = targetValue / (duration / 16);
                                     
                                     const timer = setInterval(() => {
                                         currentValue += increment;
                                         if (currentValue >= targetValue) {
-                                            // Format numbers with commas for thousands
                                             if (targetValue >= 1000) {
                                                 num.textContent = targetValue.toLocaleString();
                                             } else {
@@ -660,13 +789,11 @@
                             }
                         });
                         
-                        // Unobserve after animation starts
                         observer.unobserve(statsContainer);
                     }
                 });
             }, observerOptions);
 
-            // Observe the stats section
             const statsSection = document.querySelector('.stats');
             if (statsSection) {
                 observer.observe(statsSection);
@@ -676,7 +803,7 @@
         // Initialize stats animation
         animateStats();
 
-        // Add hover effect for stat items
+        // Touch-friendly hover effects
         const statItems = document.querySelectorAll('.stat-item');
         statItems.forEach(item => {
             item.addEventListener('mouseenter', function() {
@@ -696,17 +823,15 @@
                 });
                 const data = await response.json();
                 if (data.success && data.user) {
-                    // User is already logged in, redirect to semesters page
                     window.location.href = 'semesters.html';
                 }
             } catch (error) {
-                // No active session, stay on landing page
                 console.log('No active session');
             }
         }
 
         // Uncomment to enable auto-redirect for logged-in users
-        // checkExistingSession();
+        checkExistingSession();
     </script>
 </body>
 </html>
