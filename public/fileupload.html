@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <title>Marks Uploader | Raw CSV to ERP</title>
     <style>
-        /* Your existing styles remain the same */
         * {
             margin: 0;
             padding: 0;
@@ -270,6 +269,7 @@
             color: var(--dark-green);
         }
 
+        /* Feedback message - HIGH z-index to appear above modals */
         .alert-message {
             background: #fff3e0;
             border-left: 4px solid var(--warning);
@@ -277,6 +277,8 @@
             border-radius: 12px;
             margin-top: 1rem;
             font-size: 0.85rem;
+            position: relative;
+            z-index: 10000;
         }
 
         .erp-preview {
@@ -313,7 +315,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.7);
-            z-index: 2000;
+            z-index: 9999;
             display: none;
             justify-content: center;
             align-items: center;
@@ -327,6 +329,8 @@
             max-width: 500px;
             text-align: center;
             animation: slideUp 0.3s ease;
+            position: relative;
+            z-index: 10000;
         }
         
         @keyframes slideUp {
@@ -446,6 +450,34 @@
             cursor: not-allowed;
         }
         
+        .modal-close {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--medium-gray);
+            transition: var(--transition);
+        }
+        
+        .modal-close:hover {
+            color: var(--danger);
+        }
+        
+        /* History card styles */
+        .history-card {
+            background: var(--white);
+            border-radius: var(--border-radius-lg);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 100, 0, 0.08);
+        }
+        
+        .history-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            background: var(--light-green);
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .progress-container {
@@ -527,16 +559,19 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr class="empty-row"><td colspan="3">No data uploaded yet<\/td><\/tr>
+                    <tr class="empty-row"><td colspan="3">No data uploaded yet</td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="btn-group" style="justify-content: flex-end; margin-top: 1.25rem;">
-            <button class="btn btn-outline" id="viewHistoryBtn" onclick="openHistoryModal()">
+            <button class="btn btn-outline" id="previewErpBtn">
+                <i class="fas fa-search"></i> Preview ERP JSON
+            </button>
+            <button class="btn btn-outline" id="viewHistoryBtn">
                 <i class="fas fa-history"></i> Upload History
             </button>
-            <button class="btn btn-primary" id="pushToErpBtn" onclick="startUpload()">
+            <button class="btn btn-primary" id="pushToErpBtn">
                 <i class="fas fa-cloud-upload-alt"></i> Upload to ERP
             </button>
         </div>
@@ -591,10 +626,10 @@
             </div>
             
             <div class="btn-group" style="margin-top: 1rem;">
-                <button class="btn btn-danger" id="cancelUploadBtn" onclick="cancelUpload()" style="display: none;">
+                <button class="btn btn-danger" id="cancelUploadBtn" onclick="cancelUploadProcess()" style="display: none;">
                     <i class="fas fa-stop"></i> Cancel Upload
                 </button>
-                <button class="btn btn-primary" id="closeModalBtn" onclick="closeProgressModal()" style="display: none;">
+                <button class="btn btn-primary" id="closeModalBtn" onclick="closeProgressModalWindow()" style="display: none;">
                     <i class="fas fa-check"></i> Close
                 </button>
             </div>
@@ -604,17 +639,17 @@
     <!-- Upload History Modal -->
     <div id="historyModal" class="progress-modal">
         <div class="progress-container" style="max-width: 900px; max-height: 80vh; overflow-y: auto;">
-            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--light-green);">
                 <h3><i class="fas fa-history"></i> Upload History</h3>
-                <span class="close-modal" onclick="closeHistoryModal()" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <span class="modal-close" onclick="closeHistoryModalWindow()">&times;</span>
             </div>
             
             <div id="historyList">
-                <!-- History items will be loaded here -->
+                <div style="text-align: center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Loading history...</div>
             </div>
             
             <div class="btn-group" style="margin-top: 1rem;">
-                <button class="btn btn-outline" onclick="closeHistoryModal()">Close</button>
+                <button class="btn btn-outline" onclick="closeHistoryModalWindow()">Close</button>
             </div>
         </div>
     </div>
@@ -622,23 +657,23 @@
     <!-- Batch Details Modal -->
     <div id="batchDetailsModal" class="progress-modal">
         <div class="progress-container" style="max-width: 1000px; max-height: 80vh; overflow-y: auto;">
-            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--light-green);">
                 <h3 id="batchDetailsTitle">Batch Details</h3>
-                <span class="close-modal" onclick="closeBatchDetailsModal()" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+                <span class="modal-close" onclick="closeBatchDetailsModalWindow()">&times;</span>
             </div>
             
             <div id="batchDetailsContent">
-                <!-- Batch details will be loaded here -->
+                <div style="text-align: center; padding: 2rem;">Loading...</div>
             </div>
             
             <div class="btn-group" style="margin-top: 1rem;">
-                <button class="btn btn-primary" id="exportBatchBtn" onclick="exportBatchReport()">
+                <button class="btn btn-primary" id="exportBatchBtn">
                     <i class="fas fa-download"></i> Export as CSV
                 </button>
-                <button class="btn btn-danger" id="deleteBatchBtn" onclick="deleteBatch()">
+                <button class="btn btn-danger" id="deleteBatchBtn">
                     <i class="fas fa-trash"></i> Delete Report
                 </button>
-                <button class="btn btn-outline" onclick="closeBatchDetailsModal()">Close</button>
+                <button class="btn btn-outline" onclick="closeBatchDetailsModalWindow()">Close</button>
             </div>
         </div>
     </div>
@@ -653,7 +688,6 @@
     let currentUser = null;
     let isUploading = false;
     let uploadCancelled = false;
-    let currentUploadId = null;
     let currentBatchId = null;
 
     // DOM Elements
@@ -669,7 +703,9 @@
     const downloadBtn = document.getElementById('downloadTemplateBtn');
     const sampleBtn = document.getElementById('sampleDataBtn');
     const clearBtn = document.getElementById('clearDataBtn');
+    const previewErpBtn = document.getElementById('previewErpBtn');
     const pushToErpBtn = document.getElementById('pushToErpBtn');
+    const viewHistoryBtn = document.getElementById('viewHistoryBtn');
     const erpPreviewContainer = document.getElementById('erpPreviewContainer');
     const jsonPreview = document.getElementById('jsonPreview');
 
@@ -707,8 +743,12 @@
         feedbackDiv.innerHTML = `<span>${isError ? '⚠️ ' : '✅ '}${message}</span>`;
         feedbackDiv.style.background = isError ? '#ffe6e6' : '#e6ffed';
         feedbackDiv.style.borderLeftColor = isError ? 'var(--danger)' : 'var(--secondary-green)';
+        
+        // Auto-hide after 5 seconds
         setTimeout(() => {
-            feedbackDiv.style.display = 'none';
+            if (feedbackDiv.style.display !== 'none') {
+                feedbackDiv.style.display = 'none';
+            }
         }, 5000);
     }
 
@@ -765,9 +805,7 @@
                 admission_number: String(admissionNumber),
                 cat: catValue,
                 exam: examValue,
-                status: 'pending', // Initialize status
-                error_message: null,
-                error_code: null
+                status: 'pending'
             });
         }
         
@@ -779,7 +817,7 @@
 
     function renderTable() {
         if (!uploadedRecords.length) {
-            tableBody.innerHTML = `<tr class="empty-row"><td colspan="3">📭 No student data. Upload a CSV or load sample.<\/tr><\/td>`;
+            tableBody.innerHTML = `<tr class="empty-row"><td colspan="3">📭 No student data. Upload a CSV or load sample.</td></tr>`;
             totalStudentsSpan.innerText = '0';
             avgCatSpan.innerText = '—';
             avgExamSpan.innerText = '—';
@@ -800,10 +838,10 @@
             totalExam += r.exam;
             htmlRows += `
                 <tr>
-                    <td><strong>${escapeHtml(r.admission_number)}<\/strong><\/td>
-                    <td>${r.cat.toFixed(2)}<\/td>
-                    <td>${r.exam.toFixed(2)}<\/td>
-                <\/tr>
+                    <td><strong>${escapeHtml(r.admission_number)}</strong></td>
+                    <td>${r.cat.toFixed(2)}</td>
+                    <td>${r.exam.toFixed(2)}</td>
+                </tr>
             `;
         }
         
@@ -816,7 +854,6 @@
         recordCountBadge.innerText = `${count} record${count !== 1 ? 's' : ''}`;
         
         tableBody.innerHTML = htmlRows;
-        erpPreviewContainer.style.display = 'none';
     }
 
     function setRecords(records) {
@@ -907,6 +944,7 @@
         
         modal.style.display = 'flex';
         
+        // Prevent closing via Escape during upload
         document.addEventListener('keydown', preventEscClose);
         window.addEventListener('beforeunload', showUnloadWarning);
     }
@@ -956,14 +994,14 @@
         renderTable();
     }
     
-    function closeProgressModal() {
+    function closeProgressModalWindow() {
         document.getElementById('progressModal').style.display = 'none';
         if (!isUploading) {
             location.reload();
         }
     }
     
-    function cancelUpload() {
+    function cancelUploadProcess() {
         if (confirm('⚠️ Are you sure you want to cancel the upload?\n\nThis will stop the upload process. Already processed records will remain saved.')) {
             uploadCancelled = true;
             isUploading = false;
@@ -1015,6 +1053,8 @@
     async function saveUploadBatch(records, successCount, errorCount, startTime, batchId = null) {
         try {
             const savedClass = localStorage.getItem("selectedClass");
+            if (!savedClass) return null;
+            
             const currentClass = JSON.parse(savedClass);
             
             const recordsForDb = records.map(record => ({
@@ -1023,10 +1063,7 @@
                 cat_marks: record.cat,
                 exam_marks: record.exam,
                 status: record.status || (record.error ? 'error' : 'success'),
-                error_message: record.error_message || null,
-                error_code: record.error_code || null,
-                erp_response: null,
-                erp_status_code: null
+                error_message: record.error_message || null
             }));
             
             const batchData = {
@@ -1041,7 +1078,7 @@
                 records: recordsForDb,
                 success_count: successCount,
                 error_count: errorCount,
-                duplicate_count: records.filter(r => r.status === 'duplicate').length || 0,
+                duplicate_count: records.filter(r => r.status === 'error' && r.error_message?.includes('duplicate')).length || 0,
                 started_at: startTime || new Date(),
                 completed_at: new Date()
             };
@@ -1058,17 +1095,50 @@
             if (data.success) {
                 console.log('Upload batch saved:', data.batch_id);
                 return data.batch_id;
-            } else {
-                console.error('Failed to save batch:', data.error);
-                return null;
             }
+            return null;
         } catch (error) {
             console.error('Error saving batch:', error);
             return null;
         }
     }
 
-    // Main Upload Function with Progress Tracking
+    // Preview ERP JSON
+    function showERPPreview() {
+        if (!uploadedRecords.length) {
+            showFeedback('No data to preview. Upload a CSV or load sample first.', true);
+            return;
+        }
+        
+        const savedClass = localStorage.getItem("selectedClass");
+        if (!savedClass) {
+            showFeedback('No class selected. Please go back and select a class first.', true);
+            return;
+        }
+        
+        const currentClass = JSON.parse(savedClass);
+        
+        const payload = {
+            unit_code: currentClass.unitCode,
+            unit_name: currentClass.unitName,
+            semester: currentClass.semester?.semester || currentClass.semester?.name,
+            programme_code: currentClass.programmeCode,
+            stage: currentClass.stage,
+            exam_category: currentClass.examCategory || "DEGREE",
+            total_records: uploadedRecords.length,
+            marks_data: uploadedRecords.map(record => ({
+                admission_number: record.admission_number,
+                cat: record.cat,
+                exam: record.exam
+            }))
+        };
+        
+        jsonPreview.innerText = JSON.stringify(payload, null, 2);
+        erpPreviewContainer.style.display = 'block';
+        showFeedback('📡 ERP payload preview ready — raw CAT and Exam values.');
+    }
+
+    // Main Upload Function
     async function startUpload() {
         if (uploadedRecords.length === 0) {
             showFeedback('❌ No records to upload. Please upload a CSV file first.', true);
@@ -1117,7 +1187,7 @@
         let successCount = 0;
         let errorCount = 0;
         let processedCount = 0;
-        let uploadResults = []; // Track results for each record
+        let uploadResults = [];
         
         for (const record of uploadedRecords) {
             if (uploadCancelled) break;
@@ -1144,9 +1214,7 @@
                 const response = await fetch("/api/marks/save", {
                     method: "POST",
                     credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),
                 });
                 
@@ -1221,28 +1289,28 @@
         isUploading = false;
         completeUpload(successCount, errorCount);
         
-        // Save the batch to history
         if (uploadResults.length > 0) {
             await saveUploadBatch(uploadResults, successCount, errorCount, uploadStartTime);
         }
         
+        // Show final summary as feedback (not behind modal)
         if (successCount > 0 && errorCount === 0) {
             showFeedback(`✅ Upload complete! ${successCount} records saved successfully.`);
         } else if (successCount > 0 && errorCount > 0) {
             showFeedback(`⚠️ Upload complete: ${successCount} succeeded, ${errorCount} failed. Check the log for details.`, true);
-        } else {
+        } else if (errorCount > 0) {
             showFeedback(`❌ Upload failed: All ${errorCount} records failed to save.`, true);
         }
     }
 
-    // Open history modal and load history
-    async function openHistoryModal() {
+    // History Modal Functions
+    async function openHistoryModalWindow() {
         const modal = document.getElementById('historyModal');
         modal.style.display = 'flex';
         await loadUploadHistory();
     }
 
-    function closeHistoryModal() {
+    function closeHistoryModalWindow() {
         document.getElementById('historyModal').style.display = 'none';
     }
 
@@ -1256,12 +1324,12 @@
             });
             const data = await response.json();
             
-            if (data.success && data.batches.length > 0) {
+            if (data.success && data.batches && data.batches.length > 0) {
                 historyList.innerHTML = data.batches.map(batch => `
-                    <div class="card" style="margin-bottom: 1rem; cursor: pointer;" onclick="viewBatchDetails('${batch.batch_id}')">
+                    <div class="history-card" onclick="viewBatchDetailsWindow('${batch.batch_id}')">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                             <div>
-                                <strong style="color: var(--primary-green);">${batch.unit_code}</strong>
+                                <strong style="color: var(--primary-green);">${escapeHtml(batch.unit_code)}</strong>
                                 <div style="font-size: 0.85rem; color: var(--medium-gray);">
                                     ${batch.unit_name || 'Unit'} | ${batch.semester} | ${batch.academic_year}
                                 </div>
@@ -1292,7 +1360,7 @@
         }
     }
 
-    async function viewBatchDetails(batchId) {
+    async function viewBatchDetailsWindow(batchId) {
         currentBatchId = batchId;
         const modal = document.getElementById('batchDetailsModal');
         const content = document.getElementById('batchDetailsContent');
@@ -1314,21 +1382,21 @@
                 
                 content.innerHTML = `
                     <div class="stats-bar" style="margin-bottom: 1rem;">
-                        <div class="stat-item">📚 Unit: <strong>${batch.unit_code} - ${batch.unit_name || 'N/A'}</strong></div>
-                        <div class="stat-item">📅 Semester: <strong>${batch.semester}</strong></div>
-                        <div class="stat-item">🎓 Programme: <strong>${batch.programme_code} - ${batch.stage}</strong></div>
+                        <div class="stat-item">📚 Unit: <strong>${escapeHtml(batch.unit_code)} - ${escapeHtml(batch.unit_name) || 'N/A'}</strong></div>
+                        <div class="stat-item">📅 Semester: <strong>${escapeHtml(batch.semester)}</strong></div>
+                        <div class="stat-item">🎓 Programme: <strong>${escapeHtml(batch.programme_code)} - ${escapeHtml(batch.stage)}</strong></div>
                     </div>
                     
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1rem;">
-                        <div class="stat-card" style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 12px;">
+                        <div style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 12px;">
                             <div style="font-size: 1.5rem; font-weight: 700;">${batch.total_records}</div>
                             <div class="stat-label">Total Records</div>
                         </div>
-                        <div class="stat-card" style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 12px;">
+                        <div style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 12px;">
                             <div style="font-size: 1.5rem; font-weight: 700; color: var(--success);">${batch.success_count}</div>
                             <div class="stat-label">Successful</div>
                         </div>
-                        <div class="stat-card" style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 12px;">
+                        <div style="text-align: center; padding: 1rem; background: var(--light-gray); border-radius: 12px;">
                             <div style="font-size: 1.5rem; font-weight: 700; color: var(--danger);">${batch.error_count}</div>
                             <div class="stat-label">Failed</div>
                         </div>
@@ -1349,14 +1417,14 @@
                             <tbody>
                                 ${data.records.map(record => `
                                     <tr>
-                                        <td>${record.student_no || '-'}</td>
-                                        <td>${record.student_name || '-'}</td>
+                                        <td>${escapeHtml(record.student_no) || '-'}</td>
+                                        <td>${escapeHtml(record.student_name) || '-'}</td>
                                         <td>${record.cat_marks}</td>
                                         <td>${record.exam_marks}</td>
                                         <td><span class="badge ${record.status === 'success' ? 'badge-success' : 'badge-danger'}">
                                             ${record.status}
                                         </span></td>
-                                        <td><small>${record.error_message || '-'}</small></td>
+                                        <td><small>${escapeHtml(record.error_message) || '-'}</small></td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -1372,7 +1440,7 @@
         }
     }
 
-    function closeBatchDetailsModal() {
+    function closeBatchDetailsModalWindow() {
         document.getElementById('batchDetailsModal').style.display = 'none';
         currentBatchId = null;
     }
@@ -1388,7 +1456,7 @@
         }
     }
 
-    async function deleteBatch() {
+    async function deleteBatchRecord() {
         if (!currentBatchId) return;
         
         if (!confirm('⚠️ Are you sure you want to delete this upload report?\n\nThis action cannot be undone.')) return;
@@ -1402,7 +1470,7 @@
             
             if (data.success) {
                 alert('✅ Report deleted successfully');
-                closeBatchDetailsModal();
+                closeBatchDetailsModalWindow();
                 await loadUploadHistory();
             } else {
                 alert('❌ Error deleting report: ' + data.error);
@@ -1444,9 +1512,17 @@
         });
     }
 
+    // Initialize all event listeners
     downloadBtn.addEventListener('click', downloadTemplate);
     sampleBtn.addEventListener('click', loadSampleData);
     clearBtn.addEventListener('click', clearAllData);
+    previewErpBtn.addEventListener('click', showERPPreview);
+    pushToErpBtn.addEventListener('click', startUpload);
+    viewHistoryBtn.addEventListener('click', openHistoryModalWindow);
+    
+    // Batch detail buttons
+    document.getElementById('exportBatchBtn')?.addEventListener('click', exportBatchReport);
+    document.getElementById('deleteBatchBtn')?.addEventListener('click', deleteBatchRecord);
     
     async function init() {
         await getCurrentUser();

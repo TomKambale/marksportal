@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>COD Dashboard | Student Semester Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        :root {
+            --primary-green: #006400;
+            --secondary-green: #228B22;
+            --light-green: #f0f9f0;
+            --dark-green: #004d00;
+            --accent-gold: #D4AF37;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --success: #28a745;
+            --info: #0dcaf0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logout-btn, .back-btn {
+            display: inline-flex;
+            align-items: right;
+            gap: 0.5rem;
+            background: var(--white);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            color: var(--danger);
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            color: var(--primary-green);
+        }
+
+        .back-btn:hover {
+            background: var(--light-green);
+            transform: translateX(-4px);
+        }
+
+        .breadcrumb {
+            background: var(--white);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-green);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .header p {
+            color: var(--medium-gray);
+            margin-top: 0.5rem;
+        }
+
+        /* Search Section */
+        .search-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(0, 100, 0, 0.1);
+        }
+
+        .search-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover {
+            background: var(--dark-green);
+            transform: translateY(-2px);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            min-width: 150px;
+        }
+
+        /* Search Results */
+        .results-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .student-item {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--light-gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .student-item:hover {
+            background: var(--light-green);
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+
+        .student-details {
+            font-size: 0.8rem;
+            color: var(--medium-gray);
+        }
+
+        /* Student Profile Card */
+        .profile-card {
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            border-radius: 24px;
+            padding: 1.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .profile-item {
+            font-size: 0.9rem;
+        }
+
+        .profile-label {
+            font-size: 0.7rem;
+            opacity: 0.8;
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-value {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Semester Selector */
+        .semester-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .semester-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .semester-tab {
+            background: var(--light-gray);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .semester-tab:hover {
+            background: var(--light-green);
+        }
+
+        .semester-tab.active {
+            background: var(--primary-green);
+            color: white;
+        }
+
+        /* Results Table */
+        .results-card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: none;
+        }
+
+        .card-header {
+            background: var(--dark-green);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .export-btn {
+            background: var(--accent-gold);
+            color: var(--dark-green);
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .results-table th {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .results-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .results-table tr:hover {
+            background: var(--light-green);
+        }
+
+        /* Status Badges */
+        .status-pass {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .status-fail {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .status-supp {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .status-na {
+            color: var(--medium-gray);
+            font-style: italic;
+        }
+
+        /* Summary Card */
+        .summary-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: var(--shadow);
+            display: none;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .summary-item {
+            text-align: center;
+            padding: 0.8rem;
+            background: var(--light-gray);
+            border-radius: 16px;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+
+        .summary-label {
+            font-size: 0.7rem;
+            color: var(--medium-gray);
+            margin-top: 0.25rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--medium-gray);
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 2rem;
+            color: var(--medium-gray);
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .results-table th, .results-table td { padding: 0.5rem; font-size: 0.7rem; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="top-bar">
+        <!-- <div class="breadcrumb">
+            <a onclick="window.location.href='cod-dashboard.html'">Dashboard</a> / 
+            <span>Student Semester Results</span>
+        </div> -->
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+
+    <div class="header">
+        <h1>Student Semester Results</h1>
+        <p>Search for a student to view their complete semester academic performance</p>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-card">
+        <div class="search-input-group">
+            <input type="text" id="searchInput" class="search-input" placeholder="Enter Registration Number or Student Name..." autocomplete="off">
+            <button class="search-btn" onclick="searchStudents()">🔍 Search</button>
+        </div>
+        <div class="filter-group">
+            <select id="programmeFilter" class="filter-select">
+                <option value="">All Programmes</option>
+            </select>
+            <select id="yearFilter" class="filter-select">
+                <option value="">All Years</option>
+                <option value="1">Year 1</option>
+                <option value="2">Year 2</option>
+                <option value="3">Year 3</option>
+                <option value="4">Year 4</option>
+            </select>
+        </div>
+        <div id="searchResults" class="results-list"></div>
+    </div>
+
+    <!-- Student Profile -->
+    <div id="profileCard" class="profile-card"></div>
+
+    <!-- Semester Selector -->
+    <div id="semesterCard" class="semester-card">
+        <h3 style="margin-bottom: 0.75rem;">📅 Select Semester</h3>
+        <div id="semesterTabs" class="semester-tabs"></div>
+    </div>
+
+    <!-- Results Table -->
+    <div id="resultsCard" class="results-card">
+        <div class="card-header">
+            <h2>📊 Unit Results</h2>
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportResults('csv')">📄 Export CSV</button>
+                <button class="export-btn" onclick="exportResults('pdf')">📑 Export PDF</button>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Unit Code</th>
+                        <th>Unit Name</th>
+                        <th>Credits</th>
+                        <th>CAT Marks</th>
+                        <th>Exam Marks</th>
+                        <th>Total</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th>Lecturer</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTableBody">
+                    <tr class="empty-row"><td colspan="9">Select a student and semester to view results</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Summary Card -->
+    <div id="summaryCard" class="summary-card"></div>
+</div>
+
+<script>
+
+const USE_DEMO_DATA = true;
+const stagesData = {
+    success: true,
+    programme: {
+        code: "BSC-CS",
+        name: "Bachelor of Science in Computer Science",
+        duration: 4,
+        total_students: 345
+    },
+    stages: [
+        {
+            code: "Y1S1",
+            description: "Year 1 Semester 1",
+            order: 1,
+            students_registered: 98,
+            units_count: 6
+        },
+        {
+            code: "Y1S2",
+            description: "Year 1 Semester 2",
+            order: 2,
+            students_registered: 95,
+            units_count: 6
+        },
+        {
+            code: "Y2S1",
+            description: "Year 2 Semester 1",
+            order: 3,
+            students_registered: 87,
+            units_count: 6
+        },
+        {
+            code: "Y2S2",
+            description: "Year 2 Semester 2",
+            order: 4,
+            students_registered: 85,
+            units_count: 6
+        },
+        {
+            code: "Y3S1",
+            description: "Year 3 Semester 1",
+            order: 5,
+            students_registered: 42,
+            units_count: 5
+        },
+        {
+            code: "Y3S2",
+            description: "Year 3 Semester 2",
+            order: 6,
+            students_registered: 40,
+            units_count: 5
+        },
+        {
+            code: "Y4S1",
+            description: "Year 4 Semester 1",
+            order: 7,
+            students_registered: 35,
+            units_count: 4
+        },
+        {
+            code: "Y4S2",
+            description: "Year 4 Semester 2",
+            order: 8,
+            students_registered: 33,
+            units_count: 4
+        }
+    ]
+};
+
+    let currentStudent = null;
+    let currentSemester = null;
+    let availableSemesters = [];
+    let allProgrammes = [];
+
+    async function getCurrentUser() {
+        try {
+            const response = await fetch('/api/current-user', { credentials: 'include' });
+            const data = await response.json();
+            if (data.success && data.user) {
+                if (data.user.role !== 'cod' && data.user.role !== 'admin') {
+                    alert('Access denied. COD privileges required.');
+                    window.location.href = 'semesters.html';
+                    return false;
+                }
+                return true;
+            }
+            window.location.href = 'login.html';
+            return false;
+        } catch (error) {
+            console.error('Error:', error);
+            window.location.href = 'login.html';
+            return false;
+        }
+    }
+
+    async function searchStudents() {
+        const query = document.getElementById('searchInput').value.trim();
+        const programme = document.getElementById('programmeFilter').value;
+        const year = document.getElementById('yearFilter').value;
+        
+        if (query.length < 2) {
+            alert('Please enter at least 2 characters');
+            return;
+        }
+        
+        const searchResults = document.getElementById('searchResults');
+        searchResults.style.display = 'block';
+        searchResults.innerHTML = '<div class="loading">Searching...</div>';
+        
+        try {
+            const url = `/api/cod/students/search?q=${encodeURIComponent(query)}&programme=${programme}&year=${year}`;
+            const response = await fetch(url, { credentials: 'include' });
+            const data = await response.json();
+            
+            if (data.success && data.students.length > 0) {
+                displaySearchResults(data.students);
+            } else {
+                searchResults.innerHTML = '<div class="student-item">No students found</div>';
+            }
+        } catch (error) {
+            console.error('Error searching:', error);
+            searchResults.innerHTML = '<div class="student-item">Error searching. Please try again.</div>';
+        }
+    }
+
+    function displaySearchResults(students) {
+        const searchResults = document.getElementById('searchResults');
+        searchResults.innerHTML = students.map(student => `
+            <div class="student-item" onclick="selectStudent('${student.reg_no}')">
+                <div class="student-name">${escapeHtml(student.name)}</div>
+                <div class="student-details">${escapeHtml(student.reg_no)} | ${escapeHtml(student.programme)} | Year ${student.current_year || 'N/A'}</div>
+            </div>
+        `).join('');
+    }
+
+    async function selectStudent(regNo) {
+        document.getElementById('searchResults').style.display = 'none';
+        document.getElementById('searchInput').value = regNo;
+        
+        // Fetch student profile
+        try {
+            const response = await fetch(`/api/cod/students/${regNo}/profile`, { credentials: 'include' });
+            const data = await response.json();
+            
+            if (data.success) {
+                currentStudent = data.profile;
+                displayStudentProfile(currentStudent);
+                await fetchStudentSemesters(regNo);
+            }
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            alert('Error loading student profile');
+        }
+    }
+
+    function displayStudentProfile(student) {
+        const profileCard = document.getElementById('profileCard');
+        profileCard.style.display = 'block';
+        profileCard.innerHTML = `
+            <div class="profile-grid">
+                <div class="profile-item">
+                    <div class="profile-label">Student Name</div>
+                    <div class="profile-value">${escapeHtml(student.name)}</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Registration Number</div>
+                    <div class="profile-value">${escapeHtml(student.reg_no)}</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Programme</div>
+                    <div class="profile-value">${escapeHtml(student.programme)}</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Current Year of Study</div>
+                    <div class="profile-value">Year ${student.current_year || 'N/A'}</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Email</div>
+                    <div class="profile-value">${escapeHtml(student.email || 'N/A')}</div>
+                </div>
+                <div class="profile-item">
+                    <div class="profile-label">Phone</div>
+                    <div class="profile-value">${escapeHtml(student.phone || 'N/A')}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    async function fetchStudentSemesters(regNo) {
+        try {
+            const response = await fetch(`/api/cod/students/${regNo}/semesters`, { credentials: 'include' });
+            const data = await response.json();
+            
+            if (data.success && data.semesters) {
+                availableSemesters = data.semesters;
+                displaySemesterTabs(availableSemesters);
+            }
+        } catch (error) {
+            console.error('Error fetching semesters:', error);
+        }
+    }
+
+    function displaySemesterTabs(semesters) {
+        const semesterCard = document.getElementById('semesterCard');
+        const semesterTabs = document.getElementById('semesterTabs');
+        
+        semesterCard.style.display = 'block';
+        
+        if (!semesters || semesters.length === 0) {
+            semesterTabs.innerHTML = '<p>No semesters found</p>';
+            return;
+        }
+        
+        semesterTabs.innerHTML = semesters.map(sem => `
+            <button class="semester-tab" onclick="selectSemester('${sem}')">${escapeHtml(sem)}</button>
+        `).join('');
+    }
+
+    async function selectSemester(semester) {
+        currentSemester = semester;
+        
+        // Highlight active tab
+        document.querySelectorAll('.semester-tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.textContent === semester) {
+                tab.classList.add('active');
+            }
+        });
+        
+        // Fetch results
+        await fetchStudentResults(currentStudent.reg_no, semester);
+    }
+
+    async function fetchStudentResults(regNo, semester) {
+        const resultsCard = document.getElementById('resultsCard');
+        const summaryCard = document.getElementById('summaryCard');
+        const tbody = document.getElementById('resultsTableBody');
+        
+        resultsCard.style.display = 'block';
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Loading results...</td></tr>';
+        
+        try {
+            const response = await fetch(`/api/cod/students/${regNo}/semester/${semester}/results`, { credentials: 'include' });
+            const data = await response.json();
+            
+            if (data.success) {
+                displayResults(data.results);
+                displaySummary(data.summary);
+            } else {
+                tbody.innerHTML = `<tr class="empty-row"><td colspan="9">${data.error || 'No results found'}</td></tr>`;
+                summaryCard.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error fetching results:', error);
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">Error loading results</td></tr>';
+        }
+    }
+
+    function displayResults(results) {
+        const tbody = document.getElementById('resultsTableBody');
+        
+        if (!results || results.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No results available for this semester</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = results.map(unit => {
+            let statusClass = 'status-na';
+            if (unit.status === 'PASS') statusClass = 'status-pass';
+            else if (unit.status === 'FAIL') statusClass = 'status-fail';
+            else if (unit.status === 'SUPPLEMENTARY') statusClass = 'status-supp';
+            
+            return `
+                <tr>
+                    <td><strong>${escapeHtml(unit.unit_code)}</strong></td>
+                    <td>${escapeHtml(unit.unit_name)}</td>
+                    <td>${unit.credits || 3}</td>
+                    <td>${unit.cat_mark !== null ? unit.cat_mark : '-'}</td>
+                    <td>${unit.exam_mark !== null ? unit.exam_mark : '-'}</td>
+                    <td class="total-cell">${unit.total !== null ? unit.total.toFixed(1) : '-'}</td>
+                    <td><strong>${unit.grade || '-'}</strong></td>
+                    <td class="${statusClass}">${unit.status}</td>
+                    <td>${escapeHtml(unit.lecturer || '-')}</td>
+                </table>
+            `;
+        }).join('');
+    }
+
+    function displaySummary(summary) {
+        const summaryCard = document.getElementById('summaryCard');
+        summaryCard.style.display = 'block';
+        
+        summaryCard.innerHTML = `
+            <h3 style="margin-bottom: 1rem;">📈 Semester Performance Summary</h3>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-value">${summary.gpa}</div>
+                    <div class="summary-label">Semester GPA</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${summary.total_credits}</div>
+                    <div class="summary-label">Total Credits</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${summary.passed_units}/${summary.total_units}</div>
+                    <div class="summary-label">Units Passed</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${summary.classification}</div>
+                    <div class="summary-label">Classification</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${summary.progression_status}</div>
+                    <div class="summary-label">Progression Status</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${summary.failed_units || 0}</div>
+                    <div class="summary-label">Units Failed</div>
+                </div>
+            </div>
+        `;
+    }
+
+    async function exportResults(format) {
+        if (!currentStudent || !currentSemester) {
+            alert('Please select a student and semester first');
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/cod/students/${currentStudent.reg_no}/semester/${currentSemester}/export`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ format: format })
+            });
+            
+            if (format === 'csv') {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `student_${currentStudent.reg_no}_${currentSemester}_results.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } else {
+                const data = await response.json();
+                alert(data.message || 'PDF export coming soon!');
+            }
+        } catch (error) {
+            console.error('Error exporting:', error);
+            alert('Error exporting results');
+        }
+    }
+
+    async function logout() {
+        try {
+            await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+            localStorage.clear();
+            window.location.href = 'login.html';
+        } catch (error) {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Enter key search
+    document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchStudents();
+        }
+    });
+
+    async function init() {
+        const userValid = await getCurrentUser();
+        if (!userValid) return;
+    }
+    
+    init();
+</script>
+</body>
+</html>

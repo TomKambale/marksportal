@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>COD Dashboard | Student Marks</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        :root {
+            --primary-green: #006400;
+            --secondary-green: #228B22;
+            --light-green: #f0f9f0;
+            --dark-green: #004d00;
+            --accent-gold: #D4AF37;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --success: #28a745;
+            --info: #0dcaf0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logout-btn, .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            color: var(--danger);
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            color: var(--primary-green);
+        }
+
+        .back-btn:hover {
+            background: var(--light-green);
+            transform: translateX(-4px);
+        }
+
+        .demo-badge {
+            background: var(--accent-gold);
+            color: var(--dark-green);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .breadcrumb {
+            background: var(--white);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-green);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .unit-info {
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            border-radius: 20px;
+            padding: 1.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .unit-info h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .unit-info p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: var(--dark-green);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .search-box {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            border: none;
+            width: 250px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .students-table th {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .students-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .students-table tr:hover {
+            background: var(--light-green);
+        }
+
+        .status-pass {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .status-fail {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .status-supp {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .marks-status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .marks-status-verified {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .marks-status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 2rem;
+            color: var(--medium-gray);
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .mini-stat {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .students-table th, .students-table td { padding: 0.5rem; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="top-bar">
+        <div class="back-btn" onclick="goToUnits()">← Back to Units</div>
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+
+    <div class="unit-info" id="unitInfo">
+        <h2>Loading unit...</h2>
+        <div class="stats-row" id="unitStats"></div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>👨‍🎓 Registered Students & Marks</h2>
+            <input type="text" id="searchInput" class="search-box" placeholder="Search by name or reg no..." onkeyup="searchStudents()">
+        </div>
+        <div class="table-wrapper">
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th>Student Reg No</th>
+                        <th>Student Name</th>
+                        <th>Registration Date</th>
+                        <th>CAT Marks</th>
+                        <th>Exam Marks</th>
+                        <th>Total Marks</th>
+                        <th>Grade</th>
+                        <th>Status</th>
+                        <th>Marks Status</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                    <tr class="empty-row"><td colspan="9">Loading students...<\/tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // DEMO MODE CONFIGURATION
+    // Set USE_DEMO_DATA = false to switch to live API
+    // ============================================
+    const USE_DEMO_DATA = true;
+
+    // ============================================
+    // DUMMY DATA FOR DEMO - MULTIPLE UNITS
+    // ============================================
+    const unitStudentsDataMap = {
+        "CSC301": {
+            success: true,
+            unit: {
+                unit_code: "CSC301",
+                unit_name: "Software Engineering",
+                semester: "SEM 1 24/25",
+                programme_code: "BSC-CS",
+                stage: "Y3S1"
+            },
+            exam_category: {
+                code: "CAT",
+                category: "DEGREE",
+                max_cat_mark: 30.0,
+                max_exam_mark: 70.0
+            },
+            students: [
+                { student_no: "SE217/2000/1001", student_name: "Alice Wanjiku", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 28.5, exam_mark: 65.0, total: 93.5, grade: "A", status: "PASS" },
+                { student_no: "SE217/2000/1002", student_name: "Brian Otieno", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 26.0, exam_mark: 58.0, total: 84.0, grade: "A", status: "PASS" },
+                { student_no: "SE217/2000/1003", student_name: "Catherine Muthoni", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 24.5, exam_mark: 52.0, total: 76.5, grade: "B", status: "PASS" },
+                { student_no: "SE217/2000/1004", student_name: "David Kipchoge", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 22.0, exam_mark: 48.0, total: 70.0, grade: "B", status: "PASS" },
+                { student_no: "SE217/2000/1005", student_name: "Esther Nyokabi", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 18.5, exam_mark: 40.0, total: 58.5, grade: "C", status: "PASS" },
+                { student_no: "SE217/2000/1006", student_name: "Francis Maina", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 15.0, exam_mark: 32.0, total: 47.0, grade: "D", status: "SUPPLEMENTARY" },
+                { student_no: "SE217/2000/1007", student_name: "Grace Achieng", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 12.0, exam_mark: 25.0, total: 37.0, grade: "E", status: "FAIL" },
+                { student_no: "SE217/2000/1008", student_name: "Henry Kariuki", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 29.0, exam_mark: 68.0, total: 97.0, grade: "A", status: "PASS" },
+                { student_no: "SE217/2000/1009", student_name: "Irene Njeri", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 27.0, exam_mark: 60.0, total: 87.0, grade: "A", status: "PASS" },
+                { student_no: "SE217/2000/1010", student_name: "James Omondi", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 20.0, exam_mark: 42.0, total: 62.0, grade: "C", status: "PASS" }
+            ],
+            summary: { total_students: 10, average_cat: 22.3, average_exam: 49.0, average_total: 71.3, pass_rate: 80.0, highest_score: 97.0, lowest_score: 37.0 }
+        },
+        "CSC304": {
+            success: true,
+            unit: {
+                unit_code: "CSC304",
+                unit_name: "Network Security",
+                semester: "SEM 1 24/25",
+                programme_code: "BSC-CS",
+                stage: "Y3S1"
+            },
+            exam_category: {
+                code: "CAT",
+                category: "DEGREE",
+                max_cat_mark: 30.0,
+                max_exam_mark: 70.0
+            },
+            students: [
+                { student_no: "SE217/2000/1001", student_name: "Alice Wanjiku", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 22.0, exam_mark: 48.0, total: 70.0, grade: "B", status: "PASS" },
+                { student_no: "SE217/2000/1002", student_name: "Brian Otieno", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 18.0, exam_mark: 42.0, total: 60.0, grade: "C", status: "PASS" },
+                { student_no: "SE217/2000/1003", student_name: "Catherine Muthoni", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 15.0, exam_mark: 35.0, total: 50.0, grade: "C", status: "PASS" },
+                { student_no: "SE217/2000/1006", student_name: "Francis Maina", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 20.0, exam_mark: 25.0, total: 45.0, grade: "D", status: "SUPPLEMENTARY" },
+                { student_no: "SE217/2000/1007", student_name: "Grace Achieng", registration_date: "2022-09-01T00:00:00.000Z", cat_mark: 12.0, exam_mark: 18.0, total: 30.0, grade: "E", status: "FAIL" }
+            ],
+            summary: { total_students: 5, average_cat: 17.4, average_exam: 33.6, average_total: 51.0, pass_rate: 60.0, highest_score: 70.0, lowest_score: 30.0 }
+        }
+    };
+
+    let allStudents = [];
+    let currentUnit = null;
+    let examCategory = null;
+    let currentUser = null;
+
+    function goToDashboard() {
+        window.location.href = 'cod-dashboard.html';
+    }
+
+    function goToStages() {
+        window.location.href = 'cod-stages.html';
+    }
+
+    function goToUnits() {
+        window.location.href = 'cod-units.html';
+    }
+
+    // ============================================
+    // MOCK API FUNCTION (returns dummy data)
+    // ============================================
+    async function mockFetch(unitCode, params) {
+        console.log(`[DEMO MODE] Mock API call to: /api/cod/units/${unitCode}/students`);
+        
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const data = unitStudentsDataMap[unitCode];
+        if (data) {
+            return {
+                ok: true,
+                json: async () => data
+            };
+        }
+        
+        // Return default data if unit not found
+        return {
+            ok: true,
+            json: async () => unitStudentsDataMap["CSC301"]
+        };
+    }
+
+    // ============================================
+    // REAL API FUNCTION (calls actual backend)
+    // ============================================
+    async function realFetch(unitCode, params) {
+        const url = `/api/cod/units/${unitCode}/students?${params}`;
+        const response = await fetch(url, { credentials: 'include' });
+        return response;
+    }
+
+    // ============================================
+    // SMART FETCH - switches between mock and real
+    // ============================================
+    async function smartFetch(unitCode, params) {
+        if (USE_DEMO_DATA) {
+            return await mockFetch(unitCode, params);
+        } else {
+            return await realFetch(unitCode, params);
+        }
+    }
+
+    async function getCurrentUser() {
+        if (USE_DEMO_DATA) {
+            currentUser = {
+                id: 1,
+                email: "cod@ttu.ac.ke",
+                pf_no: "COD001",
+                full_name: "Prof. John Otieno",
+                role: "cod"
+            };
+            console.log('[DEMO MODE] User loaded:', currentUser);
+            return true;
+        }
+        
+        try {
+            const response = await fetch('/api/current-user', { credentials: 'include' });
+            const data = await response.json();
+            if (data.success && data.user) {
+                currentUser = data.user;
+                if (currentUser.role !== 'cod' && currentUser.role !== 'admin') {
+                    alert('Access denied. COD privileges required.');
+                    window.location.href = 'semesters.html';
+                    return false;
+                }
+                return true;
+            }
+            window.location.href = 'login.html';
+            return false;
+        } catch (error) {
+            console.error('Error:', error);
+            window.location.href = 'login.html';
+            return false;
+        }
+    }
+
+    function calculateGrade(total) {
+        if (total >= 70) return 'A';
+        if (total >= 60) return 'B';
+        if (total >= 50) return 'C';
+        if (total >= 40) return 'D';
+        return 'E';
+    }
+
+    function getStatusClass(total) {
+        if (total >= 50) return 'status-pass';
+        if (total >= 40) return 'status-supp';
+        return 'status-fail';
+    }
+
+    function getStatusText(total) {
+        if (total >= 50) return 'PASS';
+        if (total >= 40) return 'SUPPLEMENTARY';
+        return 'FAIL';
+    }
+
+    async function fetchStudents() {
+        const savedUnit = localStorage.getItem('selectedUnit');
+        if (!savedUnit) {
+            window.location.href = 'cod-units.html';
+            return;
+        }
+        
+        currentUnit = JSON.parse(savedUnit);
+        
+        document.getElementById('unitInfo').innerHTML = `
+            <h2>📖 ${escapeHtml(currentUnit.unit_code)} - ${escapeHtml(currentUnit.unit_name || 'Unit')}</h2>
+            <p>Programme: ${escapeHtml(currentUnit.programme_code)} | Stage: ${escapeHtml(currentUnit.stage)} | Semester: ${escapeHtml(currentUnit.semester || 'Current')}</p>
+            <div class="stats-row" id="unitStats"></div>
+        `;
+        
+        try {
+            const params = new URLSearchParams({
+                semester: currentUnit.semester || '',
+                programme_code: currentUnit.programme_code,
+                stage: currentUnit.stage
+            }).toString();
+            
+            const response = await smartFetch(currentUnit.unit_code, params);
+            const data = await response.json();
+            
+            if (data.success && data.students) {
+                allStudents = data.students;
+                examCategory = data.exam_category;
+                renderStudents(allStudents);
+                updateUnitStats();
+            } else {
+                throw new Error(data.error || 'No students found');
+            }
+        } catch (error) {
+            console.error('Error fetching students:', error);
+            document.getElementById('studentsTableBody').innerHTML = 
+                '<tr class="empty-row"><td colspan="9">Error loading students. Please try again.<\/tr>';
+        }
+    }
+
+    function updateUnitStats() {
+        const totalStudents = allStudents.length;
+        const totalCat = allStudents.reduce((sum, s) => sum + (s.cat_mark || 0), 0);
+        const totalExam = allStudents.reduce((sum, s) => sum + (s.exam_mark || 0), 0);
+        const avgCat = totalStudents > 0 ? (totalCat / totalStudents).toFixed(1) : 0;
+        const avgExam = totalStudents > 0 ? (totalExam / totalStudents).toFixed(1) : 0;
+        const passCount = allStudents.filter(s => (s.cat_mark + s.exam_mark) >= 50).length;
+        const passRate = totalStudents > 0 ? ((passCount / totalStudents) * 100).toFixed(1) : 0;
+        
+        const statsHtml = `
+            <div class="mini-stat">📊 Total Students: ${totalStudents}</div>
+            <div class="mini-stat">📈 Avg CAT: ${avgCat} / ${examCategory?.max_cat_mark || 30}</div>
+            <div class="mini-stat">📉 Avg Exam: ${avgExam} / ${examCategory?.max_exam_mark || 70}</div>
+            <div class="mini-stat">✅ Pass Rate: ${passRate}%</div>
+        `;
+        document.getElementById('unitStats').innerHTML = statsHtml;
+    }
+
+    function searchStudents() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = allStudents.filter(s => 
+            (s.student_no || '').toLowerCase().includes(searchTerm) ||
+            (s.student_name || '').toLowerCase().includes(searchTerm)
+        );
+        renderStudents(filtered);
+    }
+
+    function renderStudents(students) {
+        const tbody = document.getElementById('studentsTableBody');
+        
+        if (!students || students.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="9">No students found<\/tr>';
+            return;
+        }
+        
+        tbody.innerHTML = students.map(student => {
+            const cat = student.cat_mark || 0;
+            const exam = student.exam_mark || 0;
+            const total = cat + exam;
+            const grade = calculateGrade(total);
+            const statusClass = getStatusClass(total);
+            const statusText = getStatusText(total);
+            
+            // Determine if marks are verified (in demo, some units are verified)
+            const isVerified = currentUnit?.unit_code === 'CSC301';
+            const marksStatusBadge = isVerified 
+                ? '<span class="marks-status-badge marks-status-verified">✅ Verified</span>'
+                : '<span class="marks-status-badge marks-status-pending">⏳ Pending Review</span>';
+            
+            return `
+                <tr>
+                    <td><strong>${escapeHtml(student.student_no || '-')}</strong></td>
+                    <td>${escapeHtml(student.student_name || '-')}</td>
+                    <td>${student.registration_date ? new Date(student.registration_date).toLocaleDateString() : '-'}</td>
+                    <td>${cat}</td>
+                    <td>${exam}</td>
+                    <td><strong>${total.toFixed(1)}</strong></td>
+                    <td><strong>${grade}</strong></td>
+                    <td class="${statusClass}">${statusText}</td>
+                    <td>${marksStatusBadge}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    async function logout() {
+        if (USE_DEMO_DATA) {
+            localStorage.clear();
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+            localStorage.clear();
+            window.location.href = 'login.html';
+        } catch (error) {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    async function init() {
+        const userValid = await getCurrentUser();
+        if (!userValid) return;
+        
+        await fetchStudents();
+        
+        if (USE_DEMO_DATA) {
+            console.log('%c🔧 DEMO MODE ACTIVE - Using dummy data for student marks presentation', 'color: #D4AF37; font-size: 14px; font-weight: bold;');
+            console.log('%c📝 To switch to live data, change USE_DEMO_DATA = false in the script', 'color: #006400; font-size: 12px;');
+        }
+    }
+    
+    init();
+</script>
+</body>
+</html>

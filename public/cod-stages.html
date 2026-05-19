@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>COD Dashboard | Stages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        :root {
+            --primary-green: #006400;
+            --secondary-green: #228B22;
+            --light-green: #f0f9f0;
+            --dark-green: #004d00;
+            --accent-gold: #D4AF37;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --success: #28a745;
+            --info: #0dcaf0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logout-btn, .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            color: var(--danger);
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            color: var(--primary-green);
+        }
+
+        .back-btn:hover {
+            background: var(--light-green);
+            transform: translateX(-4px);
+        }
+
+        .demo-badge {
+            background: var(--accent-gold);
+            color: var(--dark-green);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .breadcrumb {
+            background: var(--white);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-green);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .programme-info {
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            border-radius: 20px;
+            padding: 1.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .programme-info h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .programme-info p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid rgba(0, 100, 0, 0.1);
+        }
+
+        .card-header {
+            background: var(--dark-green);
+            color: white;
+            padding: 1rem 1.5rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .stages-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .stages-table th {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .stages-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .stages-table tr:hover {
+            background: var(--light-green);
+            cursor: pointer;
+        }
+
+        .view-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .view-btn:hover {
+            background: var(--dark-green);
+            transform: translateY(-2px);
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 2rem;
+            color: var(--medium-gray);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="top-bar">
+        <div class="back-btn" onclick="goToDashboard()">← Back to Dashboard</div>
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+
+
+    <div class="programme-info" id="programmeInfo">
+        <h2>Loading programme...</h2>
+        <p>Select a stage to view available units</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>📖 Programme Stages</h2>
+        </div>
+        <div class="table-wrapper">
+            <table class="stages-table">
+                <thead>
+                    <tr>
+                        <th>Order</th>
+                        <th>Code</th>
+                        <th>Description</th>
+                        <th>Students Registered</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="stagesTableBody">
+                    <tr class="empty-row"><td colspan="5">Loading stages...<\/tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // DEMO MODE CONFIGURATION
+    // Set USE_DEMO_DATA = false to switch to live API
+    // ============================================
+    const USE_DEMO_DATA = true;
+
+    // ============================================
+    // DUMMY DATA FOR DEMO - MULTIPLE PROGRAMMES
+    // ============================================
+    const stagesDataMap = {
+        "BSC-CS": {
+            success: true,
+            programme: {
+                code: "BSC-CS",
+                name: "Bachelor of Science in Computer Science",
+                duration: 4,
+                total_students: 345
+            },
+            stages: [
+                { code: "Y1S1", description: "Year 1 Semester 1", order: 1, students_registered: 98, units_count: 6 },
+                { code: "Y1S2", description: "Year 1 Semester 2", order: 2, students_registered: 95, units_count: 6 },
+                { code: "Y2S1", description: "Year 2 Semester 1", order: 3, students_registered: 87, units_count: 6 },
+                { code: "Y2S2", description: "Year 2 Semester 2", order: 4, students_registered: 85, units_count: 6 },
+                { code: "Y3S1", description: "Year 3 Semester 1", order: 5, students_registered: 42, units_count: 5 },
+                { code: "Y3S2", description: "Year 3 Semester 2", order: 6, students_registered: 40, units_count: 5 },
+                { code: "Y4S1", description: "Year 4 Semester 1", order: 7, students_registered: 35, units_count: 4 },
+                { code: "Y4S2", description: "Year 4 Semester 2", order: 8, students_registered: 33, units_count: 4 }
+            ]
+        },
+        "BSC-IT": {
+            success: true,
+            programme: {
+                code: "BSC-IT",
+                name: "Bachelor of Science in Information Technology",
+                duration: 4,
+                total_students: 298
+            },
+            stages: [
+                { code: "Y1S1", description: "Year 1 Semester 1", order: 1, students_registered: 82, units_count: 6 },
+                { code: "Y1S2", description: "Year 1 Semester 2", order: 2, students_registered: 80, units_count: 6 },
+                { code: "Y2S1", description: "Year 2 Semester 1", order: 3, students_registered: 75, units_count: 6 },
+                { code: "Y2S2", description: "Year 2 Semester 2", order: 4, students_registered: 72, units_count: 6 },
+                { code: "Y3S1", description: "Year 3 Semester 1", order: 5, students_registered: 38, units_count: 5 },
+                { code: "Y3S2", description: "Year 3 Semester 2", order: 6, students_registered: 36, units_count: 5 },
+                { code: "Y4S1", description: "Year 4 Semester 1", order: 7, students_registered: 32, units_count: 4 },
+                { code: "Y4S2", description: "Year 4 Semester 2", order: 8, students_registered: 30, units_count: 4 }
+            ]
+        },
+        "BED_ARTS": {
+            success: true,
+            programme: {
+                code: "BED_ARTS",
+                name: "Bachelor of Education (Arts)",
+                duration: 4,
+                total_students: 412
+            },
+            stages: [
+                { code: "Y1S1", description: "Year 1 Semester 1", order: 1, students_registered: 112, units_count: 6 },
+                { code: "Y1S2", description: "Year 1 Semester 2", order: 2, students_registered: 110, units_count: 6 },
+                { code: "Y2S1", description: "Year 2 Semester 1", order: 3, students_registered: 105, units_count: 6 },
+                { code: "Y2S2", description: "Year 2 Semester 2", order: 4, students_registered: 102, units_count: 6 },
+                { code: "Y3S1", description: "Year 3 Semester 1", order: 5, students_registered: 48, units_count: 5 },
+                { code: "Y3S2", description: "Year 3 Semester 2", order: 6, students_registered: 45, units_count: 5 },
+                { code: "Y4S1", description: "Year 4 Semester 1", order: 7, students_registered: 40, units_count: 4 },
+                { code: "Y4S2", description: "Year 4 Semester 2", order: 8, students_registered: 38, units_count: 4 }
+            ]
+        },
+        "DIP-CS": {
+            success: true,
+            programme: {
+                code: "DIP-CS",
+                name: "Diploma in Computer Science",
+                duration: 2,
+                total_students: 156
+            },
+            stages: [
+                { code: "Y1S1", description: "Year 1 Semester 1", order: 1, students_registered: 82, units_count: 6 },
+                { code: "Y1S2", description: "Year 1 Semester 2", order: 2, students_registered: 74, units_count: 6 },
+                { code: "Y2S1", description: "Year 2 Semester 1", order: 3, students_registered: 0, units_count: 0 },
+                { code: "Y2S2", description: "Year 2 Semester 2", order: 4, students_registered: 0, units_count: 0 }
+            ]
+        }
+    };
+
+    let currentProgramme = null;
+    let currentUser = null;
+
+    function goToDashboard() {
+        window.location.href = 'cod-dashboard.html';
+    }
+
+    // ============================================
+    // MOCK API FUNCTION (returns dummy data)
+    // ============================================
+    async function mockFetch(programmeCode) {
+        console.log(`[DEMO MODE] Mock API call to: /api/cod/programmes/${programmeCode}/stages`);
+        
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const data = stagesDataMap[programmeCode];
+        if (data) {
+            return {
+                ok: true,
+                json: async () => data
+            };
+        }
+        
+        // Fallback for unknown programme
+        return {
+            ok: false,
+            json: async () => ({ success: false, error: 'Programme not found' })
+        };
+    }
+
+    // ============================================
+    // REAL API FUNCTION (calls actual backend)
+    // ============================================
+    async function realFetch(programmeCode) {
+        const response = await fetch(`/api/cod/programmes/${programmeCode}/stages`, {
+            credentials: 'include'
+        });
+        return response;
+    }
+
+    // ============================================
+    // SMART FETCH - switches between mock and real
+    // ============================================
+    async function smartFetch(programmeCode) {
+        if (USE_DEMO_DATA) {
+            return await mockFetch(programmeCode);
+        } else {
+            return await realFetch(programmeCode);
+        }
+    }
+
+    async function getCurrentUser() {
+        if (USE_DEMO_DATA) {
+            // Mock user for demo
+            currentUser = {
+                id: 1,
+                email: "cod@ttu.ac.ke",
+                pf_no: "COD001",
+                full_name: "Prof. John Otieno",
+                role: "cod"
+            };
+            console.log('[DEMO MODE] User loaded:', currentUser);
+            return true;
+        }
+        
+        try {
+            const response = await fetch('/api/current-user', { credentials: 'include' });
+            const data = await response.json();
+            if (data.success && data.user) {
+                currentUser = data.user;
+                if (currentUser.role !== 'cod' && currentUser.role !== 'admin') {
+                    alert('Access denied. COD privileges required.');
+                    window.location.href = 'semesters.html';
+                    return false;
+                }
+                return true;
+            }
+            window.location.href = 'login.html';
+            return false;
+        } catch (error) {
+            console.error('Error:', error);
+            window.location.href = 'login.html';
+            return false;
+        }
+    }
+
+    async function fetchStages() {
+        const saved = localStorage.getItem('selectedProgramme');
+        if (!saved) {
+            window.location.href = 'cod-dashboard.html';
+            return;
+        }
+        
+        currentProgramme = JSON.parse(saved);
+        
+        document.getElementById('programmeInfo').innerHTML = `
+            <h2>📚 ${escapeHtml(currentProgramme.code)}</h2>
+            <p>Viewing all stages for this programme. Select a stage to see units.</p>
+        `;
+        
+        try {
+            const response = await smartFetch(currentProgramme.code);
+            const data = await response.json();
+            
+            if (data.success && data.stages) {
+                renderStages(data.stages);
+                // Update programme info with additional details if available
+                if (data.programme) {
+                    document.getElementById('programmeInfo').innerHTML = `
+                        <h2>📚 ${escapeHtml(data.programme.name || currentProgramme.code)}</h2>
+                        <p>Code: ${escapeHtml(data.programme.code)} | Duration: ${data.programme.duration} years | Total Students: ${data.programme.total_students}</p>
+                        <p style="margin-top: 0.5rem;">Select a stage to view available units</p>
+                    `;
+                }
+            } else {
+                throw new Error(data.error || 'No stages found');
+            }
+        } catch (error) {
+            console.error('Error fetching stages:', error);
+            document.getElementById('stagesTableBody').innerHTML = 
+                '<tr class="empty-row"><td colspan="5">Error loading stages. Please try again.<\/tr>';
+        }
+    }
+
+    function renderStages(stages) {
+        const tbody = document.getElementById('stagesTableBody');
+        
+        // Filter out stages with 0 students (for diploma programmes)
+        const visibleStages = stages.filter(stage => stage.students_registered > 0);
+        
+        if (!visibleStages || visibleStages.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No active stages found for this programme<\/tr>';
+            return;
+        }
+        
+        tbody.innerHTML = visibleStages.map((stage, index) => `
+            <tr onclick="viewUnits('${stage.code}')">
+                <td>${stage.order || index + 1}</td>
+                <td><strong>${escapeHtml(stage.code)}</strong></td>
+                <td>${escapeHtml(stage.description)}</td>
+                <td>${stage.students_registered || 0}</td>
+                <td><button class="view-btn">View Units →</button></td>
+            </tr>
+        `).join('');
+    }
+
+    function viewUnits(stageCode) {
+        localStorage.setItem('selectedStage', JSON.stringify({ 
+            code: stageCode, 
+            programme_code: currentProgramme.code 
+        }));
+        window.location.href = 'cod-units.html';
+    }
+
+    async function logout() {
+        if (USE_DEMO_DATA) {
+            localStorage.clear();
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+            localStorage.clear();
+            window.location.href = 'login.html';
+        } catch (error) {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Initialize the page
+    async function init() {
+        const userValid = await getCurrentUser();
+        if (!userValid) return;
+        
+        await fetchStages();
+        
+        // Show demo mode indicator in console
+        if (USE_DEMO_DATA) {
+            console.log('%c🔧 DEMO MODE ACTIVE - Using dummy data for stages presentation', 'color: #D4AF37; font-size: 14px; font-weight: bold;');
+            console.log('%c📝 To switch to live data, change USE_DEMO_DATA = false in the script', 'color: #006400; font-size: 12px;');
+        }
+    }
+    
+    init();
+</script>
+</body>
+</html>

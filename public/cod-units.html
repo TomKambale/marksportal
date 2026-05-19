@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>COD Dashboard | Units</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        :root {
+            --primary-green: #006400;
+            --secondary-green: #228B22;
+            --light-green: #f0f9f0;
+            --dark-green: #004d00;
+            --accent-gold: #D4AF37;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --success: #28a745;
+            --info: #0dcaf0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logout-btn, .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            color: var(--danger);
+        }
+
+        .logout-btn:hover {
+            background: var(--danger);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            color: var(--primary-green);
+        }
+
+        .back-btn:hover {
+            background: var(--light-green);
+            transform: translateX(-4px);
+        }
+
+        .demo-badge {
+            background: var(--accent-gold);
+            color: var(--dark-green);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .breadcrumb {
+            background: var(--white);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-green);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .stage-info {
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+            border-radius: 20px;
+            padding: 1.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .stage-info h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .stage-info p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: var(--dark-green);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-select {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            border: none;
+            font-size: 0.8rem;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .units-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .units-table th {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--light-green);
+        }
+
+        .units-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+            color: var(--dark-gray);
+        }
+
+        .units-table tr:hover {
+            background: var(--light-green);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .status-verified {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-resubmit {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .view-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .view-btn:hover {
+            background: var(--dark-green);
+            transform: translateY(-2px);
+        }
+
+        .verify-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 0.3rem;
+        }
+
+        .resubmit-btn {
+            background: var(--warning);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--medium-gray);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .submit-btn {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 2rem;
+            color: var(--medium-gray);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="top-bar">
+        <div class="back-btn" onclick="goToStages()">← Back to Stages</div>
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+
+    <div class="stage-info" id="stageInfo">
+        <h2>Loading stage...</h2>
+        <p>Select a unit to view student marks</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>📋 Units & Lecturer Assignment</h2>
+            <div class="filter-group">
+                <select id="statusFilter" class="filter-select" onchange="filterUnits()">
+                    <option value="all">All Status</option>
+                    <option value="verified">Verified</option>
+                    <option value="pending">Pending</option>
+                    <option value="resubmit_requested">Resubmit Requested</option>
+                </select>
+            </div>
+        </div>
+        <div class="table-wrapper">
+            <table class="units-table">
+                <thead>
+                    <tr>
+                        <th>Unit Code</th>
+                        <th>Description</th>
+                        <th>Exam Category</th>
+                        <th>Programme Code</th>
+                        <th>Lecturer</th>
+                        <th>Marks Status</th>
+                        <th>Upload Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="unitsTableBody">
+                    <tr class="empty-row"><td colspan="8">Loading units...<\/tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Comments -->
+<div id="commentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Action Required</h3>
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="form-group">
+            <label>Comments (optional)</label>
+            <textarea id="comments" rows="4" placeholder="Add any remarks..."></textarea>
+        </div>
+        <button class="submit-btn" id="modalActionBtn" onclick="executeAction()">Submit</button>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // DEMO MODE CONFIGURATION
+    // Set USE_DEMO_DATA = false to switch to live API
+    // ============================================
+    const USE_DEMO_DATA = true;
+
+    // ============================================
+    // DUMMY DATA FOR DEMO - UNITS BY STAGE
+    // ============================================
+    const unitsDataMap = {
+        "Y1S1": {
+            success: true,
+            stage: { code: "Y1S1", description: "Year 1 Semester 1", programme_code: "BSC-CS" },
+            units: [
+                { unit_code: "CSC101", description: "Introduction to Programming", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Dr. John Otieno ", credits: 3, marks_status: "verified", upload_date: "2024-03-20T10:30:00.000Z", students_count: 98, average_score: 72.5 },
+                { unit_code: "CSC102", description: "Discrete Mathematics", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Prof. Jane Mwangi ", credits: 3, marks_status: "verified", upload_date: "2024-03-19T14:20:00.000Z", students_count: 98, average_score: 68.2 },
+                { unit_code: "CSC103", description: "Computer Organization", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Dr. Peter Kariuki ", credits: 3, marks_status: "pending", upload_date: null, students_count: 98, average_score: null }
+            ]
+        },
+        "Y2S1": {
+            success: true,
+            stage: { code: "Y2S1", description: "Year 2 Semester 1", programme_code: "BSC-CS" },
+            units: [
+                { unit_code: "CSC201", description: "Data Structures & Algorithms", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Dr. John Otieno ", credits: 3, marks_status: "verified", upload_date: "2024-03-18T10:30:00.000Z", students_count: 87, average_score: 74.2 },
+                { unit_code: "CSC202", description: "Database Systems", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Prof. Jane Mwangi ", credits: 3, marks_status: "verified", upload_date: "2024-03-17T14:20:00.000Z", students_count: 87, average_score: 71.5 },
+                { unit_code: "CSC203", description: "Operating Systems", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Dr. Peter Kariuki ", credits: 3, marks_status: "resubmit_requested", upload_date: "2024-03-15T09:15:00.000Z", students_count: 87, average_score: 48.3 }
+            ]
+        },
+        "Y3S1": {
+            success: true,
+            stage: { code: "Y3S1", description: "Year 3 Semester 1", programme_code: "BSC-CS" },
+            units: [
+                { unit_code: "CSC301", description: "Software Engineering", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Dr. John Otieno ", credits: 3, marks_status: "verified", upload_date: "2024-03-15T10:30:00.000Z", students_count: 42, average_score: 76.5 },
+                { unit_code: "CSC302", description: "Mobile Application Development", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Prof. Jane Mwangi ", credits: 3, marks_status: "verified", upload_date: "2024-03-14T14:20:00.000Z", students_count: 42, average_score: 68.2 },
+                { unit_code: "CSC303", description: "Research Methodology", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Dr. Peter Kariuki ", credits: 3, marks_status: "pending", upload_date: null, students_count: 42, average_score: null },
+                { unit_code: "CSC304", description: "Network Security", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Mr. James Otieno ", credits: 3, marks_status: "resubmit_requested", upload_date: "2024-03-10T09:15:00.000Z", students_count: 42, average_score: 45.8 },
+                { unit_code: "CSC305", description: "Cloud Computing", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Dr. Sarah Wanjiku ", credits: 3, marks_status: "verified", upload_date: "2024-03-16T11:45:00.000Z", students_count: 42, average_score: 71.3 }
+            ]
+        },
+        "Y4S1": {
+            success: true,
+            stage: { code: "Y4S1", description: "Year 4 Semester 1", programme_code: "BSC-CS" },
+            units: [
+                { unit_code: "CSC401", description: "Project Management", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Dr. John Otieno ", credits: 4, marks_status: "verified", upload_date: "2024-03-20T10:30:00.000Z", students_count: 35, average_score: 78.2 },
+                { unit_code: "CSC402", description: "Artificial Intelligence", exam_category: "DEGREE", programme_code: "BSC-CS", lecturer: "Prof. Jane Mwangi ", credits: 4, marks_status: "pending", upload_date: null, students_count: 35, average_score: null }
+            ]
+        }
+    };
+
+    let allUnits = [];
+    let currentStage = null;
+    let pendingAction = null;
+    let selectedUnit = null;
+    let currentUser = null;
+
+    function goToDashboard() {
+        window.location.href = 'cod-dashboard.html';
+    }
+
+    function goToStages() {
+        window.location.href = 'cod-stages.html';
+    }
+
+    // ============================================
+    // MOCK API FUNCTION (returns dummy data)
+    // ============================================
+    async function mockFetch(stageCode) {
+        console.log(`[DEMO MODE] Mock API call to: /api/cod/stages/${stageCode}/units`);
+        
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const data = unitsDataMap[stageCode];
+        if (data) {
+            return {
+                ok: true,
+                json: async () => data
+            };
+        }
+        
+        // Return default data if stage not found
+        return {
+            ok: true,
+            json: async () => unitsDataMap["Y3S1"]
+        };
+    }
+
+    // ============================================
+    // REAL API FUNCTION (calls actual backend)
+    // ============================================
+    async function realFetch(stageCode) {
+        const response = await fetch(`/api/cod/stages/${stageCode}/units`, {
+            credentials: 'include'
+        });
+        return response;
+    }
+
+    // ============================================
+    // SMART FETCH - switches between mock and real
+    // ============================================
+    async function smartFetch(stageCode) {
+        if (USE_DEMO_DATA) {
+            return await mockFetch(stageCode);
+        } else {
+            return await realFetch(stageCode);
+        }
+    }
+
+    async function getCurrentUser() {
+        if (USE_DEMO_DATA) {
+            currentUser = {
+                id: 1,
+                email: "cod@ttu.ac.ke",
+                pf_no: "COD001",
+                full_name: "Prof. John Otieno",
+                role: "cod"
+            };
+            console.log('[DEMO MODE] User loaded:', currentUser);
+            return true;
+        }
+        
+        try {
+            const response = await fetch('/api/current-user', { credentials: 'include' });
+            const data = await response.json();
+            if (data.success && data.user) {
+                currentUser = data.user;
+                if (currentUser.role !== 'cod' && currentUser.role !== 'admin') {
+                    alert('Access denied. COD privileges required.');
+                    window.location.href = 'semesters.html';
+                    return false;
+                }
+                return true;
+            }
+            window.location.href = 'login.html';
+            return false;
+        } catch (error) {
+            console.error('Error:', error);
+            window.location.href = 'login.html';
+            return false;
+        }
+    }
+
+    async function fetchUnits() {
+        const savedStage = localStorage.getItem('selectedStage');
+        if (!savedStage) {
+            window.location.href = 'cod-stages.html';
+            return;
+        }
+        
+        currentStage = JSON.parse(savedStage);
+        
+        document.getElementById('stageInfo').innerHTML = `
+            <h2>📖 ${escapeHtml(currentStage.code)}</h2>
+            <p>Programme: ${escapeHtml(currentStage.programme_code)} | Viewing all units for this stage</p>
+        `;
+        
+        try {
+            const response = await smartFetch(currentStage.code);
+            const data = await response.json();
+            
+            if (data.success && data.units) {
+                allUnits = data.units;
+                // Update stage info with additional details if available
+                if (data.stage) {
+                    document.getElementById('stageInfo').innerHTML = `
+                        <h2>📖 ${escapeHtml(data.stage.description || currentStage.code)}</h2>
+                        <p>Programme: ${escapeHtml(data.stage.programme_code || currentStage.programme_code)} | Total Units: ${data.units.length}</p>
+                        <p style="margin-top: 0.5rem;">Select a unit to view student marks and perform verification</p>
+                    `;
+                }
+                filterUnits();
+            } else {
+                throw new Error(data.error || 'No units found');
+            }
+        } catch (error) {
+            console.error('Error fetching units:', error);
+            document.getElementById('unitsTableBody').innerHTML = 
+                '<tr class="empty-row"><td colspan="8">Error loading units. Please try again.<\/tr>';
+        }
+    }
+
+    function filterUnits() {
+        const filter = document.getElementById('statusFilter').value;
+        let filtered = allUnits;
+        
+        if (filter !== 'all') {
+            filtered = allUnits.filter(u => u.marks_status === filter);
+        }
+        
+        renderUnits(filtered);
+    }
+
+    function getStatusBadge(status) {
+        const statusMap = {
+            'verified': { class: 'status-verified', text: '✅ Verified' },
+            'pending': { class: 'status-pending', text: '⏳ Pending' },
+            'resubmit_requested': { class: 'status-resubmit', text: '🔄 Resubmit Requested' },
+            'partial': { class: 'status-pending', text: '⚠️ Partial' }
+        };
+        const info = statusMap[status] || statusMap.pending;
+        return `<span class="status-badge ${info.class}">${info.text}</span>`;
+    }
+
+    function renderUnits(units) {
+        const tbody = document.getElementById('unitsTableBody');
+        
+        if (!units || units.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No units found for this stage<\/tr>';
+            return;
+        }
+        
+        tbody.innerHTML = units.map(unit => `
+            <tr>
+                <td><strong>${escapeHtml(unit.unit_code)}</strong></td>
+                <td>${escapeHtml(unit.description)}</td>
+                <td>${escapeHtml(unit.exam_category || '-')}</td>
+                <td>${escapeHtml(unit.programme_code)}</td>
+                <td>${escapeHtml(unit.lecturer || 'Not Assigned')}</td>
+                <td>${getStatusBadge(unit.marks_status)}</td>
+                <td>${unit.upload_date ? new Date(unit.upload_date).toLocaleDateString() : '-'}</td>
+                <td>
+                    ${unit.marks_status !== 'verified' ? 
+                        `<button class="verify-btn" onclick="openVerifyModal('${unit.unit_code}')">Verify</button>` : ''}
+                    <button class="view-btn" onclick="viewStudents('${unit.unit_code}')">View Students →</button>
+                    ${unit.marks_status !== 'verified' ? 
+                        `<button class="resubmit-btn" onclick="openResubmitModal('${unit.unit_code}')">Request Resubmit</button>` : ''}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function viewStudents(unitCode) {
+        const selectedUnit = allUnits.find(u => u.unit_code === unitCode);
+        localStorage.setItem('selectedUnit', JSON.stringify({
+            unit_code: unitCode,
+            unit_name: selectedUnit?.description,
+            semester: "SEM 1 24/25",
+            programme_code: currentStage?.programme_code,
+            stage: currentStage?.code
+        }));
+        window.location.href = 'cod-students.html';
+    }
+
+    function openVerifyModal(unitCode) {
+        pendingAction = 'verify';
+        selectedUnit = unitCode;
+        document.getElementById('modalTitle').innerText = 'Verify Unit Marks';
+        document.getElementById('commentModal').style.display = 'block';
+    }
+
+    function openResubmitModal(unitCode) {
+        pendingAction = 'resubmit';
+        selectedUnit = unitCode;
+        document.getElementById('modalTitle').innerText = 'Request Resubmission';
+        document.getElementById('commentModal').style.display = 'block';
+    }
+
+    async function executeAction() {
+        const comments = document.getElementById('comments').value;
+        
+        if (USE_DEMO_DATA) {
+            // Mock action for demo
+            console.log(`[DEMO MODE] ${pendingAction} action on ${selectedUnit} with comments: ${comments}`);
+            
+            // Update the unit status locally
+            const unitIndex = allUnits.findIndex(u => u.unit_code === selectedUnit);
+            if (unitIndex !== -1) {
+                if (pendingAction === 'verify') {
+                    allUnits[unitIndex].marks_status = 'verified';
+                    allUnits[unitIndex].upload_date = new Date().toISOString();
+                } else if (pendingAction === 'resubmit') {
+                    allUnits[unitIndex].marks_status = 'resubmit_requested';
+                }
+                renderUnits(filterUnits());
+            }
+            
+            alert(pendingAction === 'verify' ? '✅ Marks verified successfully!' : '📧 Resubmission requested');
+            closeModal();
+            return;
+        }
+        
+        // Real API call
+        const url = pendingAction === 'verify' 
+            ? `/api/cod/units/${selectedUnit}/verify`
+            : `/api/cod/units/${selectedUnit}/resubmit`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ comments })
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(pendingAction === 'verify' ? '✅ Marks verified successfully!' : '📧 Resubmission requested');
+                closeModal();
+                fetchUnits();
+            } else {
+                throw new Error(data.error);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error: ' + error.message);
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('commentModal').style.display = 'none';
+        document.getElementById('comments').value = '';
+        pendingAction = null;
+        selectedUnit = null;
+    }
+
+    async function logout() {
+        if (USE_DEMO_DATA) {
+            localStorage.clear();
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        try {
+            await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+            localStorage.clear();
+            window.location.href = 'login.html';
+        } catch (error) {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    async function init() {
+        const userValid = await getCurrentUser();
+        if (!userValid) return;
+        
+        await fetchUnits();
+        
+        if (USE_DEMO_DATA) {
+            console.log('%c🔧 DEMO MODE ACTIVE - Using dummy data for units presentation', 'color: #D4AF37; font-size: 14px; font-weight: bold;');
+            console.log('%c📝 To switch to live data, change USE_DEMO_DATA = false in the script', 'color: #006400; font-size: 12px;');
+        }
+    }
+    
+    init();
+</script>
+</body>
+</html>

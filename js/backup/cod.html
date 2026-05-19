@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Chair of Department | TTU Marks Portal</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo.jpg">
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #006400;
+            --secondary-green: #228B22;
+            --light-green: #f0f9f0;
+            --dark-green: #004d00;
+            --accent-gold: #D4AF37;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --medium-gray: #6c757d;
+            --dark-gray: #343a40;
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --success: #28a745;
+            --info: #17a2b8;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef5e8 0%, #d9e8d4 100%);
+            min-height: 100vh;
+            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 280px;
+            background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+            color: white;
+            transition: var(--transition);
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        .sidebar-nav {
+            padding: 1.5rem 0;
+        }
+
+        .nav-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: var(--transition);
+            color: rgba(255,255,255,0.9);
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            padding-left: 2rem;
+        }
+
+        .nav-item.active {
+            background: var(--accent-gold);
+            color: var(--dark-green);
+            border-left: 4px solid var(--white);
+        }
+
+        .nav-item i {
+            width: 24px;
+            font-size: 1.2rem;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 1.5rem;
+        }
+
+        .top-bar {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark-green);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--light-green);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon i {
+            font-size: 1.5rem;
+            color: var(--primary-green);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-green);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--medium-gray);
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--light-green);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-green);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem;
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .data-table th:hover {
+            background: #e0e0e0;
+        }
+
+        .data-table th i {
+            margin-left: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        .data-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--light-gray);
+            font-size: 0.85rem;
+        }
+
+        .data-table tr:hover {
+            background: var(--light-green);
+        }
+
+        .clickable-row {
+            cursor: pointer;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3e0;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .badge-primary {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .search-box {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 250px;
+            font-size: 0.85rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-edit {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-add {
+            background: var(--success);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .student-count {
+            cursor: pointer;
+            color: var(--primary-green);
+            font-weight: bold;
+            text-decoration: underline;
+        }
+
+        .student-count:hover {
+            color: var(--accent-gold);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--white);
+            margin: 5% auto;
+            width: 90%;
+            max-width: 900px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            animation: slideDown 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            position: sticky;
+            bottom: 0;
+            background: white;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--medium-gray);
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-green);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 1001;
+                background: var(--primary-green);
+                color: white;
+                border: none;
+                padding: 0.5rem;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="/logo.jpg" alt="TTU Logo" onerror="this.src='https://via.placeholder.com/60'">
+            <h3>Chair of Department</h3>
+            <p>Faculty of Computing & Informatics</p>
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-item active" data-page="dashboard"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></div>
+            <div class="nav-item" data-page="programmes"><i class="fas fa-graduation-cap"></i><span>Programmes</span></div>
+            <div class="nav-item" data-page="lecturers"><i class="fas fa-chalkboard-user"></i><span>Lecturers</span></div>
+            <div class="nav-item" data-page="submissions"><i class="fas fa-cloud-upload-alt"></i><span>Marks Submissions</span></div>
+        </div>
+    </div>
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn" style="display: none;"><i class="fas fa-bars"></i></button>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <h1 class="page-title" id="pageTitle">Dashboard Overview</h1>
+            <div class="user-info">
+                <span><i class="fas fa-user"></i> Dr. Alfred Mwangi</span>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboardPage">
+            <div class="stats-grid">
+                <div class="stat-card" onclick="switchPage('programmes')"><div class="stat-icon"><i class="fas fa-graduation-cap"></i></div><div class="stat-value" id="totalProgrammes">0</div><div class="stat-label">Academic Programmes</div></div>
+                <div class="stat-card" onclick="switchPage('lecturers')"><div class="stat-icon"><i class="fas fa-chalkboard-user"></i></div><div class="stat-value" id="totalLecturers">0</div><div class="stat-label">Active Lecturers</div></div>
+                <div class="stat-card" onclick="switchPage('submissions')"><div class="stat-icon"><i class="fas fa-book-open"></i></div><div class="stat-value" id="totalUnits">0</div><div class="stat-label">Units Offered</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value" id="totalStudents">0</div><div class="stat-label">Total Students</div></div>
+            </div>
+        </div>
+
+        <!-- Programmes Page -->
+        <div id="programmesPage" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-graduation-cap"></i> Department Programmes</div>
+                    <div class="filter-group">
+                        <input type="text" id="programmeSearch" class="search-box" placeholder="Search programmes...">
+                        <button class="btn-add" onclick="openProgrammeModal()"><i class="fas fa-plus"></i> Add Programme</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="programmesTable">
+                        <thead><tr><th onclick="sortProgrammes('code')">Code <i class="fas fa-sort"></i></th><th onclick="sortProgrammes('description')">Description <i class="fas fa-sort"></i></th><th onclick="sortProgrammes('category')">Category <i class="fas fa-sort"></i></th><th onclick="sortProgrammes('students')">Students Registered <i class="fas fa-sort"></i></th><th>Actions</th></tr></thead>
+                        <tbody id="programmesTableBody"><tr><td colspan="5" style="text-align: center;">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lecturers Page -->
+        <div id="lecturersPage" style="display: none;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-chalkboard-user"></i> Department Lecturers</div>
+                    <input type="text" id="lecturerSearch" class="search-box" placeholder="Search lecturers...">
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th>PF Number</th><th>Name</th><th>Email</th><th>Assigned Units</th><th>Submission Progress</th><th>Action</th></tr></thead>
+                        <tbody id="lecturersTableBody"><tr><td colspan="6" style="text-align: center;">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submissions Page -->
+        <div id="submissionsPage" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-value" id="submittedUnits">0</div><div class="stat-label">Units Submitted</div></div>
+                <div class="stat-card"><div class="stat-value" id="pendingUnits">0</div><div class="stat-label">Pending Submission</div></div>
+                <div class="stat-card"><div class="stat-value" id="overdueUnits">0</div><div class="stat-label">Overdue</div></div>
+                <div class="stat-card"><div class="stat-value" id="submissionRate">0%</div><div class="stat-label">Completion Rate</div></div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-cloud-upload-alt"></i> Unit-wise Marks Submission Status</div>
+                    <div class="filter-group">
+                        <select id="filterProgramme" class="search-box"><option value="">All Programmes</option></select>
+                        <select id="filterStage" class="search-box"><option value="">All Stages</option></select>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th>Unit Code</th><th>Unit Name</th><th>Programme</th><th>Stage</th><th>Lecturer</th><th>Status</th><th>Progress</th></tr></thead>
+                        <tbody id="submissionsTableBody"><tr><td colspan="7" style="text-align: center;">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Programme Modal -->
+    <div id="programmeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="programmeModalTitle">Add Programme</h3><span class="close-modal" onclick="closeProgrammeModal()">&times;</span></div>
+            <div class="modal-body">
+                <form id="programmeForm">
+                    <input type="hidden" id="programmeId">
+                    <div class="form-group"><label>Programme Code</label><input type="text" id="progCode" required placeholder="e.g., BSCS"></div>
+                    <div class="form-group"><label>Description</label><input type="text" id="progDescription" required placeholder="e.g., Bachelor of Science in Computer Science"></div>
+                    <div class="form-group"><label>Category</label><select id="progCategory" required><option value="Undergraduate">Undergraduate</option><option value="Postgraduate">Postgraduate</option><option value="Diploma">Diploma</option><option value="Certificate">Certificate</option></select></div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn-add" onclick="saveProgramme()">Save</button><button class="btn-delete" onclick="closeProgrammeModal()">Cancel</button></div>
+        </div>
+    </div>
+
+    <!-- Stages Modal -->
+    <div id="stagesModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header"><h3 id="stagesModalTitle">Programme Stages</h3><span class="close-modal" onclick="closeStagesModal()">&times;</span></div>
+            <div class="modal-body">
+                <div style="margin-bottom: 1rem;"><button class="btn-add" onclick="openStageModal()"><i class="fas fa-plus"></i> Add Stage</button></div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th>Stage Code</th><th>Description</th><th>Student Count</th><th>Actions</th></tr></thead>
+                        <tbody id="stagesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="btn-delete" onclick="closeStagesModal()">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Stage Form Modal -->
+    <div id="stageFormModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="stageModalTitle">Add Stage</h3><span class="close-modal" onclick="closeStageFormModal()">&times;</span></div>
+            <div class="modal-body">
+                <form id="stageForm">
+                    <input type="hidden" id="stageProgrammeCode">
+                    <div class="form-group"><label>Stage Code</label><input type="text" id="stageCode" required placeholder="e.g., Y1S1, Y2S2"></div>
+                    <div class="form-group"><label>Description</label><input type="text" id="stageDesc" required placeholder="e.g., Year 1 Semester 1"></div>
+                    <div class="form-group"><label>Student Count</label><input type="number" id="stageStudentCount" required></div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn-add" onclick="saveStage()">Save</button><button class="btn-delete" onclick="closeStageFormModal()">Cancel</button></div>
+        </div>
+    </div>
+
+    <!-- Units Modal -->
+    <div id="unitsModal" class="modal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header"><h3 id="unitsModalTitle">Stage Units</h3><span class="close-modal" onclick="closeUnitsModal()">&times;</span></div>
+            <div class="modal-body">
+                <div style="margin-bottom: 1rem;"><button class="btn-add" onclick="openUnitModal()"><i class="fas fa-plus"></i> Add Unit</button></div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th>Unit Code</th><th>Description</th><th>Stage Code</th><th>Students Registered</th><th>Exam Category</th><th>Programme Code</th><th>Actions</th></tr></thead>
+                        <tbody id="unitsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="btn-delete" onclick="closeUnitsModal()">Close</button></div>
+        </div>
+    </div>
+
+    <!-- Unit Form Modal -->
+    <div id="unitFormModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="unitModalTitle">Add Unit</h3><span class="close-modal" onclick="closeUnitFormModal()">&times;</span></div>
+            <div class="modal-body">
+                <form id="unitForm">
+                    <input type="hidden" id="unitStageCode"><input type="hidden" id="unitProgrammeCode">
+                    <div class="form-group"><label>Unit Code</label><input type="text" id="unitCode" required placeholder="e.g., ICS 1101"></div>
+                    <div class="form-group"><label>Description</label><input type="text" id="unitDesc" required placeholder="e.g., Programming Fundamentals"></div>
+                    <div class="form-group"><label>Students Registered</label><input type="number" id="unitStudents" required></div>
+                    <div class="form-group"><label>Exam Category</label><select id="unitExamCategory" required><option value="DEGREE">Degree</option><option value="DIPLOMA">Diploma</option><option value="CERTIFICATE">Certificate</option></select></div>
+                </form>
+            </div>
+            <div class="modal-footer"><button class="btn-add" onclick="saveUnit()">Save</button><button class="btn-delete" onclick="closeUnitFormModal()">Cancel</button></div>
+        </div>
+    </div>
+
+    <!-- Students Modal -->
+    <div id="studentsModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header"><h3 id="studentsModalTitle">Student List</h3><span class="close-modal" onclick="closeStudentsModal()">&times;</span></div>
+            <div class="modal-body">
+                <div class="filter-group" style="margin-bottom: 1rem;"><input type="text" id="studentSearch" class="search-box" placeholder="Search students..." onkeyup="filterStudentList()"></div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th>Reg. Transaction ID</th><th>Student No.</th><th>Student Name</th></tr></thead>
+                        <tbody id="studentsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer"><button class="btn-delete" onclick="closeStudentsModal()">Close</button></div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DUMMY DATA ====================
+        // Programmes: Code, Description, Category, Students Registered
+        let programmesData = [
+            { id: 1, code: "BSCS", description: "Bachelor of Science in Computer Science", category: "Undergraduate", students: 456 },
+            { id: 2, code: "BScIT", description: "Bachelor of Science in Information Technology", category: "Undergraduate", students: 389 },
+            { id: 3, code: "BED", description: "Bachelor of Education (ICT)", category: "Undergraduate", students: 234 },
+            { id: 4, code: "DCS", description: "Diploma in Computer Science", category: "Diploma", students: 178 },
+            { id: 5, code: "MSCS", description: "Master of Science in Computer Science", category: "Postgraduate", students: 45 }
+        ];
+
+        // Stages: Code, Description, Student Count
+        let stagesData = [
+            { id: 1, programmeCode: "BSCS", code: "Y1S1", description: "Year 1 Semester 1", studentCount: 120 },
+            { id: 2, programmeCode: "BSCS", code: "Y1S2", description: "Year 1 Semester 2", studentCount: 118 },
+            { id: 3, programmeCode: "BSCS", code: "Y2S1", description: "Year 2 Semester 1", studentCount: 115 },
+            { id: 4, programmeCode: "BSCS", code: "Y2S2", description: "Year 2 Semester 2", studentCount: 103 },
+            { id: 5, programmeCode: "BScIT", code: "Y1S1", description: "Year 1 Semester 1", studentCount: 98 },
+            { id: 6, programmeCode: "BScIT", code: "Y1S2", description: "Year 1 Semester 2", studentCount: 95 },
+            { id: 7, programmeCode: "DCS", code: "Y1S1", description: "Year 1 Semester 1", studentCount: 90 },
+            { id: 8, programmeCode: "DCS", code: "Y1S2", description: "Year 1 Semester 2", studentCount: 88 }
+        ];
+
+        // Units: Unit Code, Description, Stage Code, Students Registered, Exam Category, Programme Code
+        let unitsData = [
+            { id: 1, unitCode: "ICS 1101", description: "Programming Fundamentals", stageCode: "Y1S1", studentsRegistered: 120, examCategory: "DEGREE", programmeCode: "BSCS" },
+            { id: 2, unitCode: "ICS 1102", description: "Discrete Mathematics", stageCode: "Y1S1", studentsRegistered: 118, examCategory: "DEGREE", programmeCode: "BSCS" },
+            { id: 3, unitCode: "ICS 1103", description: "Computer Organization", stageCode: "Y1S1", studentsRegistered: 115, examCategory: "DEGREE", programmeCode: "BSCS" },
+            { id: 4, unitCode: "ICS 1201", description: "Object Oriented Programming", stageCode: "Y1S2", studentsRegistered: 110, examCategory: "DEGREE", programmeCode: "BSCS" },
+            { id: 5, unitCode: "ICS 2101", description: "Data Structures", stageCode: "Y2S1", studentsRegistered: 108, examCategory: "DEGREE", programmeCode: "BSCS" },
+            { id: 6, unitCode: "BIT 1101", description: "Introduction to IT", stageCode: "Y1S1", studentsRegistered: 98, examCategory: "DEGREE", programmeCode: "BScIT" },
+            { id: 7, unitCode: "DCS 1101", description: "Computer Applications", stageCode: "Y1S1", studentsRegistered: 90, examCategory: "DIPLOMA", programmeCode: "DCS" }
+        ];
+
+        // Students: Reg. Transaction ID, Student No.
+        let studentsData = [
+            { regId: "REG2024001", studentNo: "SE217/2000/2022", name: "John Kamau", programmeCode: "BSCS", stageCode: "Y1S1" },
+            { regId: "REG2024002", studentNo: "SE217/2000/2023", name: "Mary Wanjiku", programmeCode: "BSCS", stageCode: "Y1S1" },
+            { regId: "REG2024003", studentNo: "SE217/2000/2024", name: "Peter Omondi", programmeCode: "BSCS", stageCode: "Y1S1" },
+            { regId: "REG2024004", studentNo: "SE217/2000/2025", name: "Sarah Muthoni", programmeCode: "BSCS", stageCode: "Y1S2" },
+            { regId: "REG2024005", studentNo: "SE217/2000/2026", name: "James Otieno", programmeCode: "BSCS", stageCode: "Y2S1" },
+            { regId: "REG2024006", studentNo: "BIT/2000/2022", name: "Alice Njeri", programmeCode: "BScIT", stageCode: "Y1S1" },
+            { regId: "REG2024007", studentNo: "BIT/2000/2023", name: "Brian Kipchoge", programmeCode: "BScIT", stageCode: "Y1S1" },
+            { regId: "REG2024008", studentNo: "DCS/2000/2022", name: "Catherine Mwende", programmeCode: "DCS", stageCode: "Y1S1" }
+        ];
+
+        let lecturersData = [
+            { pf_no: "TTU0001", name: "Dr. Jane Mwangi", email: "j.mwangi@ttu.ac.ke", units: 3, submitted: 2, total: 3 },
+            { pf_no: "TTU0002", name: "Prof. John Otieno", email: "j.otieno@ttu.ac.ke", units: 4, submitted: 4, total: 4 }
+        ];
+
+        let submissionsData = [
+            { code: "ICS 1101", name: "Programming Fundamentals", programme: "BSCS", stage: "Y1S1", lecturer: "Dr. Jane Mwangi", status: "submitted", progress: 100 },
+            { code: "ICS 1102", name: "Discrete Mathematics", programme: "BSCS", stage: "Y1S1", lecturer: "Prof. John Otieno", status: "submitted", progress: 100 },
+            { code: "ICS 2101", name: "Data Structures", programme: "BSCS", stage: "Y2S1", lecturer: "Dr. Sarah Wanjiku", status: "pending", progress: 65 }
+        ];
+
+        let currentProgramme = null;
+        let currentStage = null;
+        let currentStudentList = [];
+        let programmeSortColumn = 'code';
+        let programmeSortDirection = 'asc';
+
+        function init() {
+            updateDashboardStats();
+            renderProgrammes();
+            renderLecturers();
+            renderSubmissions();
+            setupEventListeners();
+            populateStageFilters();
+        }
+
+        function updateDashboardStats() {
+            document.getElementById('totalProgrammes').textContent = programmesData.length;
+            document.getElementById('totalLecturers').textContent = lecturersData.length;
+            document.getElementById('totalUnits').textContent = unitsData.length;
+            const totalStudents = programmesData.reduce((sum, p) => sum + p.students, 0);
+            document.getElementById('totalStudents').textContent = totalStudents;
+        }
+
+        // ==================== PROGRAMMES CRUD ====================
+        function sortProgrammes(column) {
+            if (programmeSortColumn === column) programmeSortDirection = programmeSortDirection === 'asc' ? 'desc' : 'asc';
+            else { programmeSortColumn = column; programmeSortDirection = 'asc'; }
+            renderProgrammes();
+        }
+
+        function renderProgrammes() {
+            let filtered = [...programmesData];
+            const searchTerm = document.getElementById('programmeSearch')?.value.toLowerCase() || '';
+            if (searchTerm) filtered = filtered.filter(p => p.code.toLowerCase().includes(searchTerm) || p.description.toLowerCase().includes(searchTerm));
+            
+            filtered.sort((a, b) => {
+                let aVal = a[programmeSortColumn], bVal = b[programmeSortColumn];
+                if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+                if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+                if (aVal < bVal) return programmeSortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return programmeSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            const tbody = document.getElementById('programmesTableBody');
+            tbody.innerHTML = filtered.map(p => `<tr><td><strong>${p.code}</strong></td><td>${p.description}</td><td><span class="badge badge-info">${p.category}</span></td><td class="student-count" onclick="viewProgrammeStudents('${p.code}')">${p.students}</td><td><button class="btn-sm btn-edit" onclick="editProgramme(${p.id})"><i class="fas fa-edit"></i></button> <button class="btn-sm btn-delete" onclick="deleteProgramme(${p.id})"><i class="fas fa-trash"></i></button> <button class="btn-sm btn-add" onclick="viewStages('${p.code}')"><i class="fas fa-layer-group"></i> Stages</button></td></tr>`).join('');
+        }
+
+        function openProgrammeModal(programme = null) {
+            document.getElementById('programmeModalTitle').textContent = programme ? 'Edit Programme' : 'Add Programme';
+            document.getElementById('programmeId').value = programme?.id || '';
+            document.getElementById('progCode').value = programme?.code || '';
+            document.getElementById('progDescription').value = programme?.description || '';
+            document.getElementById('progCategory').value = programme?.category || 'Undergraduate';
+            document.getElementById('programmeModal').style.display = 'block';
+        }
+
+        function editProgramme(id) { openProgrammeModal(programmesData.find(p => p.id === id)); }
+        
+        function saveProgramme() {
+            const id = document.getElementById('programmeId').value;
+            const code = document.getElementById('progCode').value;
+            const description = document.getElementById('progDescription').value;
+            const category = document.getElementById('progCategory').value;
+            if (id) {
+                const index = programmesData.findIndex(p => p.id === parseInt(id));
+                if (index !== -1) programmesData[index] = { ...programmesData[index], code, description, category };
+            } else {
+                programmesData.push({ id: Math.max(...programmesData.map(p => p.id)) + 1, code, description, category, students: 0 });
+            }
+            renderProgrammes(); updateDashboardStats(); closeProgrammeModal();
+        }
+
+        function deleteProgramme(id) {
+            if (confirm('Delete this programme? This will delete all associated stages and units.')) {
+                programmesData = programmesData.filter(p => p.id !== id);
+                renderProgrammes(); updateDashboardStats();
+            }
+        }
+        function closeProgrammeModal() { document.getElementById('programmeModal').style.display = 'none'; }
+        function viewProgrammeStudents(programmeCode) { showStudents(studentsData.filter(s => s.programmeCode === programmeCode), `${programmeCode} - Student List`); }
+
+        // ==================== STAGES CRUD ====================
+        function viewStages(programmeCode) {
+            currentProgramme = programmeCode;
+            const stages = stagesData.filter(s => s.programmeCode === programmeCode);
+            document.getElementById('stagesModalTitle').textContent = `${programmeCode} - Stages`;
+            document.getElementById('stagesTableBody').innerHTML = stages.map(s => `<tr class="clickable-row" onclick="viewUnits('${s.code}', '${s.programmeCode}')"><td><strong>${s.code}</strong></td><td>${s.description}</td><td class="student-count" onclick="event.stopPropagation(); viewStageStudents('${s.programmeCode}', '${s.code}')">${s.studentCount}</td><td><button class="btn-sm btn-edit" onclick="event.stopPropagation(); editStage(${s.id})"><i class="fas fa-edit"></i></button> <button class="btn-sm btn-delete" onclick="event.stopPropagation(); deleteStage(${s.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+            document.getElementById('stagesModal').style.display = 'block';
+        }
+
+        function openStageModal(stage = null) {
+            document.getElementById('stageProgrammeCode').value = currentProgramme;
+            document.getElementById('stageModalTitle').textContent = stage ? 'Edit Stage' : 'Add Stage';
+            document.getElementById('stageCode').value = stage?.code || '';
+            document.getElementById('stageDesc').value = stage?.description || '';
+            document.getElementById('stageStudentCount').value = stage?.studentCount || 0;
+            if (stage) document.getElementById('stageFormModal').dataset.editId = stage.id;
+            else delete document.getElementById('stageFormModal').dataset.editId;
+            document.getElementById('stageFormModal').style.display = 'block';
+        }
+
+        function editStage(id) { openStageModal(stagesData.find(s => s.id === id)); }
+        
+        function saveStage() {
+            const programmeCode = document.getElementById('stageProgrammeCode').value;
+            const code = document.getElementById('stageCode').value;
+            const description = document.getElementById('stageDesc').value;
+            const studentCount = parseInt(document.getElementById('stageStudentCount').value);
+            const editId = document.getElementById('stageFormModal').dataset.editId;
+            if (editId) {
+                const index = stagesData.findIndex(s => s.id === parseInt(editId));
+                if (index !== -1) stagesData[index] = { ...stagesData[index], code, description, studentCount };
+            } else {
+                stagesData.push({ id: Math.max(...stagesData.map(s => s.id), 0) + 1, programmeCode, code, description, studentCount });
+            }
+            viewStages(programmeCode); closeStageFormModal();
+        }
+
+        function deleteStage(id) {
+            if (confirm('Delete this stage?')) { stagesData = stagesData.filter(s => s.id !== id); viewStages(currentProgramme); }
+        }
+        function closeStagesModal() { document.getElementById('stagesModal').style.display = 'none'; }
+        function closeStageFormModal() { document.getElementById('stageFormModal').style.display = 'none'; }
+        function viewStageStudents(programmeCode, stageCode) { showStudents(studentsData.filter(s => s.programmeCode === programmeCode && s.stageCode === stageCode), `${stageCode} - Student List`); }
+
+        // ==================== UNITS CRUD ====================
+        function viewUnits(stageCode, programmeCode) {
+            currentStage = { code: stageCode, programmeCode };
+            const units = unitsData.filter(u => u.stageCode === stageCode && u.programmeCode === programmeCode);
+            document.getElementById('unitsModalTitle').textContent = `${stageCode} - Units`;
+            document.getElementById('unitsTableBody').innerHTML = units.map(u => `<tr><td><strong>${u.unitCode}</strong></td><td>${u.description}</td><td>${u.stageCode}</td><td class="student-count" onclick="viewUnitStudents('${u.unitCode}')">${u.studentsRegistered}</td><td><span class="badge badge-info">${u.examCategory}</span></td><td>${u.programmeCode}</td><td><button class="btn-sm btn-edit" onclick="editUnit(${u.id})"><i class="fas fa-edit"></i></button> <button class="btn-sm btn-delete" onclick="deleteUnit(${u.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+            document.getElementById('unitsModal').style.display = 'block';
+        }
+
+        function openUnitModal(unit = null) {
+            document.getElementById('unitStageCode').value = currentStage.code;
+            document.getElementById('unitProgrammeCode').value = currentStage.programmeCode;
+            document.getElementById('unitModalTitle').textContent = unit ? 'Edit Unit' : 'Add Unit';
+            document.getElementById('unitCode').value = unit?.unitCode || '';
+            document.getElementById('unitDesc').value = unit?.description || '';
+            document.getElementById('unitStudents').value = unit?.studentsRegistered || 0;
+            document.getElementById('unitExamCategory').value = unit?.examCategory || 'DEGREE';
+            if (unit) document.getElementById('unitFormModal').dataset.editId = unit.id;
+            else delete document.getElementById('unitFormModal').dataset.editId;
+            document.getElementById('unitFormModal').style.display = 'block';
+        }
+
+        function editUnit(id) { openUnitModal(unitsData.find(u => u.id === id)); }
+        
+        function saveUnit() {
+            const stageCode = document.getElementById('unitStageCode').value;
+            const programmeCode = document.getElementById('unitProgrammeCode').value;
+            const unitCode = document.getElementById('unitCode').value;
+            const description = document.getElementById('unitDesc').value;
+            const studentsRegistered = parseInt(document.getElementById('unitStudents').value);
+            const examCategory = document.getElementById('unitExamCategory').value;
+            const editId = document.getElementById('unitFormModal').dataset.editId;
+            if (editId) {
+                const index = unitsData.findIndex(u => u.id === parseInt(editId));
+                if (index !== -1) unitsData[index] = { ...unitsData[index], unitCode, description, studentsRegistered, examCategory };
+            } else {
+                unitsData.push({ id: Math.max(...unitsData.map(u => u.id), 0) + 1, unitCode, description, stageCode, studentsRegistered, examCategory, programmeCode });
+            }
+            viewUnits(stageCode, programmeCode); closeUnitFormModal();
+        }
+
+        function deleteUnit(id) {
+            if (confirm('Delete this unit?')) { unitsData = unitsData.filter(u => u.id !== id); viewUnits(currentStage.code, currentStage.programmeCode); }
+        }
+        function closeUnitsModal() { document.getElementById('unitsModal').style.display = 'none'; }
+        function closeUnitFormModal() { document.getElementById('unitFormModal').style.display = 'none'; }
+        function viewUnitStudents(unitCode) {
+            const unit = unitsData.find(u => u.unitCode === unitCode);
+            showStudents(studentsData.filter(s => s.programmeCode === unit?.programmeCode && s.stageCode === unit?.stageCode), `${unitCode} - Student List`);
+        }
+
+        // ==================== STUDENTS ====================
+        function showStudents(students, title) {
+            currentStudentList = students;
+            document.getElementById('studentsModalTitle').textContent = `${title} (${students.length} students)`;
+            document.getElementById('studentsTableBody').innerHTML = students.map(s => `<tr><td>${s.regId}</td><td>${s.studentNo}</td><td>${s.name}</td></tr>`).join('');
+            document.getElementById('studentsModal').style.display = 'block';
+        }
+
+        function filterStudentList() {
+            const searchTerm = document.getElementById('studentSearch')?.value.toLowerCase() || '';
+            const filtered = currentStudentList.filter(s => s.regId.toLowerCase().includes(searchTerm) || s.studentNo.toLowerCase().includes(searchTerm) || s.name.toLowerCase().includes(searchTerm));
+            document.getElementById('studentsTableBody').innerHTML = filtered.map(s => `<tr><td>${s.regId}</td><td>${s.studentNo}</td><td>${s.name}</td></tr>`).join('');
+        }
+        function closeStudentsModal() { document.getElementById('studentsModal').style.display = 'none'; document.getElementById('studentSearch').value = ''; }
+
+        // ==================== LECTURERS & SUBMISSIONS ====================
+        function renderLecturers() {
+            const tbody = document.getElementById('lecturersTableBody');
+            const searchTerm = document.getElementById('lecturerSearch')?.value.toLowerCase() || '';
+            let filtered = lecturersData.filter(l => l.name.toLowerCase().includes(searchTerm) || l.pf_no.toLowerCase().includes(searchTerm));
+            tbody.innerHTML = filtered.map(l => `<tr><td>${l.pf_no}</td><td><strong>${l.name}</strong></td><td>${l.email}</td><td>${l.units}</td><td><div class="progress-bar"><div class="progress-fill" style="width: ${(l.submitted/l.total)*100}%"></div></div><small>${l.submitted}/${l.total} units</small></td><td><button class="badge badge-info" onclick="alert('Lecturer: ${l.name}\nUnits: ${l.units}')">View Units</button></td></tr>`).join('');
+        }
+
+        function renderSubmissions() {
+            const filterProgramme = document.getElementById('filterProgramme')?.value || '';
+            const filterStage = document.getElementById('filterStage')?.value || '';
+            let filtered = [...submissionsData];
+            if (filterProgramme) filtered = filtered.filter(u => u.programme === filterProgramme);
+            if (filterStage) filtered = filtered.filter(u => u.stage === filterStage);
+            
+            const submitted = filtered.filter(u => u.status === 'submitted').length;
+            const pending = filtered.filter(u => u.status === 'pending').length;
+            const overdue = filtered.filter(u => u.status === 'overdue').length;
+            const total = filtered.length;
+            
+            document.getElementById('submittedUnits').textContent = submitted;
+            document.getElementById('pendingUnits').textContent = pending;
+            document.getElementById('overdueUnits').textContent = overdue;
+            document.getElementById('submissionRate').textContent = total > 0 ? Math.round((submitted / total) * 100) + '%' : '0%';
+            
+            document.getElementById('submissionsTableBody').innerHTML = filtered.map(u => `<tr><td><strong>${u.code}</strong></td><td>${u.name}</td><td>${u.programme}</td><td>${u.stage}</td><td>${u.lecturer}</td><td><span class="badge ${u.status === 'submitted' ? 'badge-success' : 'badge-warning'}">${u.status}</span></td><td><div class="progress-bar"><div class="progress-fill" style="width: ${u.progress}%"></div></div><small>${u.progress}%</small></td></tr>`).join('');
+        }
+
+        function populateStageFilters() {
+            const stages = [...new Set(stagesData.map(s => s.code))];
+            const stageSelect = document.getElementById('filterStage');
+            stageSelect.innerHTML = '<option value="">All Stages</option>' + stages.map(s => `<option value="${s}">${s}</option>`).join('');
+            const programmeSelect = document.getElementById('filterProgramme');
+            programmeSelect.innerHTML = '<option value="">All Programmes</option>' + programmesData.map(p => `<option value="${p.code}">${p.code} - ${p.description}</option>`).join('');
+        }
+
+        function switchPage(page) {
+            const pages = ['dashboard', 'programmes', 'lecturers', 'submissions'];
+            pages.forEach(p => { document.getElementById(`${p}Page`).style.display = p === page ? 'block' : 'none'; });
+            document.querySelectorAll('.nav-item').forEach(item => { if (item.getAttribute('data-page') === page) item.classList.add('active'); else item.classList.remove('active'); });
+            document.getElementById('pageTitle').textContent = { dashboard: 'Dashboard Overview', programmes: 'Programme Management', lecturers: 'Lecturer Management', submissions: 'Marks Submission Monitoring' }[page];
+            if (page === 'submissions') renderSubmissions();
+            if (page === 'programmes') renderProgrammes();
+            if (page === 'lecturers') renderLecturers();
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.nav-item').forEach(item => { item.addEventListener('click', () => switchPage(item.getAttribute('data-page'))); });
+            document.getElementById('programmeSearch')?.addEventListener('input', () => renderProgrammes());
+            document.getElementById('lecturerSearch')?.addEventListener('input', () => renderLecturers());
+            document.getElementById('filterProgramme')?.addEventListener('change', () => renderSubmissions());
+            document.getElementById('filterStage')?.addEventListener('change', () => renderSubmissions());
+        }
+
+        function logout() { window.location.href = 'login.html'; }
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', () => { document.getElementById('sidebar').classList.toggle('mobile-open'); });
+        init();
+    </script>
+</body>
+</html>
