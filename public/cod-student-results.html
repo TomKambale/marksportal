@@ -437,6 +437,7 @@
             <a onclick="window.location.href='cod-dashboard.html'">Dashboard</a> / 
             <span>Student Semester Results</span>
         </div> -->
+        <div class="back-btn" onclick="goToDashboard()">← Back to Dashboard</div>
         <button class="logout-btn" onclick="logout()">🚪 Logout</button>
     </div>
 
@@ -452,9 +453,9 @@
             <button class="search-btn" onclick="searchStudents()">🔍 Search</button>
         </div>
         <div class="filter-group">
-            <select id="programmeFilter" class="filter-select">
+            <!-- <select id="programmeFilter" class="filter-select">
                 <option value="">All Programmes</option>
-            </select>
+            </select> -->
             <select id="yearFilter" class="filter-select">
                 <option value="">All Years</option>
                 <option value="1">Year 1</option>
@@ -609,7 +610,7 @@ const stagesData = {
 
     async function searchStudents() {
         const query = document.getElementById('searchInput').value.trim();
-        const programme = document.getElementById('programmeFilter').value;
+        // const programme = document.getElementById('programmeFilter').value;
         const year = document.getElementById('yearFilter').value;
         
         if (query.length < 2) {
@@ -878,6 +879,9 @@ const stagesData = {
             localStorage.clear();
             window.location.href = 'login.html';
         }
+    }
+    function goToDashboard() {
+        window.location.href = 'cod-dashboard.html';
     }
 
     function escapeHtml(str) {

@@ -423,7 +423,7 @@ app.get('/api/admin/users', async (req, res) => {
                 return res.status(403).json({ success: false, error: 'Admin access required' });
             }
             
-            const sql = 'SELECT id, email, pf_number, full_name, role, status, created_at FROM users ORDER BY id DESC';
+            const sql = 'SELECT id, email, pf_number, full_name, role, status, created_at, last_login FROM users ORDER BY id DESC';
             db.query(sql, (err, users) => {
                 if (err) {
                     return res.status(500).json({ success: false, error: 'Database error' });

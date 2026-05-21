@@ -489,6 +489,7 @@
                 <th>Role</th>
                 <th>Status</th>
                 <th>Created At</th>
+                <th>Last Login</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -668,6 +669,13 @@
                 <td><span class="role-badge role-${user.role}">${user.role.toUpperCase()}</span></td>
                 <td><span class="status-badge status-${user.status}">${user.status.toUpperCase()}</span></td>
                 <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                <td>
+  ${
+    user.last_login
+      ? new Date(user.last_login).toLocaleString()
+      : "Never"
+  }
+</td>
                 <td>
     <button class="action-btn edit-btn" onclick="editUser(${user.id})" title="Edit User">
         <i class="fa-solid fa-user-pen"></i>
