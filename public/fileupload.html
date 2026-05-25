@@ -565,9 +565,9 @@
         </div>
 
         <div class="btn-group" style="justify-content: flex-end; margin-top: 1.25rem;">
-            <button class="btn btn-outline" id="previewErpBtn">
+            <!-- <button class="btn btn-outline" id="previewErpBtn">
                 <i class="fas fa-search"></i> Preview ERP JSON
-            </button>
+            </button> -->
             <button class="btn btn-outline" id="viewHistoryBtn">
                 <i class="fas fa-history"></i> Upload History
             </button>
@@ -703,7 +703,7 @@
     const downloadBtn = document.getElementById('downloadTemplateBtn');
     const sampleBtn = document.getElementById('sampleDataBtn');
     const clearBtn = document.getElementById('clearDataBtn');
-    const previewErpBtn = document.getElementById('previewErpBtn');
+    // const previewErpBtn = document.getElementById('previewErpBtn');
     const pushToErpBtn = document.getElementById('pushToErpBtn');
     const viewHistoryBtn = document.getElementById('viewHistoryBtn');
     const erpPreviewContainer = document.getElementById('erpPreviewContainer');
@@ -1516,7 +1516,7 @@
     downloadBtn.addEventListener('click', downloadTemplate);
     sampleBtn.addEventListener('click', loadSampleData);
     clearBtn.addEventListener('click', clearAllData);
-    previewErpBtn.addEventListener('click', showERPPreview);
+    // previewErpBtn.addEventListener('click', showERPPreview);
     pushToErpBtn.addEventListener('click', startUpload);
     viewHistoryBtn.addEventListener('click', openHistoryModalWindow);
     
